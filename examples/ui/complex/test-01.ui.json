@@ -1,0 +1,123 @@
+{
+	component: 'view',
+	width: '100%',
+	height: '100%',
+	flexible: true,
+	items: [
+		{
+			component: 'space',
+			size: 9
+		}, {
+			component: 'cardview',
+			bg: '#7C7C7C',
+			selected: 1,
+			items: [
+				{
+					component: 'html',
+					html: 'a<br/>a<br/>a<br/>a<br/>a<br/>a<br/>a<br/>a!'
+				}, {
+					component: 'html',
+					html: 'b<br/>b<br/>b<br/>b<br/>b<br/>b<br/>b<br/>b<br/>b!'
+				}, {
+					component: 'html',
+					html: 'c<br/>c<br/>c<br/>c<br/>c<br/>c<br/>c!'
+				}
+			]
+		}, {
+			component: 'space',
+			size: 9
+		}, {
+			component: 'view',
+			horizontal: true,
+			flexible: true,
+			items: [
+				{
+					component: 'view',
+					flexible: true,
+					items: [
+						{
+							component: 'view',
+							horizontal: true,
+							flexible: true,
+							items: [
+								{
+									component: 'html',
+									bg: '#5B9AA9',
+									height: '100%',
+									html: 'Improves performance of JavaScript, Top Sites, and trackpad pinch gestures. Adds faster page loading with DNS prefetching and improved page caching...'
+								}, {
+									component: 'space',
+									size: 9
+								}, {
+									component: 'html',
+									bg: '#8B5D79',
+									height: '50%',
+									width: '50%',
+									align: 'center',
+									valign: 'middle',
+									html: 'Youtube'
+								}
+							]
+						}, {
+							component: 'space',
+							size: 9
+						}, {
+							component: 'html',
+							bg: '#DD8650',
+							height: '100%',
+							html: 'Weather'
+						}
+					]
+				}, {
+					component: 'space',
+					size: 9
+				}, {
+					component: 'video',
+					type: 'youtube',
+					cover: '',
+					src: 'k0PduP7PXx0'
+				}, {
+					component: 'space',
+					size: 9
+				}, {
+					component: 'view',
+					flexible: true,
+					items: [
+						{
+							component: 'html',
+							bg: '#5B9AA9',
+							height: '100%',
+							html: 'New Messages'
+						}, {
+							component: 'space',
+							size: 9
+						}, {
+							component: 'view',
+							horizontal: true,
+							flexible: true,
+							items: [
+								{
+									component: 'html',
+									bg: '#1F7E5C',
+									height: '100%',
+									html: 'Messages'
+								}, {
+									component: 'space',
+									size: 9
+								}, {
+									component: 'html',
+									bg: '#232323',
+									height: '100%',
+									html: 'Settings'
+								}
+							]
+						}
+					]
+				}
+			]
+		}, {
+			component: 'space',
+			size: 9
+		}
+	]
+}

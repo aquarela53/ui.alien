@@ -1,0 +1,17 @@
+{
+	"name": "test",
+	"description": "테스트 모듈",
+	"author": {
+		"name": "joje",
+		"email": "joje.attrs@gmail.com",
+		"url": "https://github.com/joje6"
+	},
+	"version": "1.0.0",
+	"model": 1,
+	"main": "frame.js",
+
+	"ui": [
+		"frame.ui.json",
+		"component.editor.ui.json"
+	]
+}

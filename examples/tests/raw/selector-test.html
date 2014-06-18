@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="Shop API">
+		<title>selector test</title>
+		<script type="text/javascript">
+			
+			window.onload = function() {
+				var a = document.getElementById('a');
+				console.log('document.getElementById(\'a\')', a);
+
+				var b = document.getElementById('b');				
+				console.log('document.getElementById(\'b\')', b);
+
+				var a2 = b.querySelector('#a');				
+				console.log('b.querySelector(\'#a\')', a2);
+
+				var c = document.createElement('div');
+				c.id = 'c';
+				console.log('document.createElement(\'div\')', c);
+
+				var fc = document.getElementById('c');
+				console.log('document.getElementById(\'c\')', fc);
+
+				document.body.appendChild(c);
+				fc = document.getElementById('c');
+				console.log('document.getElementById(\'c\')', fc);
+			};
+		</script>
+	</head>
+	<body>
+		<div id="a">
+			<div id="a1">
+			</div>
+		</div>
+
+		<div id="b">
+			<span id="a">
+			</span>
+		</div>
+	</body>
+</html>

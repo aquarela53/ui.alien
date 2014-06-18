@@ -1,0 +1,129 @@
+{
+	$: 'View',
+	c: [
+		{
+			$: 'View',
+			c: [
+				{
+					$: 'FieldSet',
+					title: '기본정보',
+					margin: 5,
+					css: 'bordered',
+					collapsible: false,
+					style_: {
+						'background-color': 'rgb(36, 36, 38)',
+						'border': '1px solid rgb(55, 55, 55)'
+					},
+					c: [
+						{
+							$: 'Field',
+							label: '제목',
+							type: 'text'
+						}, {
+							$: 'Field',
+							label: '제목',
+							type: 'text'
+						}, {
+							$: 'Field',
+							label: '카테고리',
+							type: {
+								$: 'Button',
+								text: '카테고리 선택하기',
+								e: {
+									action: function(e) {
+									}
+								}
+							}
+						}, {
+							$: 'HTML',
+							css: 'text-center text-shadowtext',
+							margin: '10px 0',
+							html: '기본정보를 입력해주세요.'
+						}
+					]
+				}, {
+					$: 'TabView',
+					style: {
+						'margin': 5,
+						'margin-bottom': 0
+					},
+					c: [
+						{
+							$: 'View',
+							title: '기타',
+							c: {
+								$: 'FieldSet',
+								margin: 5,
+								collapsible: true,
+								c: [
+									{
+										$: 'Field',
+										label: '연락처',
+										type: 'text'
+									}, {
+										$: 'Field',
+										label: '주소',
+										type: 'text'
+									}, {
+										$: 'HTML',
+										css: 'text-center text-lightshadow',
+										margin: '10px 0',
+										html: '주소와 연락처를 입력해주세요.'
+									}
+								]
+							}
+						}, {
+							$: 'View',
+							title: '이미지',
+							c: {
+								$: 'FieldSet',
+								margin: 5,
+								collapsible: true,
+								c: [
+									{
+										$: 'Field',
+										label: '이미지',
+										type: 'text'
+									}, {
+										$: 'HTML',
+										css: 'text-center text-lightshadow',
+										margin: '10px 0',
+										html: '이미지 파일은 jpeg 파일만 가능합니다. (512x512 이하)'
+									}
+								]
+							}
+						}
+					]
+				}
+			]
+		}, {
+			$: 'Bar',
+			c: [
+				{
+					$: 'Button',
+					text: '등록하기',
+					align: 'right',
+					e: {
+						action: function(e) {
+						}
+					}
+				}, {
+					$: 'Button',
+					text: '닫기',
+					align: 'right',
+					e: {
+						action: function(e) {
+							var btn = e.src;
+							var app = btn.getParent(Appbus.Application);
+							//console.log('application', app);
+							var win = btn.getWindow();
+							//console.log('window', win);
+
+							if( win ) win.close();
+						}
+					}
+				}
+			]
+		}
+	]
+}

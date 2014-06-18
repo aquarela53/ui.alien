@@ -1,0 +1,98 @@
+context 에 대해.
+
+- Context
+ Context 는 하나의 개별 논리 UI 집합으로써 각 context 는 완전히 개별적으로 작동된다.
+컨텍스트 내부의 Component, StyleSheet 등 개별적인 작동을 위해 서로 공유되지 않으며, 같은 클래스로부터 정의된 Component 라고 하더라도
+물리적으로 별개의 Component concrete 가 생성된다.
+
+'''
+var cmp = UI.Context.root().component('html');
+var cmp2 = anotherctx.component('html');
+
+cmp.concrete === cmp2.concrete
+cmp !== cmp2
+'''
+
+ Style Sheet 의 경우, 하나의 물리적 HTML 내에서 작동하므로 실질적으로는 한 페이지에 정의된 Style Sheet 의 집합에 불과하지만, 내부적으로는
+Context 의 accessor 와 Component 의 accessor 와 instance 에서 지정된 class 의 accessor 가 조합되어 분리된 스타일시트를 제공한다.
+
+- Context 의 분리
+ Context 가 분리되는 경우는 외부 UI / HTML 을 UI.Context.load('src') 를 통해 로드했을 경우이다.
+MTL level 에서는 이런 Context 레벨의 load가 일어나는 경우는 <ui> 태그를 이용했을 경우이며, ui json 의 경우에서는 
+{type:'module', src: 'src'} 처럼 외부의 module 을 호출했을 경우이다.
+ 외부 모듈을 <include> 혹은 {type:'include', src: 'src'} 로 불러왔을 경우 Context 는 분리되지 않으며, 호출자의 context 에서 로딩된다.
+
+
+
+
+
+
+
+
+
+
+
+589-302867-02-101
+658064
+
+
+
+
+
+
+
+
+새희망홀씨 대출
+
+
+
+
+
+
+
+
+
+
+1577-6119
+서울신용보증재단
+
+
+
+
+Context
+	Component
+	Container
+	HTML
+	... etc bundle component ...
+	
+	context-1
+		Component
+		Container
+		HTML (different HTML of Context)
+		...
+	context-2
+		Component
+		Container
+		HTML (different HTML of Context)
+		CustomComponent (defined only this context)
+		...
+		
+		
+		
+Module
+	- HTML
+		- dom
+	- View
+		- Button
+		- View
+			- Module
+				- View
+				- HTML
+				- Button
+				- Module
+					- View
+					- HTML
+			- HTML
+		- Tabs
+		
+		

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="CSS Test">
+	</head>
+
+	<style>
+		* {
+			--margin: 0;
+			--padding: 0;
+		}
+
+		h3 {
+			font-size: 12px;
+			margin: 0;
+			padding: 0;
+		}
+
+		div {
+			box-sizing: border-box;
+		}
+
+		.orange {
+			background-color: #F03A37;
+		}
+
+		.blue {
+			background-color: #044B8D;
+		}
+
+		.red {
+			background-color: #BA2425;
+		}
+		
+		.green {
+			background-color: #568052;
+		}
+
+
+
+		.view {
+			display: block;
+			position: relative;
+			--border: 1px dotted black;
+		}
+
+		.view > .innerview.h {
+			display: table;
+			width: 100%;
+		}
+
+		.view > .innerview.h > .cell {
+			display: table-cell;
+			width: 1px;
+			background: #ececec;
+			--border: 1px dotted #F03A37;
+		}
+
+		.view > .innerview.h > .pad {
+		}
+		
+		.view > .innerview.h.equally > .cell {
+			width: auto;
+		}
+
+		.view > .innerview.h.equally > .pad {
+			display: none;
+		}
+
+		.entry {
+		}
+	</style>
+	<body>
+		<!-- 
+		{
+			component: 'view',
+			horizontal: true,
+			items: [
+				{
+					component: 'cmp',
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					cell: {
+						width: 100,				// cell 의 width
+						align: 'center',		// 자식노드의 margin : 0 auto
+						valign: 'middle'		// cell 의 vertical-align
+					},
+					width: 50,
+					height: 50,
+					html: 'C'
+				}, {
+					component: 'cmp',
+					cell: {
+						width: 'auto',			// cell 의 width
+					},
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					cell: {
+						width: 150,				// cell 의 width
+						height: 'auto'			// cell 의 height 가 auto 라면 매번 계산해서 새로운 높이를 스크립트로 지정*.
+					},
+					width: '100%',
+					height: '100%',
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					cell: {
+						width: 'auto',			// cell 의 width
+					},
+					html: 'Component'
+				}
+			]
+		}
+		-->
+		<h3>Horizontal View, default(with width 'auto')</h3>
+		<div class="view">
+			<div class="innerview h">
+				<div class="cell">
+					<div class="entry blue">Component<br/>Component</div>
+				</div>
+				<div class="cell" style="width:100px;vertical-align:middle;">
+					<div style="margin:0 auto;width:50px;height:50px;">
+						<div class="entry red" style="width:50px;height:50px;">C</div>
+					</div>
+				</div>
+				<div class="cell" style="width:auto;">
+					<div class="entry orange">Component</div>
+				</div>
+				<div class="cell" style="width:150px;height:100px;">
+					<div class="entry green" style="width:100%;height:100%;">Component</div>
+				</div>
+				<div class="cell" style=";">
+					<div class="entry orange">ComponentComponent</div>
+				</div>
+				<div class="pad"></div>
+			</div>
+		</div>
+	</body>
+</html>

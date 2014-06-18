@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="CSS Test">
+	</head>
+
+	<style>
+		* {
+			--margin: 0;
+			--padding: 0;
+		}
+
+		h3 {
+			font-size: 12px;
+			margin: 0;
+			padding: 0;
+		}
+
+		div {
+			box-sizing: border-box;
+		}
+
+		.orange {
+			background-color: #F03A37;
+		}
+
+		.blue {
+			background-color: #044B8D;
+		}
+
+		.red {
+			background-color: #BA2425;
+		}
+		
+		.green {
+			background-color: #568052;
+		}
+	</style>
+	<body>
+		<div style="height:100px;overflow:hidden;">
+			<div style="width:10000px;height:100%;">
+				<div class="blue" style="float:left;width:250px;height:100%;">
+					<div style="height:100px;overflow:hidden;">
+						<div style="width:10000px;height:100%;">
+							<div style="float:left;"><div class="blue" style="width:100px;height:100%;"></div></div>
+							<div style="float:left;"><div class="red" style="width:100px;height:100%;"></div></div>
+							<div style="float:left;"><div class="orange" style="width:100px;height:100%;"></div></div>
+						</div>
+					</div>
+				</div>
+				<div class="red" style="float:left;width:100px;height:100%;"></div>
+				<div class="orange" style="float:left;width:100px;height:100%;"></div>
+			</div>
+		</div>
+		<div style="height:100px;overflow:hidden;">
+			<div style="width:10000px;height:100%;">
+				<div class="orange" style="float:left;width:100px;height:100%;"></div>
+				<div class="blue" style="float:left;width:100px;height:100%;"></div>
+				<div class="red" style="float:left;width:100px;height:100%;"></div>
+			</div>
+		</div>
+	</body>
+</html>

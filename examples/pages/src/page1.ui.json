@@ -1,0 +1,104 @@
+{
+	component: 'view',
+	name: 'slot',					
+	padding: 15,
+	css: {
+		'text-align': 'center'
+	},
+	items: [
+		{
+			component: 'html',
+			html: '새로운 시대가 오고 있나요?',
+			height: 100,
+			effects: {
+				staged: [
+					{
+						duration: 0,
+						'opacity': 0.1
+					}, {
+						delay: 200,
+						duration: 750,
+						'font-size': 30,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '1. HTML5 시대가 열리고 있어, 이제는 javascript 로 뭐든지 만들 수 있어!',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '2. 훗 javascript 쯤이야! 이번 프로젝트는 자바스크립트로 고고싱!',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '3. 그리고, 서서히 드리우는 어둠의 그림자.',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			},
+			e: {
+				click: function() {
+					var root = this.context().find('root');
+					console.log('root', root);
+					
+					root.anim({
+						duration: 750,
+						color: 'white',
+						'background-color': '#555'
+					}).run();
+				}
+			}
+		}
+	]
+}
+
+/*
+새로운 시대가 오고 있나요?
+
+1. HTML5 시대가 열리고 있어, 이제는 javascript 로 뭐든지 만들 수 있어!
+
+2. 훗 javascript 쯤이야! 이번 프로젝트는 자바스크립트로 고고싱!
+
+3. 그리고, 서서히 드리우는 어둠의 그림자.
+
+(배경 회색으로 전환)
+*/

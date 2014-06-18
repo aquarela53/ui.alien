@@ -1,0 +1,27 @@
+{
+	component: 'view',
+	items: [
+		{
+			component: 'cmp',
+			name: 'cmp1',
+			classes: 'cls',
+			style: {
+			},
+			html: 'this is list cmp1'
+		}, {
+			component: 'cmp',
+			name: 'cmp2',
+			classes: 'cls',
+			style: {
+			},
+			html: 'this is list cmp2'
+		}, {
+			component: 'cmp',
+			name: 'cmp3',
+			classes: 'cls',
+			style: {
+			},
+			html: 'this is list cmp3'
+		}
+	]
+}

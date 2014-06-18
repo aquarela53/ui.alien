@@ -1,0 +1,138 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="class system 2">
+		<title>class system 2</title>
+		
+		<script type="text/javascript" src="js/Appbus.Class.js"></script>
+		<script type="text/javascript">
+			Protocol.define('IUIComponent', {
+				attach: 1
+			});
+			
+			console.log(' -- P class --------------------------------------------');
+			Class.define('P', function() {
+				this.value = 'this is P.static';
+
+				function P(options) {
+					//console.log('P.init', this, options);
+					this.options = options;
+				}
+
+				function method() {
+					console.log('this is parent method', arguments, this);
+					return this.options;
+				}
+
+				return {
+					$protocols: IUIComponent,
+					value: 'parent',
+					p: 'p value',
+					attach: function(el){},
+					initializer: P,
+					method: method,
+					$abstract: {
+						build: true
+					}
+				};
+			});
+			
+			console.log(' -- P instance -----------------------------------------');
+			var p = new P({test:111});
+			
+			console.log(' -- C class --------------------------------------------');
+			var C = P.inherit(function($super) {
+				// static
+				this.value = 'this is static';
+				this.set = function(value) {
+					this.value = value;
+				};
+				this.get = function() {
+					return this.value;
+				};
+
+				// private
+				var cmps = {};
+				function C(options) {
+					//console.log('C.init', this, $super, ($super === this._super), options);
+					$super.initializer.apply(this, options);
+
+					this.el = document.createElement('div');
+					this.el.style = 'background:rgba(255,0,0,0.2)';
+					this.el.className = 'view';
+				}
+
+				function method() {
+					console.log('this is child method', arguments, this);
+					return this.$super(arguments[0]);
+				}
+
+				function build() {
+				}
+
+				function add() {
+					cmps.push();
+				}
+
+				function _add() {
+				}
+				
+				// export to public
+				return {
+					$: {
+						static2: 'static2',
+						print: function() {
+							console.log(this.static2);
+							return 'OK';
+						}
+					},
+					child: 'c value',
+					value: 'child',
+					method: method,
+					initializer: C,
+					build: build,
+					add: add
+				};
+			});
+
+			console.log(' -- C instance -----------------------------------------');
+			var c = new C({c:2232});
+			console.dir(c);
+
+			console.log('c.method', c.method('test'));
+			
+			if( false ) {
+				console.log('C.value', C.value);
+				C.set('test');
+				console.log('C.get()', C.get());
+				console.log('C.attrs', C.attrs);
+				console.log('P.attrs', P.attrs);
+				console.log('C.print', C.print());
+				
+				
+				console.log(JSON.stringify(c));
+			}
+
+			
+
+			var test = function() {	
+				var starttime = new Date().getTime();
+				console.log('- start ------------------------------------------------');
+				starttime = new Date().getTime();
+				for(var i=0; i < 10000; i++) {
+					var instance = new C({
+						id: 'view' + i	
+					});
+				}
+				console.log('- ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+			};
+
+			test();
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

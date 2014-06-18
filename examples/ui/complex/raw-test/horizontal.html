@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="CSS Test">
+	</head>
+
+	<style>
+		* {
+			--margin: 0;
+			--padding: 0;
+		}
+
+		h3 {
+			font-size: 12px;
+			margin: 0;
+			padding: 0;
+		}
+
+		div {
+			box-sizing: border-box;
+		}
+
+		.orange {
+			background-color: #F03A37;
+		}
+
+		.blue {
+			background-color: #044B8D;
+		}
+
+		.red {
+			background-color: #BA2425;
+		}
+		
+		.green {
+			background-color: #568052;
+		}
+
+
+
+
+		.view {
+			display: block;
+			border: 3px dotted black;
+		}
+
+		.view > .innerview.h {
+			display: table;
+			width: 100%;
+		}
+
+		.view > .innerview.h > .cell {
+			display: table-cell;
+			position: relative;
+			width: 1px;
+			background: #ececec;
+		}
+
+		.view > .innerview.h > .fit {
+			width: auto;
+		}
+
+		.entry {
+		}
+	</style>
+	<body>
+		<!-- 
+		{
+			component: 'view',
+			horizontal: true,
+			items: [
+				{
+					component: 'cmp',
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					html: 'Component'
+				}
+			]
+		}
+		-->
+		<h3>Horizontal View, default</h3>
+		<div class="view" style="border: 3px dotted black;">
+			<div class="innerview h">
+				<div class="cell">
+					<div class="entry blue">Component</div>
+				</div>
+				<div class="cell">
+					<div class="entry red">Component</div>
+				</div>
+				<div class="cell">
+					<div class="entry green">Component</div>
+				</div>
+				<div class="cell fit"></div>
+			</div>
+		</div>
+
+		<br/><br/>
+
+		<!-- 
+		{
+			component: 'view',
+			horizontal: true,
+			equally: true,
+			items: [
+				{
+					component: 'cmp',
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					html: 'Component'
+				}
+			]
+		}
+		-->
+		<h3>Horizontal View, equally</h3>
+		<div class="view" style="border: 3px dotted black;">
+			<div class="innerview h">
+				<div class="cell">
+					<div class="entry blue">Component</div>
+				</div>
+				<div class="cell">
+					<div class="entry red">Component</div>
+				</div>
+				<div class="cell">
+					<div class="entry green">Component</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

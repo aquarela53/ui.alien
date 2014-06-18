@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="attrs.ui examples - Lab">
+		
+		<!-- attrs.ui initial paramters -->
+		<meta name="attrs.ui.tagsupport" content="true">
+		<meta name="attrs.ui.debug" content="false">
+		<meta name="attrs.ui.debug.mutation" content="false">
+		
+		<title>build.json</title>
+
+		<script type="text/javascript" src="../../../dist/ui.js"></script>
+		
+		<script type="text/javascript">
+		//<![CDATA[			
+			var UI = require('ui').context();
+			var $ = require('dom');
+			
+			$.ready(function() {				
+				var ui = {
+					component: 'view',
+					direction: 'horizontal',
+					items: [
+						{
+							component: 'html',
+							name: 'test',
+							classes: 'cls1 cls2',
+							theme: 'ios',
+							title: 'title',
+							html: 'html contents'
+						}, {
+							component: 'html',
+							html: 'test!'
+						}, {
+							component: 'button',
+							text: 'Hello'
+						}
+					]
+				};
+				
+				var view = UI.build(ui);
+				
+				view.attachTo('#slot');
+				
+				console.log('view.dom()', view.dom());
+				console.log('view.items()', view.items());
+				console.log('view.children()', view.children());
+				console.log('view.get(0)', view.get(0));
+				console.log('view.componentByItem(view.get(0))', view.componentByItem(view.get(0)));
+			});
+		//]]>
+		</script>
+	</head>
+	<body>
+		<div id="slot"></div>
+	</body>
+</html>
+

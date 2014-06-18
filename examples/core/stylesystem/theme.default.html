@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1000">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Default Theme</title>
+		
+		<script type="text/javascript" src="../ui.debug.js"></script>
+		<script type="text/javascript">
+			// print default theme, default theme is origin from 'style' attribute of components class
+			console.log(Appbus.Theme.getDefault().build(false));
+
+			// print attrs.ui full build time
+			console.error('Appbus.info.version:', Appbus.info.version);
+			console.error('Appbus.info.buildtime:', Appbus.info.buildtime + ' ms');
+			console.error('elapsed time to here:', (new Date().getTime() - Appbus.info.finishtime) + ' ms');
+			console.error('total elapsed time:', (new Date().getTime() - Appbus.info.starttime) + ' ms');
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

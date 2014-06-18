@@ -1,0 +1,121 @@
+{
+	component: 'view',
+	name: 'slot',					
+	padding: 15,
+	css: {
+		'text-align': 'center'
+	},
+	items: [
+		{
+			component: 'html',
+			html: '무엇이 문제인가?',
+			height: 100,
+			effects: {
+				staged: [
+					{
+						duration: 0,
+						'opacity': 0.1
+					}, {
+						delay: 200,
+						duration: 750,
+						'font-size': 30,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '1. 단지 엘리먼트들을 멋지게 움직이고 싶었을 뿐',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '2. 그래 역시 사람들이 프레임워크들을 괜히 쓰는게 아니었어. 우리도 쓰자! jquery!',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '3. 간단한 펑션호출로도 복잡한 기능들을 마구마구 사용할 수 있게 되었어!!',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '4. 하지만 이걸로 된걸까???...',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			},
+			e: {
+				click: function() {
+					var root = this.context().find('root');
+					console.log('root', root);
+					
+					root.anim({
+						duration: 750,
+						color: 'white',
+						'background-color': '#111'
+					}).run();
+				}
+			}
+		}
+	]
+}
+
+/*
+무엇이 문제인가?
+
+1. 단지 엘리먼트들을 멋지게 움직이고 싶었을 뿐
+
+2. 그래 역시 사람들이 프레임워크들을 괜히 쓰는게 아니었어. 우리도 쓰자! jquery!
+
+3. 간단한 펑션호출로도 복잡한 기능들을 마구마구 사용할 수 있게 되었어!!
+
+(배경 검정으로 전환)
+*/

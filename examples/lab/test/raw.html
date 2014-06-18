@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<title>Raw Scenario</title>
+	</head>
+	<body>
+		<div id="header">
+			<div class="gnb">
+				<!-- authored -->
+				<view class="test" theme="ios7">
+					<div id="html1">HTML</div>
+					<btn id="btn1" class="blue">버튼</btn>
+					<module src="./app.js"></module>
+				</view>
+				<!-- //authored -->
+				
+				<!-- 
+					will be translate to 
+					
+					class="aui ctx-local x view test" 중
+					aui ctx-local : context 의 accessor
+					aui ctx-local theme-ios7: context 에 정의된 theme 의 accessor
+					aui ctx-local x : ctx-local 의 Component 클래스의 accessor
+					aui ctx-local x container view : ctx-local 의 View 클래스의 accessor
+					test : 사용자 지정 class
+				-->		
+				<div class="aui ctx-local theme-ios7 x container view test">
+					<div id="html1" class="aui ctx-local x html">HTML</div>
+					<div id="btn1" class="aui ctx-local x button blue">
+						<div class="inner">
+							<div class="icon iconpack-modern ico01"></div>
+							<div class="text">버튼</div>
+						</div>
+					</div>							
+					<div class="aui ctx-01 x module">
+						...
+					</div>
+				</div>
+				<!-- //will be translate to -->
+				
+			</div>
+		</div>
+		<div id="wrapper">
+			<div id="side">사이드</div>
+			<div id="contents">
+				<div>
+					<div class="a">a</div>
+					<ui id="control1" src="uijson/ui.json" style="border:1px solid orange;"></ui>
+					<div class="b">b</div>
+					<flagment id="html1" src="html/sample.html"></flagment>
+					<div class="c">c</div>
+					<btn id="btn1">버튼</btn>
+				</div>
+			</div>
+		</div>
+		<div id="footer">
+			<div class="copyright">copyright</div>
+		</div>
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

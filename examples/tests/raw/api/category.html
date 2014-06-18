@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="attrs.oop test">
+		<title>attrs.oop test</title>
+		
+		<script type="text/javascript" src="../../libs/attrs.ui-5.0.0/Appbus.Foundation.js"></script>
+		<script type="text/javascript" src="../../libs/attrs.ui-5.0.0/Appbus.Class.js"></script>
+		<script type="text/javascript" src="../../libs/attrs.ui-5.0.0/Appbus.EventProvider.js"></script>
+		<script type="text/javascript" src="../../libs/attrs.ui-5.0.0/util/Appbus.Ajax.js"></script>
+
+		<!-- PrintingEngine API -->
+		<script type="text/javascript" src="../../api/attrs.auth/attrs.auth.UserSession.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../../api/attrs.ds/attrs.ds.DataStore.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../../api/attrs.shop/attrs.shop.ShopAPI.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../../api/attrs.shop/attrs.shop.ShopInformation.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../../api/attrs.shop/attrs.shop.Category.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../../api/attrs.shop/attrs.shop.Product.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../../api/attrs.shop/attrs.shop.Order.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../../api/attrs.shop/attrs.shop.Cart.js" charset="utf-8"></script>
+
+		<script type="text/javascript">
+			// login
+			var api = new attrs.shop.ShopAPI('test');
+			api.auth('test', '1111').complete(function(err, user) {
+				if( err ) {
+					console.error('Login Failure', err);
+					return;
+				}
+
+				console.log('Login Successfully', user);
+			});
+
+			// test
+			api.on('logined', function() {
+				// category
+				var $category = api.get('category');
+				
+				$category.remove('product').complete(function(err, data) {
+					if( err ) console.error('remove category error:', err);
+					else console.log('remove category success:', data);
+					
+					$category.create('product').complete(function(err, data) {
+						if( err ) {
+							console.error('create category error:', err);
+							return;
+						}
+
+						$category.get('product').complete(function(err, data) {
+							if( err ) {
+								console.error('get category error:', err);
+								return;
+							}
+
+							console.log('get category success:', data);
+
+							$category.add('product://', {
+								name: 'namecard',
+								label: '명함'
+							}).complete(function(err, data) {
+								if( err ) {
+									console.error('add category error:', err);
+									return;
+								}
+
+								console.log('add category success:', data);
+							});
+
+							$category.add('product://namecard', {
+								name: 'fancy_namecard',
+								label: '팬시명함'
+							}).complete(function(err, data) {
+								if( err ) {
+									console.error('add category error:', err);
+									return;
+								}
+
+								console.log('add category success:', data);
+							});
+						});
+					});
+				});
+			});
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

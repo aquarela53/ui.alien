@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1081">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Module Mock</title>
+
+		<style>
+			
+		</style>
+	</head>
+	<body>
+		<script type="text/javscript">
+			// -- file: ui.json
+			{
+				component: 'view',
+				items: [
+					{
+						component: 'html',
+						name: 'test',
+						html: 'test'
+					}
+				]
+			}
+			// -- EOF
+		</script>
+
+		<script type="text/javscript">
+			// -- file : MyComponent.js
+			var UI = require('ui');
+
+			function MyComponent(options) {
+				this.$super(options);
+			}
+
+			MyComponent.prototype = {
+				build: function() {
+					var view = new UI.View();					// same as view.add({component:'view'});
+					view.add(new UI.HTML({html:'something'}));	// same as view.add({component:'html',html:'something'});
+					this.add(view);								// same as this.add({component:'view',items:[{component:'html',html:'something'}]});
+				}
+			};
+
+			MyComponent.style = {
+				'background': '#efefef'
+			};
+
+			MyComponent = UI.inherit(MyComponent, UI.Component);
+			module.exports = MyComponent;
+			// -- EOF
+		</script>
+
+		<script type="text/javscript">
+			// file: module.js
+			var UI = require('ui');
+			var MyComponent = require('./MyComponent.js');
+
+			function Test(options) {
+				var context = this.context();
+				context.component('mycmp', MyComponent);
+				context.theme({
+					'global': {
+						'font-size': 9
+					},
+					'view': {
+						'color': '#333'
+					},
+					'html': {
+						'color': '#555'
+					},
+					'mycmp': {
+						'border': '1px solid #777'
+					}
+				});
+
+				this.ui('ui.json');
+				this.add(new MyComponent({msg:'mycmp'}));
+			}
+
+			Test.prototype = {
+				test: function() {
+					this.add(new MyComponent({msg:'mycmp'}));
+				}
+			};
+
+			module.exports = Test;
+			// EOF
+		</script>
+
+		<script type="text/javscript">
+			// in some.html
+			var ui = UI.build({
+				component: 'view'
+				name: 'root',
+				items: [
+					{
+						component: 'html',
+						name: 'html1',
+						html: 'html'
+					}, {
+						component: 'module',
+						name: 'module1',
+						src: '/src/module.js'
+					}, {
+						component: 'module',
+						name: 'module2',
+						src: '/src/ui.json'
+					}, {
+						component: 'view',
+						name: 'include',
+						src: '/src/ui.json'
+					}
+				]
+			});
+
+			var root = ui.find('root');			// instance of UI.View
+			root.context();						// local context
+			root.origin();						// null	(because component initialized with local context)
+
+			var html1 = ui.find('html1');		// instance of UI.HTML
+			html1.context();					// local context
+			html1.origin();						// null	(because component initialized with local context)
+
+			var module1 = ui.find('module1');	// instance of UI.UIModule
+			module1.context();					// module1 context (ex:c1)
+			module1.origin();					// instance of UI.UIModuleConcrete (concrete class of module1)
+
+			var module2 = ui.find('module2');	// instance of UI.UIModule
+			module2.context();					// module2 context (ex:c2)
+			module2.origin();					// instance of UI.UIModuleConcrete (concrete class of module2)
+			
+			var include = ui.find('include');	// instance of UI.View
+			include.context();					// local context
+			include.origin();					// null	(because component initialized with local context)
+			// EOF
+		</script>
+		
+		<!-- generated html -->
+		<div name="root" class="x view">
+			<div name="html1" class="x html">html</div>
+			<div name="module1" class="x c1 module" origin="http://127.0.0.1/src/module.js">
+				<div class="x c1 view" origin="http://127.0.0.1/src/ui.json">
+					<div name="test" class="x c1 html" origin="http://127.0.0.1/src/ui.json">test</div>
+				</div>
+				<div name="test" class="x c1 mycmp" origin="http://127.0.0.1/src/module.js">
+					<div class="x c1 view" origin="http://127.0.0.1/src/module.js">
+						<div name="test" class="x c1 html" origin="http://127.0.0.1/src/module.js">test</div>
+					</div>
+				</div>
+			</div>
+			<div name="module2" class="x c2 module" origin="http://127.0.0.1/src/ui.json">
+				<div class="x c2 view" origin="http://127.0.0.1/src/ui.json">
+					<div name="test" class="x c2 html" origin="http://127.0.0.1/src/ui.json">test</div>
+				</div>
+			</div>
+			<div name="include" class="x view">
+				<div class="x view" origin="http://127.0.0.1/src/ui.json">
+					<div name="test" class="x html" origin="http://127.0.0.1/src/ui.json">test</div>
+				</div>
+			</div>
+		</div>
+		<!-- // generated html -->
+	</body>
+</html>
+
+<!-- generated style -->
+<style>
+	/* default component style */
+	.x {
+	}
+
+	.x.html {
+	}
+
+	.x.view {
+	}
+
+	/* custom style from context(c1) */
+	.x.c1 {
+		font-size: 9px;
+	}
+
+	.x.c1.view {
+		color: #333;
+	}
+
+	.x.c1.html {
+		color: #555;
+	}
+
+	.x.c1.mycmp {
+		background: #efefef;
+		border: 1px solid #777;
+	}
+</style>
+<!-- // generated style -->

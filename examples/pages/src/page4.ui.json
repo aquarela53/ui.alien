@@ -1,0 +1,140 @@
+{
+	component: 'view',
+	name: 'slot',					
+	padding: 15,
+	css: {
+		'text-align': 'center'
+	},
+	items: [
+		{
+			component: 'html',
+			html: '문제는 해결하기 위해 존재하는 것. 모듈 시스템!',
+			height: 100,
+			effects: {
+				staged: [
+					{
+						duration: 0,
+						'opacity': 0.1
+					}, {
+						delay: 200,
+						duration: 750,
+						'font-size': 30,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '1. 자바스크립트 개발의 치명적인 문제. 네임스페이스.',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '2. 네임스페이스를 분리할 샌드박스가 필요해. commonjs/amd/es6',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			},
+			e: {
+				click: function() {
+					var root = this.context().find('root');
+					
+					root.anim({
+						duration: 750,
+						color: 'white',
+						'background-color': '#669900'
+					}).run();					
+				}
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '3. 모듈별로 정상작동하는 묶음으로 파일들을 분리하자.',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '4. 클라이언트에서도 MVC가 필요해. AngularJS',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '5. 여러가지 아이디어들의 등장. 아이디어들의 비판적 수용.',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}
+	]
+}
+
+/*
+모듈 시스템의 등장.
+1. 자바스크립트 개발의 치명적인 문제. 네임스페이스.
+
+2. 네임스페이스를 분리할 샌드박스가 필요해. commonjs/amd
+
+3. 모듈별로 정상작동하는 묶음으로 파일들을 분리하자.
+
+4. 클라이언트에서도 MVC가 필요해. AngularJS
+
+5. 여러가지 아이디어들의 등장. 아이디어들의 비판적 수용. 
+ 
+(배경 다시 흰색으로)
+*/

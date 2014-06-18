@@ -1,0 +1,92 @@
+{
+	component: 'view',
+	name: 'root',
+	fit: true,
+	items: [
+		{
+			component: 'view',
+			name: 'slot',
+			flex: 1,
+			padding: 15,
+			css: {
+				'text-align': 'center'
+			},
+			items: [
+				{
+					component: 'html',
+					name: 'title',
+					html: 'Untitled Pages',
+					effects: {
+						staged: [
+							{
+								duration: 0,
+								'opacity': 0.1
+							}, {
+								delay: 200,
+								duration: 750,
+								'font-size': 30,
+								'opacity': 1
+							}, {
+								delay: 1200,
+								duration: 250,
+								'transform': {
+									rx: 360,
+									ry: 360,
+									rz: 360
+								}
+							}, {
+								duration: 250,
+								'transform': {
+									rx: 0,
+									ry: 0,
+									rz: 0
+								}
+							}
+						]
+					}
+				}, {
+					component: 'html',
+					name: 'author',
+					html: 'joje',
+					effects: {
+						staged: [
+							{
+								duration: 10,
+								'transform': {
+									rx: 360,
+									ry: 360,
+									rz: 360
+								}
+							}, {
+								delay: 3000,
+								duration: 500,
+								'transform': {
+									rx: 0,
+									ry: 0,
+									rz: 0
+								}
+							}
+						]
+					}
+				}
+			]
+		}, {
+			component: 'view',
+			horizontal: true,
+			items: [
+				{
+					component: 'html',
+					name: 'prev',
+					html: '이전'
+				}, {
+					component: 'html',
+					flex: 1
+				}, {
+					component: 'html',
+					name: 'next',
+					html: '다음'
+				}
+			]
+		}
+	]
+}

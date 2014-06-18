@@ -1,0 +1,67 @@
+{
+	component: 'view',
+	name: 'root',
+	style: 'border:1px solid black;',
+	fit: true,
+	items: [
+		{
+			component: 'view',
+			name: 'top',
+			padding: 15,
+			items: [
+				{
+					component: 'html',
+					name: 'gnb',
+					html: '부엌에 참기름이 어디 있는지 생각해 보라.'
+				}
+			]
+		}, {
+			component: 'view',
+			name: 'center',
+			bg: '#555',
+			flex: 1,
+			horizontal: true,
+			items: [
+				{
+					component: 'view',
+					name: 'side',
+					bg: '#777',
+					width: 250,
+					items: [
+						{
+							component: 'html',
+							flex: 1,
+							theme: 'test',
+							name: 'snb',
+							html: 'side'
+						}
+					]
+				}, {
+					component: 'view',
+					name: 'contents',
+					context: true,
+					width: 'auto',
+					bg: 'white',
+					css: {
+						padding: 10,
+						flex: 1
+					},
+					style: {
+					},
+					items: [
+						
+					]
+				}
+			]
+		}, {
+			component: 'view',
+			name: 'footer',
+			bg: '#3f3e3e',
+			height: 45,
+			horizontal: true,
+			items: [
+				
+			]
+		}
+	]
+}

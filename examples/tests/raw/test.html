@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="">
+		<title></title>
+
+		<script type="text/javascript">
+			var P1 = function() {this.uuid=Math.random();};
+			P1.prototype = {
+				v: 'P1',
+				method: function() {
+					console.log(this.v);
+				}
+			};
+
+			var P2 = function() {this.uuid=Math.random();};
+			P2.prototype = {
+				v: 'P2',
+				method: function() {
+					console.log(this.v);
+				}
+			};
+
+			var B = function() {};
+			B.prototype = {
+				v: 'B',
+				method: function() {
+					console.log(this.v);
+				}
+			};
+
+			console.log(P1.prototype);
+
+			var C1 = function() {this.uuid=Math.random();};
+			C1.prototype = new B();
+			
+			if( C1.__proto__ ) C1.prototype.__proto__.__proto__ = new P1();
+			else C1.prototype.constructor.prototype.constructor.prototype = new P1();
+
+			var c1 = new C1();
+
+			C1.prototype = new P2();
+
+
+			var c2 = new C1();
+			console.dir(c1);
+			console.dir(c2);
+
+			c1.method();
+			//c1.methodB();
+			c2.method();
+			
+			
+			console.log('(c1 instanceof P1)', (c1 instanceof P1));
+			console.log('(c1 instanceof P2)', (c1 instanceof P2));
+			console.log('(c1 instanceof B)', (c1 instanceof B));
+
+			console.log('(c2 instanceof P1)', (c2 instanceof P1));
+			console.log('(c2 instanceof P2)', (c2 instanceof P2));
+			console.log('(c2 instanceof B)', (c2 instanceof B));
+
+			var fn = function(p, o ) {
+				var a = 0;
+				p.vaaa = '1111';
+			};
+
+			console.log(fn.toString());
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

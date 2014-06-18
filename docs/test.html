@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Appbus Web UI Toolkit</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="apple-mobile-web-app-capable" content="no">
+
+		<meta name="description" content="Appbus Web UI Toolkit Documents">
+		<meta name="author" content="joje@attribues">
+		
+		<!-- bootstrap customized stylesheet -->
+		<link href="css/style.css" rel="stylesheet">
+		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js" charset="utf-8"></script>
+		<script type="text/javascript" src="js/bootstrap.min.js" charset="utf-8"></script>
+		
+		<script type="text/javascript">
+			$(document).ready(function() {
+				console.log($('li').find('a'));
+				console.log($('a').attr('href'));
+
+				$('ul').find('a').each(function(index, el) {
+					console.log('el', $(this).attr('href'));
+				});
+
+				var arg = $('ul').find('a');
+				console.log((arg instanceof Array));
+				console.log(arg[0]);
+				
+				console.log(arg, arg.length);
+				arg[17] = 'test';
+				arg.push('test');
+				console.log(arg, arg.length);
+			});
+		</script>
+	</head>
+
+	<body>
+		<div class="container">
+			<div id="header" style="margin-top:10px;">
+				<div class="navbar navbar-inverse navbar-fixed-top_">
+					<div class="navbar-inner">
+						<div class="container">
+							<a class="brand" href="index.html">AppBus</a>
+							<div class="nav-collapse collapse">
+								<ul id="gnb-nav" class="nav">
+									<li class="active"><a href="index.html">Home</a></li>
+									<li><a href="getstarted.html">Get Started</a></li>
+									<li><a href="tutorials.html">Tutorial</a></li>
+									<li><a href="api/index.html">API</a></li>
+									<li class="dropdown">
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown">Customer Support <b class="caret"></b></a>
+										<ul class="dropdown-menu">
+											<li><a href="customer.html">Support Home</a></li>
+											<li><a href="customer.html#notice">Notice</a></li>
+											<li><a href="customer.html#qna">Questions</a></li>
+											<li><a href="customer.html#faq">FAQ</a></li>
+										</ul>
+									</li>
+									<li class="dropdown">
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown">My Page <b class="caret"></b></a>
+										<ul class="dropdown-menu">
+											<li><a href="mypage.html">MyPage Home</a></li>
+											<li><a href="mypage.html#inprocess">In Process</a></li>
+											<li><a href="mypage.html#orders">Orders</a></li>
+											<li><a href="mypage.html#payments">Payment History</a></li>
+											<li class="divider"></li>
+											<li><a href="mypage.html#users">User Profile</a></li>
+											<li><a href="mypage.html#secession">Secession</a></li>
+											<li><a href="mypage.html#logout">Log out</a></li>
+										</ul>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="contents-top"></div>
+
+			<div class="container-fluid" style="padding:5px;">
+				<div id="test">
+				</div>
+			</div>
+
+			<footer id="footer" style="padding:15px;">
+				&copy; Attributes 2012
+			</footer>
+		</div>
+	</body>
+</html>

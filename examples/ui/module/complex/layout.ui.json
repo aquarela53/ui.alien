@@ -1,0 +1,62 @@
+{
+	component: 'view',
+	name: 'root',
+	fit: true,
+	items: [
+		{
+			component: 'view',
+			name: 'top',
+			bg: '#333',							
+			padding: 15,
+			color: 'white',
+			items: [
+				{
+					component: 'module',
+					name: 'gnb',
+					src: './gnb/gnb.js',
+					message: 'this is GNB!!'
+				}
+			]
+		}, {
+			component: 'view',
+			name: 'contents',
+			bg: '#555',
+			flex: 1,
+			horizontal: true,
+			async: true,
+			items: [
+				{
+					component: 'view',
+					name: 'side',
+					bg: '#777',
+					width: 250,
+					items: [
+						{
+							component: 'module',
+							name: 'snb',
+							css: {
+								'background-color': 'orange'
+							},
+							src: './snb/snb.js'
+						}
+					]
+				}, {
+					component: 'view',
+					name: 'contents',
+					width: 'auto',
+					bg: '#999',
+					css: {
+						padding: 10,
+						flex: 1
+					},
+					html: 'contents'
+				}
+			]
+		}, {
+			component: 'view',
+			name: 'footer',
+			bg: '#333',
+			src: './footer/footer.ui.json'
+		}
+	]
+}

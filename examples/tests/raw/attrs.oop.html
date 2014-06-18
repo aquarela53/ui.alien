@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="attrs.oop test">
+		<title>attrs.oop test</title>
+
+		<script type="text/javascript" src="js/attrs.oop.js"></script>
+
+		<script type="text/javascript">
+			Class.define('Parent', {
+				//$debug: true,
+				value: 'parent',
+				parent: function() {
+				}
+			});
+
+			Class.define('Child', {
+				//$debug: true,
+				$extends: Parent,
+				value: 'child',
+				child: function() {
+				}
+			});
+
+			Class.define('GrandSon', {
+				//$debug: true,
+				$extends: Child,
+				value: 'grandson',
+				grandson: function() {
+				}
+			});
+
+			Class.define('Solo', {
+				//$debug: true,
+				value: 'solo',
+				solo: function() {
+				}
+			});
+
+			console.dir(Parent.prototype);
+			console.dir(Child.prototype);
+			console.dir(GrandSon.prototype);
+			console.dir(Solo.prototype);
+
+			console.log('- instantiate --------------------------');
+			
+			var parent = new Parent();
+			var child = new Child();
+			var grandson = new GrandSon();
+			var solo = new Solo();
+
+			console.dir(parent);
+			console.dir(child);
+			console.dir(grandson);
+			console.dir(solo);
+			
+			console.log('parent instanceof Parent', (parent instanceof Parent));
+			
+			console.log('child instanceof Parent', (child instanceof Parent));
+			console.log('child instanceof Child', (child instanceof Child));
+
+			console.log('grandson instanceof Parent', (grandson instanceof Parent));
+			console.log('grandson instanceof Child', (grandson instanceof Child));
+			console.log('grandson instanceof GrandSon', (grandson instanceof GrandSon));
+
+			
+			console.log('solo instanceof Solo', (solo instanceof Solo));
+
+			
+			var DEF = function() {};
+			DEF.prototype = {
+				value: 'def',
+			};
+
+			var test = function() {			
+				starttime = new Date().getTime();
+				console.log('- start ------------------------------------------------');
+				for(var i=0; i < 1000; i++) {
+					var instance = new DEF({
+						id: 'view' + i	
+					});
+				}
+				console.log('- ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+				starttime = new Date().getTime();
+
+				console.log('- start ------------------------------------------------');
+				starttime = new Date().getTime();
+				for(var i=0; i < 1000; i++) {
+					var instance = new GrandSon({
+						id: 'view' + i	
+					});
+				}
+				console.log('- ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+			};
+
+			test();
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

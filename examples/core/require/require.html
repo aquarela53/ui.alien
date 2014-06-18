@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Require</title>
+		
+		<script type="text/javascript" src="../../require.debug.js"></script>
+		<script type="text/javascript">
+			console.log('\n\n-- print window object');
+			for(var k in window) {
+				console.log(k, window[k]);
+			}
+			
+			console.log('\n\n-- load module');
+			document.write(require('resources/module.js'));
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1000">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Module</title>
+		
+		<script type="text/javascript" src="../../ui.debug.js"></script>
+		<script type="text/javascript">
+			var UI = require('ui');
+
+			// define controller
+			function MyModuleController(options) {
+				console.log('initialized with', options, this);
+				
+				this.items({
+					component: 'html',
+					html: 'Hello UI?'
+				});
+			}
+			
+			// get & instantiate module
+			var MyModule = new UI.ModuleConcrete(MyModuleController);
+			var MyModuleComponent = MyModule.component();
+			var mymodule = new MyModuleComponent('mymodule');
+
+			UI.on('ready', function() {
+				mymodule.attachTo('#slot');
+
+				console.log('MyModule', MyModule);
+				console.log('MyModuleComponent', MyModuleComponent);
+				console.log('mymodule', mymodule);
+			});
+		</script>
+	</head>
+	<body>
+		<div id="slot"></div>
+	</body>
+</html>

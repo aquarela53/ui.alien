@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1081">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Context Explain</title>		
+	</head>
+	<body>		
+		<!-- component & context 구조 -->
+		<div name="attrs.ui">							<!-- cmp.context() : 기본 context -->
+			<div></div>								<!-- cmp.context() : 기본 context -->
+			<div name="a.name">						<!-- Context.get('a').get('name') -->
+				<div><div>							<!-- cmp.context() : a context -->
+				<div name="c"><div>					<!-- cmp.context() : c context -->
+				<div>
+					<div name="b.name a">			<!-- Context.get('b').get('name') -->
+						<div><div>					<!-- cmp.context() : b context -->
+						<div name="c">				<!-- Context.get('c').get() -->
+							<div><div>				<!-- cmp.context() : c context -->
+						</div>
+					</div>
+					<div id="view-100"><div>		<!-- cmp.context() : a context // custom style 이 있을 경우, css 를 적용하기 위해 id 가 지정된다.  -->
+				<div>
+			<div>
+		</div>
+
+		<!--
+			- id 는 options 에서 직접 지정할 수 없다. 필요할 떄 자동으로 unique 값이 생성된다.
+			- id 의 경우 css 를 적용하기 위한 수단으로써만 존재한다. 그 외엔 id 를 element 에 별도로 mark 하지 않는다.
+			- 같은 context 에 name 이 중복될 경우 find 은 최초발견, finds 은 모두 찾아 배열로 반환한다.
+			- context 의 findsAll 혹은 visit 을 통해 현재 context에 있는 모든 컴포넌트에 접근할 수 있다.
+			  이때, context 는 컴포넌트의 모든 레퍼런스를 갖고 있진 않고, name 이 mark 된 컴포넌트만 가지고 있으므로,
+			  name 이 마크된 컴포넌트를 기준으로 하위의 context 가 지정되지 않은 모든 컴포넌트들을 찾아서 반환하거나 visit 한다.
+
+			- 컴포넌트를 context에 추가하기 위한 몇 가지 방법
+				- 생성시 지정
+					// 새로운 context 를 가진 컴포넌트 생성
+					var cmp = new View({
+						name: 'name',
+						context: true
+					});
+
+					// a context 를 옵션에 지정
+					var context = new Appbus.Context();
+					var cmp = new View({
+						name: 'name',
+						context: context
+					});
+
+					// cmp 에 직접 지정
+					var context = new Appbus.Context();
+					cmp.context(context);
+
+			- 하나의 컴포넌트는 여러개의 context에 속할 수 없다.
+		-->
+	</body>
+</html>

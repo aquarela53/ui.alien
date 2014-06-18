@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="Shop API">
+		<title>Appbus.El test</title>
+		
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Class.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Foundation.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Device.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Element.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Styles.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.EventProvider.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.DeviceEventAdapter.js"></script>	
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Scroller.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/util/Appbus.Options.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/util/Appbus.Tpl.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/util/Appbus.Color.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/util/Appbus.Ajax.js"></script>
+		
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/Appbus.UIComponent.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/Appbus.Container.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/Appbus.View.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/Appbus.Window.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/Appbus.Translators.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/application/Appbus.Application.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/layout/Appbus.AbsoluteLayout.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/layout/Appbus.BoxLayout.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/layout/Appbus.Splitter.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/layout/Appbus.CardLayout.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/layout/Appbus.SlideLayout.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/layout/Appbus.StackLayout.js"></script>
+				
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.HTML.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.Box.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.BoxGrid.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.Paragraph.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.Image.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.List.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.Space.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.Bar.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.Button.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.Slider.js"></script>
+		
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/tab/Appbus.TabView.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/tab/Appbus.TabBar.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/tab/Appbus.TabBar.Tab.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/table/Appbus.Table.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/table/Appbus.Table.Row.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/tree/Appbus.Tree.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/tree/Appbus.TreeNode.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/form/Appbus.FieldSet.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/form/Appbus.Field.js"></script>
+		
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/form/fields/Appbus.AttachField.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/form/fields/Appbus.BooleanField.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/form/fields/Appbus.DateField.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/form/fields/Appbus.LabelField.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/form/fields/Appbus.LinkField.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/form/fields/Appbus.NumberField.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/form/fields/Appbus.SearchField.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/form/fields/Appbus.TextArea.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/form/fields/Appbus.TextField.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/test/Appbus.TestComponent.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/test/Appbus.TestContainer.js"></script>
+
+		<script type="text/javascript">
+			var container_test = function() {
+				var starttime;
+
+				var cmp = new Appbus.TestComponent({
+					e: {
+						click: function(e) {
+							console.error('클릭', e);
+						}
+					}
+				});
+
+				console.error('- cmp.attachTo(El(body))');
+				cmp.attachTo(El('body'));
+
+				starttime = new Date().getTime();
+				for(var i=0; i < 10000; i++) {
+					cmp.attach(document.createElement('div'));
+				}				
+				console.log('- ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+
+				starttime = new Date().getTime();
+				var parent = document.createElement('div');
+				for(var i=0; i < 10000; i++) {
+					parent.appendChild(document.createElement('div'));
+				}				
+				console.log('- ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+
+				starttime = new Date().getTime();
+				for(var i=0; i < 10000; i++) {
+					cmp.attach(El.create('div'));
+				}				
+				console.log('- ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+				
+				starttime = new Date().getTime();
+				var parent = El.create('div');
+				for(var i=0; i < 10000; i++) {
+					parent.attach(El.create('div'));
+				}
+				console.log('- ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+
+				starttime = new Date().getTime();
+				for(var i=0; i < 100; i++) {
+					new Appbus.TestComponent().attachTo(cmp);
+				}				
+				console.log('- ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+
+				starttime = new Date().getTime();
+				for(var i=0; i < 100; i++) {
+					cmp.attach(new Appbus.TestComponent());
+				}				
+				console.log('- ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+
+
+				console.log('cmp.getChildren()', cmp.getChildren());
+			};
+
+			Appbus.on('ready', function(e) {
+				container_test();
+			});
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

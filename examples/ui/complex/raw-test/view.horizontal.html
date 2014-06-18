@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="CSS Test">
+	</head>
+
+	<style>
+		* {
+			--margin: 0;
+			--padding: 0;
+		}
+
+		h3 {
+			font-size: 12px;
+			margin: 0;
+			padding: 0;
+		}
+
+		div {
+			box-sizing: border-box;
+		}
+
+		.orange {
+			background-color: #F03A37;
+		}
+
+		.blue {
+			background-color: #044B8D;
+		}
+
+		.red {
+			background-color: #BA2425;
+		}
+		
+		.green {
+			background-color: #568052;
+		}
+
+
+
+		.view {
+			display: block;
+			position: relative;
+			--border: 1px dotted black;
+		}
+
+		.view > .innerview.h {
+			display: table;
+			width: 100%;
+		}
+
+		.view > .innerview.h > .cell {
+			display: table-cell;
+			width: 1px;
+			background: #ececec;
+			--border: 1px dotted #F03A37;
+		}
+
+		.view > .innerview.h > .pad {
+		}
+		
+		/*.view > .innerview.h.equally > .cell {
+			width: auto;
+		}
+
+		.view > .innerview.h.equally > .pad {
+			display: none;
+		}*/
+
+		.entry {
+		}
+	</style>
+	<body>
+		<!-- 
+		{
+			component: 'view',
+			horizontal: true,
+			items: [
+				{
+					component: 'cmp',
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					height: 80,
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					html: 'Component'
+				}
+			]
+		}
+		-->
+		<h3>Horizontal View, default</h3>
+		<div class="view">
+			<div class="innerview h">
+				<div class="cell">
+					<div class="entry blue">Component</div>
+				</div>
+				<div class="cell">
+					<div class="entry red" style="height:80px;">Component</div>
+				</div>
+				<div class="cell">
+					<div class="entry green">Component</div>
+				</div>
+				<div class="pad"></div>
+			</div>
+		</div>
+
+		<br/><br/>
+
+		<!-- 
+		{
+			component: 'view',
+			horizontal: true,
+			items: [
+				{
+					component: 'cmp',
+					html: 'Component'
+				}, {
+					component: 'view',
+					items: [
+						{
+							component: 'cmp',
+							absolute: 'full'
+							style: {
+								margin: 5
+							},
+							html: 'Absolute'
+						}
+					]
+				}, {
+					component: 'cmp',
+					absolute: 'bottom right'
+					width: 50,
+					height: 50,
+					html: 'Absolute'
+				}
+			]
+		}
+		-->
+		<h3>Horizontal View, default(with 'absolute' position node)</h3>
+		<div class="view">
+			<div class="innerview h">
+				<div class="cell">
+					<div class="entry blue">Component</div>
+				</div>
+				<div class="cell">
+					<div class="entry orange">Component</div>
+				</div>
+				<div class="cell" style="width:150px;height:100px;">
+					<div class="view red" style="width:100%;height:100%;">
+						<div class="innerview">
+							<div class="cell">
+								<div class="entry green">Component</div>
+								<div class="entry orange" style="position:absolute;left:0;top:0;width:100%;height:100%;">Absolute</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="cell">
+					<div class="entry green" style="position:absolute;bottom:0;right:0;width:50px;height:50px;">Absolute</div>
+				</div>
+				<div class="pad"></div>
+			</div>
+		</div>
+
+		<br/><br/>
+
+		<!-- 
+		{
+			component: 'view',
+			horizontal: true,
+			items: [
+				{
+					component: 'cmp',
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					cell: {
+						width: 100,				// cell 의 width
+						align: 'center',		// 자식노드의 margin : 0 auto
+						valign: 'middle'		// cell 의 vertical-align
+					},
+					width: 50,
+					height: 50,
+					html: 'C'
+				}, {
+					component: 'cmp',
+					cell: {
+						width: 'auto',			// cell 의 width
+					},
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					cell: {
+						width: 150,				// cell 의 width
+						height: 'auto'			// cell 의 height 가 auto 라면 매번 계산해서 새로운 높이를 스크립트로 지정*.
+					},
+					width: '100%',
+					height: '100%',
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					cell: {
+						width: 'auto',			// cell 의 width
+					},
+					html: 'Component'
+				}
+			]
+		}
+		-->
+		<h3>Horizontal View, default(with width 'auto')</h3>
+		<div class="view">
+			<div class="innerview h">
+				<div class="cell">
+					<div class="entry blue">Component<br/>Component</div>
+				</div>
+				<div class="cell" style="width:100px;vertical-align:middle;">
+					<div style="margin:0 auto;width:50px;height:50px;">
+						<div class="entry red" style="width:50px;height:50px;">C</div>
+					</div>
+				</div>
+				<div class="cell" style="width:auto;">
+					<div class="entry orange">Component</div>
+				</div>
+				<div class="cell" style="width:150px;height:100px;">
+					<div class="entry green" style="width:100%;height:100%;">Component</div>
+				</div>
+				<div class="cell" style="width:auto;">
+					<div class="entry orange">Component</div>
+				</div>
+				<div class="pad"></div>
+			</div>
+		</div>
+
+		<br/><br/>
+
+		<!-- 
+		{
+			component: 'view',
+			horizontal: true,
+			equally: true,
+			items: [
+				{
+					component: 'cmp',
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					html: 'Component'
+				}, {
+					component: 'cmp',
+					html: 'Component'
+				}
+			]
+		}
+		-->
+		<h3>Horizontal View, equally</h3>
+		<div class="view">
+			<div class="innerview h equally">
+				<div class="cell" style="width:auto;">
+					<div class="entry blue">Component</div>
+				</div>
+				<div class="cell" style="width:auto;">
+					<div class="entry red">Component</div>
+				</div>
+				<div class="cell" style="width:auto;">
+					<div class="entry green">ComponentComponentComponentComponent</div>
+				</div>
+				<div class="pad"></div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="Shop API">
+		<title>function call speed test</title>
+		<script type="text/javascript">
+			var test = function() {
+				var starttime, fn;
+
+				console.error('- preparing');
+				starttime = new Date().getTime();
+				fn = function(num) {
+					if( !this.seq ) this.seq = num;
+					else this.seq += num;
+				}
+				for(var i=0; i < 1000000; i++) {
+					fn();
+				}				
+				console.log('- ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+
+				for(var x=0; x < 3; x++) {
+					console.error('- fn.call()');
+					starttime = new Date().getTime();
+					fn = function(num) {
+						if( !this.seq ) this.seq = num;
+						else this.seq += num;
+					}
+					for(var i=0; i < 10000000; i++) {
+						fn.call(this, i);
+					}
+					console.log('- fn.call() : ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+
+					starttime = new Date().getTime();
+					fn = function(num) {
+						if( !this.seq ) this.seq = num;
+						else this.seq += num;
+					}
+					for(var i=0; i < 10000000; i++) {
+						fn.apply(this, [i]);
+					}
+					console.log('- fn.apply() : ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+
+					starttime = new Date().getTime();
+					fn = function(num) {
+						if( !this.seq ) this.seq = num;
+						else this.seq += num;
+					}
+					for(var i=0; i < 10000000; i++) {
+						fn(i);
+					}
+					console.log('- fn() : ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+				}
+
+			};
+
+			test();
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

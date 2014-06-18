@@ -1,0 +1,125 @@
+{
+	component: 'view',
+	name: 'slot',					
+	padding: 15,
+	css: {
+		'text-align': 'center'
+	},
+	items: [
+		{
+			component: 'html',
+			html: 'Javascript 의 시대는 부팅중!',
+			height: 100,
+			effects: {
+				staged: [
+					{
+						duration: 0,
+						'opacity': 0.1
+					}, {
+						delay: 200,
+						duration: 750,
+						'font-size': 30,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '1. 하나의 페이지에 여러가지 프로그램들을 코드수정없이 넣어도 그냥 작동해주면 안되겠니...',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '2. HTML과 CSS와 Javascript 코드의 패키지화',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '3. 자바스크립트는 자바스크립트답게, 처음 모습 있는 그대로 하지만 더 강력하게!',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '4. 갈 길은 멀지만, 즐거운 여정을 위한 준비',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 80,
+			css: {
+				opacity: 0.1
+			},
+			html: '감사합니다.',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			},
+			e: {
+				click: function() {
+					var root = this.context().find('root');
+					
+					root.anim({
+						duration: 3750,
+						color: '#333',
+						'background-color': '#ffffff'
+					}).run();					
+				}
+			}
+		}
+	]
+}

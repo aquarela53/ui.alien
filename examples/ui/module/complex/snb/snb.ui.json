@@ -1,0 +1,10 @@
+{
+	component: 'view',
+	items: [
+		{
+			component: 'html',
+			name: 'cmp',
+			html: 'SNB'
+		}
+	]
+}

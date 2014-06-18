@@ -1,0 +1,24 @@
+{
+	component: 'view',
+	padding: 30,
+	color: 'white',
+	items: [
+		{
+			component: 'view',
+			name: 'cmp',
+			items: [
+				{
+					component: 'view',
+					name: 'cmp',
+					items: [
+						{
+							component: 'html',
+							name: 'cmp',
+							html: 'footer'
+						}
+					]
+				}
+			]
+		}
+	]
+}

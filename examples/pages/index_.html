@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1081">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="description" content="examples">
+		<title>Layout</title>
+		
+		<script type="text/javascript" src="../ui.debug.js"></script>
+
+		<script type="text/javascript">
+			var UI = require('ui');
+
+			var ui = {
+				component: 'view',
+				name: 'root',
+				fit: true,
+				effects: {
+					staged: [
+						{
+							'background-color': 'blue'
+						}, {
+							'background-color': 'darkred'
+						}, {
+							'background-color': 'orange'
+					}
+					]
+				},
+				items: [
+					{
+						component: 'view',
+						name: 'top',
+						items: [
+							{
+								component: 'html',
+								name: 'gnb',
+								html: 'this is GNB!!'
+							}
+						]
+					}, {
+						component: 'view',
+						name: 'wrapper',
+						flex: 1,
+						horizontal: true,
+						items: [
+							{
+								component: 'view',
+								name: 'side',
+								width: 250,
+								items: [
+									{
+										component: 'html',
+										name: 'snb',
+										flex: 1,
+										html: 'side'
+									}
+								]
+							}, {
+								component: 'view',
+								name: 'contents',
+								width: 'auto',
+								flex: 1,
+								bg: 'silver',
+								items: [
+									{
+										component: 'html',
+										name: 'contents-html',
+										html: 'contents'
+									}
+								],
+								effects: {
+									click: [
+										{
+											'transform': {
+												x: -100,
+												y: -100,
+												rx: 90,
+												ry: 90,
+												sx: 0.1,
+												sy: 0.1
+											}
+										}, {
+											'transform': {
+												x: 100,
+												y: 100,
+												sx: 0.5,
+												sy: 0.5
+											}
+										}, {
+											'transform': {
+												x: 0,
+												y: 0
+											},
+											height: 'auto'
+										}
+									]
+								},
+								e: {
+									'click': function(e) {
+										//console.log(e.type, this, e);
+									}
+								}
+							}
+						]
+					}, {
+						component: 'view',
+						name: 'footer',
+						e: {
+							'click': function(e) {
+								var footer = this.context().find('footer');
+								console.log('footer', footer);
+							}
+						},
+						html: 'footer'
+					}
+				]
+			};
+
+			UI.on('ready', function(e) {
+				UI.build(ui).attachTo(document.body);
+				
+				require('buildinfo').print();
+			});
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

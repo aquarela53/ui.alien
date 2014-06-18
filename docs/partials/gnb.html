@@ -1,0 +1,57 @@
+<script type="text/javascript" singleton="true">
+	page.on('hash', function(e) {
+		El.finds('#gnb-nav li').forEach(function(li) {
+			li.rc('active');
+		});
+		
+		var name = page.path.pagename; 
+		if( e.hash ) name = (page.path.pagename + '#' + e.hash);
+
+		var c = El.find('#gnb-nav a[href="' + name + '"]');
+		if( c && c.parent()) {
+			c.parent().ac('active');
+ 
+			if( c.parent().id() !== 'gnb-nav' ) {
+				c.parent().parent().parent().ac('active');
+			}
+		}
+	});
+</script>
+
+<div class="navbar navbar-inverse navbar-fixed-top_">
+	<div class="navbar-inner">
+		<div class="container">
+			<a class="brand" href="index.html">AppBus</a>
+			<div class="nav-collapse collapse">
+				<ul id="gnb-nav" class="nav">
+					<li class="active"><a href="index.html">Home</a></li>
+					<li><a href="getstarted.html">Get Started</a></li>
+					<li><a href="tutorials.html">Tutorial</a></li>
+					<li><a href="api/index.html">API</a></li>
+					<!-- <li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Customer Support <b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<li><a href="customer.html">Support Home</a></li>
+							<li><a href="customer.html#notice">Notice</a></li>
+							<li><a href="customer.html#qna">Questions</a></li>
+							<li><a href="customer.html#faq">FAQ</a></li>
+						</ul>
+					</li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">My Page <b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<li><a href="mypage.html">MyPage Home</a></li>
+							<li><a href="mypage.html#inprocess">In Process</a></li>
+							<li><a href="mypage.html#orders">Orders</a></li>
+							<li><a href="mypage.html#payments">Payment History</a></li>
+							<li class="divider"></li>
+							<li><a href="mypage.html#users">User Profile</a></li>
+							<li><a href="mypage.html#secession">Secession</a></li>
+							<li><a href="mypage.html#logout">Log out</a></li>
+						</ul>
+					</li> -->
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

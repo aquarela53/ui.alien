@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1081">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Style System</title>
+		
+		<!-- // style system generate style tags like this, bottom is pseudo tags for explain. -->
+		<style title="attrs.ui.global" type="text/css" media="all">
+			/* global */
+
+			/*
+			 *	global 에 추가된 style이 있을 경우 나열된다.
+			 *
+			 *	Appbus.StyleSystem.global.set('body', {});
+			 */
+			* {}
+			html {}
+			body {}
+			pre {}
+		</style>
+
+		<style title="attrs.ui.themes" type="text/css" media="all">
+			/* theme */
+
+			/*
+			 *	component에서 theme를 지정한 경우 표현하기 위해 모든 theme 항상 나열.
+			 *
+			 *	var theme = new Appbus.Theme({...theme json...});
+			 *	Appbus.StyleSystem.themes.add(theme);		// 이 시점에서 나열됨
+			 */
+
+			/* theme 의 global */
+			.themeid * {}
+			.themeid html {}
+			.themeid body {}
+			.themeid pre {}
+			
+			/* theme 의 component style */
+			.themeid.view {}
+			.themeid.view.top {}
+			.themeid.view > .items {}
+
+			.themeid.tab {}
+			.themeid.tab > .items {}
+		</style>
+			
+		<style title="attrs.ui.theme.selected" type="text/css" media="all">
+			/* selected theme */
+
+			/*	
+			 *	선택된 theme는 모든 component에 적용되기 위해 accessor 없이 나열된다. 
+			 *	선택값이 없을경우 component의 component 자체의 style의 집합인 기본 theme가 사용
+			 *	theme 의 각 style 설정(inherit:false)에 따라 기본값을 merge 표현할지 새로운 style만 나열할지 결정된다.
+			 *	선택된 theme가 변경될 때 이 stylesheet는 초기화후 재나열된다.
+			 *
+			 *	var theme = new Appbus.Theme({...theme json...});
+			 *	Appbus.StyleSystem.themes.add(theme);
+			 *	Appbus.StyleSystem.themes.select('themeid');	// 이 시점에서 재생성되어 나열됨
+			 */
+
+			/* theme 의 global */
+			 * {}
+			html {}
+			body {}
+			pre {}
+			
+			/* theme 의 component style */
+			.view {}
+			.view.top {}
+			.view > .items {}
+
+			.tab {}
+			.tab > .items {}
+		</style>
+
+		<style title="attrs.ui.instances" type="text/css" media="all">
+			/* instance */
+
+			/*
+			 *	component에서 theme를 지정한 경우 표현하기 위해 모든 theme 항상 나열.
+			 *
+			 *	var style = new Appbus.Style('#cmpid', {...style...});
+			 *	Appbus.StyleSystem.themes.add(style);		// 이 시점에서 나열됨
+			 */
+			#cmpid {}
+			#cmpid > .items {}
+		</style>
+	</head>
+	<body>
+		<div id="slot"></div>
+	</body>
+</html>

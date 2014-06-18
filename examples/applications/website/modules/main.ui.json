@@ -1,0 +1,94 @@
+{
+	component: 'view',
+	style: {
+		'margin': '0 auto',
+		'margin-top': 5
+	},
+	width: 1018,
+	items: [
+		{
+			component: 'view',
+			name: 'top',
+			items: [
+				{
+					component: 'text',
+					title: 'Modules',
+					style: {
+						'margin': '0 auto'
+					},
+					width: 300,
+					text: 'Top',
+					bg: 'green'
+				}
+			]
+		}, {
+			component: 'view',
+			horizontal: true,
+			items: [
+				{
+					component: 'ui',
+					name: 'gnb',
+					src: './navigation.global/gnb.js',
+					args: ['i wanna gnb!!!']
+				}
+			]
+		}, {
+			component: 'view',
+			name: 'contents-top',
+			horizontal: true,
+			items: [
+				{
+					component: 'text',
+					title: 'Modules',
+					text: 'Contents Top'
+				}
+			]
+		}, {
+			component: 'view',
+			name: 'contents-body',
+			horizontal: true,
+			items: [
+				{
+					component: 'view',
+					name: 'side-navigation',
+					width: 250,
+					text: 'Side A'
+				}, {
+					component: 'view',
+					name: 'contents',
+					items: [
+						{
+							component: 'text',
+							title: 'Modules',
+							text: 'Contents Item 1'
+						}, {
+							component: 'text',
+							title: 'Modules',
+							text: 'Contents Item 2'
+						}
+					]
+				}
+			]
+		}, {
+			component: 'view',
+			name: 'contents-bottom',
+			items: [
+				{
+					component: 'text',
+					title: 'Modules',
+					text: 'Contents Bottom'
+				}
+			]
+		}, {
+			component: 'view',
+			name: 'footer',
+			items: [
+				{
+					component: 'text',
+					title: 'Modules',
+					text: 'Footer '
+				}
+			]
+		}
+	]
+}

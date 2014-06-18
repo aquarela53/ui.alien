@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="keywords" content="">
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="">
+		<title></title>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Class.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Foundation.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Device.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.EventProvider.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.DeviceEventAdapter.js"></script>	
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Styles.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Element.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Scroller.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/util/Appbus.Options.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/util/Appbus.Tpl.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/util/Appbus.Color.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/util/Appbus.Ajax.js"></script>
+		
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/Appbus.UIComponent.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/Appbus.Container.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/Appbus.View.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/Appbus.Window.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/application/Appbus.Application.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/views/Appbus.Cards.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/views/Appbus.Slide.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/views/Appbus.Stack.js"></script>
+		
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.HTML.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.List.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.Space.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.Bar.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/parts/Appbus.Button.js"></script>
+		
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/tab/Appbus.TabView.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/tab/Appbus.TabBar.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/ui/table/Appbus.Table.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/editorpack/Appbus.editor.CodeEditor.js"></script>
+
+		<script type="text/javascript">			
+			Appbus.on('ready', function(e) {
+				var app = Appbus.build({
+					$: 'View',
+					bg: '#eee',
+					w: '100%',
+					h: '100%',
+					css: {
+						'': {
+							position: 'absolute'
+						}
+					},
+					horizontal: true,
+					c: [
+						{
+							$: 'HTML',
+							bg: 'green',
+							w: 200,
+							html: '1'
+						}, {
+							$: 'View',
+							bg: 'red',
+							c: [
+								{
+									$: 'View',
+									bg: 'silver',
+									horizontal: true,
+									c: [
+										{
+											$: 'View',
+											bg: 'red',
+											html: '1123123'
+										}, {
+											$: 'View',
+											bg: 'blue',
+											html: '2123123123123'
+										}, {
+											$: 'View',
+											bg: 'orange',
+											html: '1231231233'
+										}
+									]
+								}, {
+									$: 'HTML',
+									bg: 'green',
+									h: 200,
+									html: '3'
+								}, {
+									$: 'HTML',
+									bg: 'green',
+									h: 200,
+									html: '4'
+								}
+							]
+						}
+					]
+				});
+				
+				app.attachTo(document.body);
+			});
+		</script>
+	</head>
+	<body style="padding:0;margin:0;">
+	</body>
+</html>

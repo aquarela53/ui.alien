@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="">
+
+		<script type="text/javascript">
+			window.onload = function() {
+				console.log('querySelector', document.querySelector);
+				console.log('querySelectorAll', document.querySelectorAll);
+
+				if( true ) {
+					var div = document.createElement('div');
+					console.log('div', div);
+					console.log('nodeType', div.nodeType);
+					console.log('nodeName', div.nodeName);
+					console.log('parentNode', div.parentNode);
+
+					document.body.appendChild(div);
+					console.log('div', div);
+					console.log('nodeType', div.nodeType);
+					console.log('nodeName', div.nodeName);
+					console.log('parentNode', div.parentNode);
+
+					document.body.removeChild(div);
+					console.log('div', div);
+					console.log('nodeType', div.nodeType);
+					console.log('nodeName', div.nodeName);
+					console.log('parentNode', div.parentNode);
+
+					document.body.appendChild(div);
+					console.log('div', div);
+					console.log('nodeType', div.nodeType);
+					console.log('nodeName', div.nodeName);
+					console.log('parentNode', div.parentNode);
+				}
+				// 망할 IE8 이하의 경우 한번 append 되었다가 remove 되면 parentNode 가 null 이 아니라 HTMLDocument.
+
+				if( false ) {
+					var container = document.createElement('div');
+					var div = document.createElement('div');
+					console.log('div', div);
+					console.log('nodeType', div.nodeType);
+					console.log('nodeName', div.nodeName);
+					console.log('parentNode', div.parentNode);
+
+					container.appendChild(div);
+					console.log('div', div);
+					console.log('nodeType', div.nodeType);
+					console.log('nodeName', div.nodeName);
+					console.log('parentNode', div.parentNode);
+
+					container.removeChild(div);
+					console.log('div', div);
+					console.log('nodeType', div.nodeType);
+					console.log('nodeName', div.nodeName);
+					console.log('parentNode', div.parentNode);
+				}
+
+				if( false ) {
+					var div = document.createElement('div');
+					document.body.appendChild(div);
+
+					div.innerHTML = 'test';
+					div.style['background'] = '#7C7C7C'
+				}
+			};
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

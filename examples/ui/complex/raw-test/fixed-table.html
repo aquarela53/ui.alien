@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="CSS Test">
+	</head>
+
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: "나눔 고딕", "맑은 고딕", Helvetica, sans-serif;
+			font-size: 12px;
+			margin: 0;
+			padding: 0;
+			background-color: #EEEBE4;
+		}
+
+		div {
+			box-sizing: border-box;
+		}
+
+		.orange {
+			background-color: #F03A37;
+		}
+
+		.blue {
+			background-color: #044B8D;
+		}
+
+		.red {
+			background-color: #BA2425;
+		}
+		
+		.green {
+			background-color: #568052;
+		}
+
+		.table {
+			display: table;
+			width: 100%;
+			table-layout: fixed;
+		}
+
+		.table .row {
+			display: table-row;
+		}
+
+		.table .row:last-child .cell {
+			border-bottom: none;
+		}
+
+		.table .row .cell {
+			display: table-cell;
+			vertical-align: middle;
+			overflow: hidden;
+		}
+
+		.table .row .cell.auto {
+			width: auto;
+		}
+
+		.center {
+			margin: 0 auto;
+		}
+	</style>
+	<body>
+		<div style="width:650px;margin: 10px auto;border: 1px solid #2e2e2e;">
+			<div class="table">
+				<div class="row">
+					<div class="cell" style="width:50px;height:50px;">
+						<div class="red" style="height:100%;">1</div>
+					</div>
+					<div class="cell auto">
+						<div class="green" style="height:100%;">2</div>
+					</div>
+					<div class="cell auto">
+						<div class="green">2</div>
+					</div>
+					<div class="cell" style="width:50px;max-height:100%;">
+						<div class="blue center" style="height:100%;">3</div>
+					</div>
+					<div class="cell" style="width:50px;">
+						<div class="orange">4</div>
+					</div>
+					<div class="cell" style="width:550px;">
+						<div class="red">4</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

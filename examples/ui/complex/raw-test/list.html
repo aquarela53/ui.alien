@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="CSS Test">
+	</head>
+
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: "나눔 고딕", "맑은 고딕", Helvetica, sans-serif;
+			font-size: 12px;
+			margin: 0;
+			padding: 0;
+			background-color: #EEEBE4;
+		}
+
+		div {
+			box-sizing: border-box;
+		}
+
+		.orange {
+			background-color: #F03A37;
+		}
+
+		.blue {
+			background-color: #044B8D;
+		}
+
+		.red {
+			background-color: #BA2425;
+		}
+		
+		.green {
+			background-color: #568052;
+		}
+
+
+		.list {
+			--border: 1px solid orange;
+			position: relative;
+			background-color: #232323;
+			color: #fcfcfc;
+			width: 100%;
+		}
+
+		.list .items {
+			display: table;
+			width: 100%;
+			height: 40px;
+			border-bottom: 1px solid #2e2e2e;
+		}
+
+		.list .items:hover {
+			background-color: #6A5A8C;
+			border-bottom: 1px solid #6A5A8C;
+		}
+
+		.list .items:hover .separator {
+			background-color: #6A5A8C !important;
+		}
+
+		.list .items .row {
+			display: table-row;
+			cursor: pointer;
+		}
+
+		.list .items .row:last-child .cell {
+			border-bottom: none;
+		}
+
+		.list .items .row .cell {
+			display: table-cell;
+			vertical-align: middle;
+			width: 1px;
+		}
+
+		.list .items .row .separator {
+			display: table-cell;
+			border-bottom: 1px solid #2e2e2e;
+			background-color: #2e2e2e;
+			width: 1px;
+		}
+
+		.list .items .row .cell.auto {
+			width: auto;
+		}
+
+
+		/* icon */
+		.list .icon {
+			margin: 0 8px;
+			margin-top: 2px;
+			width: 22px;
+		}
+
+		.list .icon img {
+			width: 22px;
+		}
+		
+		/* thumnail */
+		.list .thumnail {
+			padding: 5px;
+			overflow: hidden;
+		}
+
+		.list .thumnail img {
+			width: 30px;
+			height: 30px;
+		}
+
+		.list .text {
+			padding: 4px 6px;
+		}
+
+		.list .title {
+			font-weight: bold;
+			font-size: 1em;
+		}
+
+		.list .description {
+			font-weight: bold;
+			font-size: 0.9em;
+			color: #959595;
+		}
+
+		.list .round {
+			margin-left: 4px;
+			font-size: 1em;
+			font-weight: bold;
+			background: #6b5b8c;
+			color: white;
+			padding: 1px 8px 2px;
+			margin-top: -1px;
+		}
+
+		.list .arrow {
+			margin: 0 8px;
+			width: 9px;
+			height: 13px;
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAaCAYAAAC6nQw6AAABGklEQVQ4jbXULW7DMBQHcK+jiTYpZCcwXXGQUaQBS4ODRfExco0mZHQkFwjyAQw6VgV5KCFPShWDKaQlTZU5H6vt9iFbfv7Jlv42QvcqSumGc95gjNdOiBDiKIQ4WmNDxAZ76Aec88bzvCe9oSzLb8YYadu2WYJW/SCOY6KUOugNGOPXNE257/vPV53ovGmdZRm3OdnjcAIAtZRyH0XRh94YBMFLGIZvRVF8dV33uwghhJCUcl9V1Q8h5N0EG0Hna+xMsUnIBpuFTLFF6Fosz/PtamqzTf0LUUo3SZJ8Tq312UJIC6QN0gd0FjJBZiFTZBKyQUaQy6O9QC7IH8j1Y7skGwBqPb1KqQNjjABAvYSM6iaf/xBzRlzqBKp+G8ywLRSzAAAAAElFTkSuQmCC);
+			background-repeat: no-repeat no-repeat;
+			background-size: 9px 13px;
+		}
+	</style>
+	<body>
+		<div style="width:250px;margin: 10px auto;border: 0px solid #2e2e2e;">
+			<div class="list">
+				<div class="items">
+					<div class="row">
+						<div class="cell auto">
+							<div class="text">
+								<div class="title">This is List</div>
+							</div>
+						</div>
+						<div class="cell">
+							<div class="arrow"></div>
+						</div>
+					</div>
+				</div>
+				<div class="items">
+					<div class="row">
+						<div class="cell auto">
+							<div class="text">
+								<div class="title">This is List</div>
+							</div>
+						</div>
+						<div class="cell">
+							<div class="arrow"></div>
+						</div>
+					</div>
+				</div>
+				<div class="items">
+					<div class="row">
+						<div class="cell auto">
+							<div class="text">
+								<div class="title">This is List</div>
+							</div>
+						</div>
+						<div class="cell">
+							<div class="arrow"></div>
+						</div>
+					</div>
+				</div>
+				<div class="items">
+					<div class="row">
+						<div class="cell">
+							<div class="icon">
+								<img src="icons/heart.svg" />
+							</div>
+						</div>
+						<div class="separator"></div>
+						<div class="cell auto">
+							<div class="text">
+								<div class="title">새로운새로운</div>
+							</div>
+						</div>
+						<div class="cell">
+							<div class="arrow"></div>
+						</div>
+					</div>
+				</div>
+				<div class="items">
+					<div class="row">
+						<div class="cell">
+							<div class="thumnail">
+								<img src="icons/heart.svg" />
+							</div>
+						</div>
+						<div class="cell auto">
+							<div class="text">
+								<div class="title">새로운새로운</div>
+							</div>
+						</div>
+						<div class="cell">
+							<div class="arrow"></div>
+						</div>
+					</div>
+				</div>
+				<div class="items">
+					<div class="row">
+						<div class="cell">
+							<div class="icon">
+								<img src="icons/heart.svg" />
+							</div>
+						</div>
+						<div class="cell auto">
+							<div class="text">
+								<div class="title">새로운새로운</div>
+							</div>
+						</div>
+						<div class="cell">
+							<div class="arrow"></div>
+						</div>
+					</div>
+				</div>
+				<div class="items">
+					<div class="row">
+						<div class="cell">
+							<div class="icon">
+								<img src="icons/heart.svg" />
+							</div>
+						</div>
+						<div class="cell auto">
+							<div class="text">
+								<div class="title">새로운새로운</div>
+							</div>
+						</div>
+						<div class="cell">
+							<div class="arrow"></div>
+						</div>
+					</div>
+				</div>
+				<div class="items">
+					<div class="row">
+						<div class="cell">
+							<div class="thumnail">
+								<img src="images/m1.jpg" />
+							</div>
+						</div>
+						<div class="separator"></div>
+						<div class="cell auto">
+							<div class="text">
+								<div class="title">새로운 시대의 시작, </div>
+								<div class="description">80년대의 글로벌 히트 아이템은?</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="items">
+					<div class="row">
+						<div class="cell auto">
+							<div class="text">
+								<div class="title">새로운새로운새로운</div>
+								<div class="description">80년대의 글로벌 히트 아이템은?</div>
+							</div>
+						</div>
+						<div class="cell">
+							<div class="round">10</div>
+						</div>
+						<div class="cell">
+							<div class="arrow"></div>
+						</div>
+					</div>
+				</div>
+				<div class="items">
+					<div class="row">
+						<div class="cell">
+							<div class="icon">
+								<img src="icons/tv.svg" />
+							</div>
+						</div>
+						<div class="separator"></div>
+						<div class="cell auto">
+							<div class="text">
+								<div class="title">새로운 시대의 시작, </div>
+								<div class="description">80년대의 글로벌 히트 아이템은?</div>
+							</div>
+						</div>
+						<div class="cell">
+							<div class="round">10</div>
+						</div>
+						<div class="cell">
+							<div class="arrow"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

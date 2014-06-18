@@ -1,0 +1,130 @@
+{
+	component: 'view',
+	width: '100%',
+	items: [
+		{
+			component: 'space',
+			size: 9
+		}, {
+			component: 'bar',
+			name: 'gnb',
+			classes: 'round ishadow boxshadow',
+			height: 36,
+			bg: '#333',
+			items: [
+				{
+					component: 'image',
+					align: 'left',
+					
+				}, {
+					component: 'button',
+					align: 'right',
+					label: '버튼1',
+				}, {
+					component: 'button',
+					align: 'right',
+					label: '버튼2',
+				}, {
+					component: 'button',
+					align: 'right',
+					label: '버튼3',
+				}
+			]
+		}, {
+			component: 'space',
+			size: 9
+		}, {
+			component: 'cardview',
+			height: 150,
+			items: [
+				{
+					component: 'html',
+					html: ''
+				}
+			]
+		}, {
+			component: 'space',
+			size: 9
+		}, {
+			component: 'view',
+			horizontal: true,
+			flexible: true,
+			style: {
+				'border-radius': '4px',
+				'background': '#fff',
+				'border': '1px solid',
+				'border-color': '#e5e5e5 #dbdbdb #d2d2d2',
+				'box-shadow': 'rgba(0,0,0,0.3) 0 1px 3px'
+			},
+			items: [
+				{
+					component: 'view',
+					width: 250,
+					height: '100%',
+					items: [
+						{
+							component: 'list',
+							editable: true,
+							sortable: true,
+							editmode: true,
+							items: [
+								{
+									thumnail: 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRufxlO_8FD-gp1YkHqGRVMWphdfFj4Uk0xyUC-l9oguVZl8NCinA',
+									title: '제목',
+									description: '설명',
+									removable: true
+								}, {
+									thumnail: 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRufxlO_8FD-gp1YkHqGRVMWphdfFj4Uk0xyUC-l9oguVZl8NCinA',
+									title: '제목',
+									description: '설명',
+									removable: true
+								}, {
+									thumnail: 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRufxlO_8FD-gp1YkHqGRVMWphdfFj4Uk0xyUC-l9oguVZl8NCinA',
+									title: '제목',
+									description: '설명',
+									removable: true
+								}, {
+									thumnail: 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRufxlO_8FD-gp1YkHqGRVMWphdfFj4Uk0xyUC-l9oguVZl8NCinA',
+									title: '제목',
+									description: '설명',
+									removable: true
+								}
+							]
+						}
+					]
+				}, {
+					component: 'space',
+					bg: '#e5e5e5',
+					width: 1,
+					height: '100%'
+				}, {
+					component: 'view',
+					items: [
+						{
+							component: 'html',
+							style: {
+								'font': '12px/18px "Lucida Grande", "Lucida Sans Unicode", Dotum, Helvetica, Arial, Verdana, sans-serif',
+								'font-size': '12px',
+								'line-height': '16px',
+								'word-spacing': '-1px',
+								'border-radius': '4px',
+								'color': '#333',
+								'padding': ' 15px'
+							},
+							html: '전 세계적으로 7억 7천400만 명이 글을 읽거나 쓰지 못하고 이 중 약 3분의 2가 여성이라는 유엔교육과학문화기구(UNESCO)의 조사 결과가 나왔다.<br/><br/> 유네스코는 세계문맹퇴치의 날인 6일(현지시간)을 맞아 문맹자 대부분이 사하라 사막 이남 아프리카와 인도 등 서남아시아에 살고 있고, 문맹자 중 1억 2천300만 명은 15세에서 24세의 젊은이라고 발표했다.<br/><br/> 유네스코는 또 지난 1990년 이후 문맹자 숫자가 약 1억 명 줄었지만, 유엔의 밀레니엄 개발 목표 시점인 2015년까지 문맹률을 절반으로 줄이려는 목표는 달성하지 못할 전망이라고 7일 밝혔다.<br/><br/> 문맹 퇴치를 위한 교육환경도 열악해 전 세계적으로 5천700만 명의 초등학교 연령대 어린이와 6천900만 명의 중등학교 연령대 청소년들이 학교에 다니지 못하고 있다고 유네스코는 설명했다.<br/><br/> 특히 내전 상태인 시리아는 6세에서 15세 사이의 어린이 40%는 아예 교육을 받지 못하고 있으며, 3천개 이상의 학교가 2년 전 내전이 시작된 이후 파괴되거나 무너진 상태이고 900여 개 학교는 시리아 내 난민 거주지로 이용되고 있다.<br/><br/> 해외로 탈출한 시리아 난민들의 자녀 역시 제대로 교육을 받지 못하고 있다.<br/><br/> 요르단에 있는 3만 명의 어린이는 수용소에 학교시설이 개설됐지만 미래가 불확실한 상황에서 학교에 가지 못하고 있으며, 이라크에 있는 어린이의 90%도 마찬가지 상황이고 레바논은 아예 학교시설도 없는 실정이다.<br/><br/> 미국 인구조사국에 따르면 2013년 1월 현재 세계인구는 71억명으로 추산되고 있다.<br><br>전 세계적으로 7억 7천400만 명이 글을 읽거나 쓰지 못하고 이 중 약 3분의 2가 여성이라는 유엔교육과학문화기구(UNESCO)의 조사 결과가 나왔다.<br/><br/> 유네스코는 세계문맹퇴치의 날인 6일(현지시간)을 맞아 문맹자 대부분이 사하라 사막 이남 아프리카와 인도 등 서남아시아에 살고 있고, 문맹자 중 1억 2천300만 명은 15세에서 24세의 젊은이라고 발표했다.<br/><br/> 유네스코는 또 지난 1990년 이후 문맹자 숫자가 약 1억 명 줄었지만, 유엔의 밀레니엄 개발 목표 시점인 2015년까지 문맹률을 절반으로 줄이려는 목표는 달성하지 못할 전망이라고 7일 밝혔다.<br/><br/> 문맹 퇴치를 위한 교육환경도 열악해 전 세계적으로 5천700만 명의 초등학교 연령대 어린이와 6천900만 명의 중등학교 연령대 청소년들이 학교에 다니지 못하고 있다고 유네스코는 설명했다.<br/><br/> 특히 내전 상태인 시리아는 6세에서 15세 사이의 어린이 40%는 아예 교육을 받지 못하고 있으며, 3천개 이상의 학교가 2년 전 내전이 시작된 이후 파괴되거나 무너진 상태이고 900여 개 학교는 시리아 내 난민 거주지로 이용되고 있다.<br/><br/> 해외로 탈출한 시리아 난민들의 자녀 역시 제대로 교육을 받지 못하고 있다.<br/><br/> 요르단에 있는 3만 명의 어린이는 수용소에 학교시설이 개설됐지만 미래가 불확실한 상황에서 학교에 가지 못하고 있으며, 이라크에 있는 어린이의 90%도 마찬가지 상황이고 레바논은 아예 학교시설도 없는 실정이다.<br/><br/> 미국 인구조사국에 따르면 2013년 1월 현재 세계인구는 71억명으로 추산되고 있다.<br><br> 유네스코는 세계문맹퇴치의 날인 6일(현지시간)을 맞아 문맹자 대부분이 사하라 사막 이남 아프리카와 인도 등 서남아시아에 살고 있고, 문맹자 중 1억 2천300만 명은 15세에서 24세의 젊은이라고 발표했다.<br/><br/> 유네스코는 또 지난 1990년 이후 문맹자 숫자가 약 1억 명 줄었지만, 유엔의 밀레니엄 개발 목표 시점인 2015년까지 문맹률을 절반으로 줄이려는 목표는 달성하지 못할 전망이라고 7일 밝혔다.<br/><br/> 문맹 퇴치를 위한 교육환경도 열악해 전 세계적으로 5천700만 명의 초등학교 연령대 어린이와 6천900만 명의 중등학교 연령대 청소년들이 학교에 다니지 못하고 있다고 유네스코는 설명했다.<br/><br/> 특히 내전 상태인 시리아는 6세에서 15세 사이의 어린이 40%는 아예 교육을 받지 못하고 있으며, 3천개 이상의 학교가 2년 전 내전이 시작된 이후 파괴되거나 무너진 상태이고 900여 개 학교는 시리아 내 난민 거주지로 이용되고 있다.<br/><br/> 해외로 탈출한 시리아 난민들의 자녀 역시 제대로 교육을 받지 못하고 있다.<br/><br/> 요르단에 있는 3만 명의 어린이는 수용소에 학교시설이 개설됐지만 미래가 불확실한 상황에서 학교에 가지 못하고 있으며, 이라크에 있는 어린이의 90%도 마찬가지 상황이고 레바논은 아예 학교시설도 없는 실정이다.<br/><br/> 미국 인구조사국에 따르면 2013년 1월 현재 세계인구는 71억명으로 추산되고 있다.<br><br> 유네스코는 세계문맹퇴치의 날인 6일(현지시간)을 맞아 문맹자 대부분이 사하라 사막 이남 아프리카와 인도 등 서남아시아에 살고 있고, 문맹자 중 1억 2천300만 명은 15세에서 24세의 젊은이라고 발표했다.<br/><br/> 유네스코는 또 지난 1990년 이후 문맹자 숫자가 약 1억 명 줄었지만, 유엔의 밀레니엄 개발 목표 시점인 2015년까지 문맹률을 절반으로 줄이려는 목표는 달성하지 못할 전망이라고 7일 밝혔다.<br/><br/> 문맹 퇴치를 위한 교육환경도 열악해 전 세계적으로 5천700만 명의 초등학교 연령대 어린이와 6천900만 명의 중등학교 연령대 청소년들이 학교에 다니지 못하고 있다고 유네스코는 설명했다.<br/><br/> 특히 내전 상태인 시리아는 6세에서 15세 사이의 어린이 40%는 아예 교육을 받지 못하고 있으며, 3천개 이상의 학교가 2년 전 내전이 시작된 이후 파괴되거나 무너진 상태이고 900여 개 학교는 시리아 내 난민 거주지로 이용되고 있다.<br/><br/> 해외로 탈출한 시리아 난민들의 자녀 역시 제대로 교육을 받지 못하고 있다.<br/><br/> 요르단에 있는 3만 명의 어린이는 수용소에 학교시설이 개설됐지만 미래가 불확실한 상황에서 학교에 가지 못하고 있으며, 이라크에 있는 어린이의 90%도 마찬가지 상황이고 레바논은 아예 학교시설도 없는 실정이다.<br/><br/> 미국 인구조사국에 따르면 2013년 1월 현재 세계인구는 71억명으로 추산되고 있다.<br><br>'
+						}
+					]
+				}
+			]
+		}, {
+			component: 'space',
+			size: 9
+		}, {
+			component: 'html',
+			classes: 'right',
+			padding: 10,
+			color: '#efefef',
+			html: 'Appbus © 2013'
+		}
+	]
+}

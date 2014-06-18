@@ -1,0 +1,172 @@
+element.style {
+}
+Matched CSS Rules
+pinterest.commedia="all"
+#UnauthCallout .Sheet div .Button:first-child {
+margin: 0 0 5px 0;
+}
+pinterest.commedia="all"
+#UnauthCallout .Sheet div .Button {
+margin-left: 10px;
+}
+pinterest.commedia="all"
+.Button.RedButton {
+background-color: rgb(212, 54, 56);
+background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgb(235, 83, 103)), to(rgb(212, 54, 56)), color-stop(0.5, rgb(224, 71, 81)), color-stop(0.5, rgb(222, 64, 74)));
+background-image: -moz-linear-gradient(top, rgb(235, 83, 103), rgb(224, 71, 81) 50%, rgb(222, 64, 74) 50%, rgb(212, 54, 56));
+background-image: -o-linear-gradient(top, rgb(235, 83, 103), rgb(224, 71, 81) 50%, rgb(222, 64, 74) 50%, rgb(212, 54, 56));
+background-image: -webkit-linear-gradient(top, rgb(235, 83, 103), rgb(224, 71, 81) 50%, rgb(222, 64, 74) 50%, rgb(212, 54, 56));
+border-color: rgb(145, 1, 1);
+color: rgb(252, 249, 249);
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eb5367', endColorstr='#d43638');
+text-shadow: 0 -1px rgba(34, 25, 25, 0.5);
+-webkit-font-smoothing: antialiased;
+}
+pinterest.commedia="all"
+.Button.Button18 {
+-moz-border-radius: 6px;
+-webkit-border-radius: 6px;
+border-radius: 6px;
+font-size: 18px;
+}
+pinterest.commedia="all"
+.Button {
+border: 1px solid transparent;
+-moz-border-radius: .3em;
+-webkit-border-radius: .3em;
+border-radius: .3em;
+-moz-box-shadow: 0 1px rgba(255,255,255,0.8),inset 0 1px rgba(255,255,255,0.35);
+-webkit-box-shadow: 0 1px rgba(255, 255, 255, 0.8),inset 0 1px rgba(255, 255, 255, 0.35);
+box-shadow: 0 1px rgba(255, 255, 255, 0.8),inset 0 1px rgba(255, 255, 255, 0.35);
+cursor: pointer;
+display: inline-block;
+font-family: "helvetica neue",arial,sans-serif;
+font-weight: bold;
+line-height: 1em;
+margin: 0;
+padding: .45em .825em .45em;
+text-align: center;
+-moz-transition: all .05s ease-in-out;
+-o-transition: all .05s ease-in-out;
+-webkit-transition: all .05s ease-in-out;
+}
+pinterest.commedia="all"
+a {
+font-weight: bold;
+color: rgb(34, 25, 25);
+text-decoration: none;
+outline: none;
+}
+user agent stylesheeta:-webkit-any-link {
+color: -webkit-link;
+text-decoration: underline;
+cursor: auto;
+}
+Inherited from div
+pinterest.commedia="all"
+#UnauthCallout .Sheet div {
+text-align: right;
+}
+Inherited from div.Nag
+pinterest.commedia="all"
+#UnauthCallout .Nag {
+text-align: left;
+}
+pinterest.commedia="all"
+.Nag {
+text-align: center;
+font-size: 18px;
+}
+Inherited from body#profile.hidefixed
+pinterest.commedia="all"
+body {
+font-family: "helvetica neue",arial,sans-serif;
+font-size: 10px;
+color: rgb(33, 25, 34);
+}
+
+
+
+
+
+element.style {
+}
+Matched CSS Rules
+pinterest.commedia="all"
+#UnauthCallout .Sheet div .Button {
+margin-left: 10px;
+}
+pinterest.commedia="all"
+.Button.WhiteButton, .repin_memo_on .pin:hover .actions .repin_link {
+background-color: rgb(240, 237, 237);
+background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgb(253, 250, 251)), to(rgb(240, 237, 237)), color-stop(0.5, rgb(249, 247, 247)), color-stop(0.5, rgb(246, 243, 244)));
+background-image: -moz-linear-gradient(top, rgb(253, 250, 251), rgb(249, 247, 247) 50%, rgb(246, 243, 244) 50%, rgb(240, 237, 237));
+background-image: -o-linear-gradient(top, rgb(253, 250, 251), rgb(249, 247, 247) 50%, rgb(246, 243, 244) 50%, rgb(240, 237, 237));
+background-image: -webkit-linear-gradient(top, rgb(253, 250, 251), rgb(249, 247, 247) 50%, rgb(246, 243, 244) 50%, rgb(240, 237, 237));
+border-color: rgb(187, 187, 187);
+color: rgb(82, 77, 77);
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fdfafb', endColorstr='#f0eded');
+text-shadow: 0 1px rgba(255, 255, 255, 0.9);
+}
+pinterest.commedia="all"
+.Button.Button18 {
+-moz-border-radius: 6px;
+-webkit-border-radius: 6px;
+border-radius: 6px;
+font-size: 18px;
+}
+pinterest.commedia="all"
+.Button {
+border: 1px solid transparent;
+-moz-border-radius: .3em;
+-webkit-border-radius: .3em;
+border-radius: .3em;
+-moz-box-shadow: 0 1px rgba(255,255,255,0.8),inset 0 1px rgba(255,255,255,0.35);
+-webkit-box-shadow: 0 1px rgba(255, 255, 255, 0.8),inset 0 1px rgba(255, 255, 255, 0.35);
+box-shadow: 0 1px rgba(255, 255, 255, 0.8),inset 0 1px rgba(255, 255, 255, 0.35);
+cursor: pointer;
+display: inline-block;
+font-family: "helvetica neue",arial,sans-serif;
+font-weight: bold;
+line-height: 1em;
+margin: 0;
+padding: .45em .825em .45em;
+text-align: center;
+-moz-transition: all .05s ease-in-out;
+-o-transition: all .05s ease-in-out;
+-webkit-transition: all .05s ease-in-out;
+}
+pinterest.commedia="all"
+a {
+font-weight: bold;
+color: rgb(34, 25, 25);
+text-decoration: none;
+outline: none;
+}
+user agent stylesheeta:-webkit-any-link {
+color: -webkit-link;
+text-decoration: underline;
+cursor: auto;
+}
+Inherited from div
+pinterest.commedia="all"
+#UnauthCallout .Sheet div {
+text-align: right;
+}
+Inherited from div.Nag
+pinterest.commedia="all"
+#UnauthCallout .Nag {
+text-align: left;
+}
+pinterest.commedia="all"
+.Nag {
+text-align: center;
+font-size: 18px;
+}
+Inherited from body#profile.hidefixed
+pinterest.commedia="all"
+body {
+font-family: "helvetica neue",arial,sans-serif;
+font-size: 10px;
+color: rgb(33, 25, 34);
+}

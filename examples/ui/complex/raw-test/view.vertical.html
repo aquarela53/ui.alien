@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="CSS Test">
+	</head>
+
+	<style>
+		* {
+			--margin: 0;
+			--padding: 0;
+		}
+
+		h3 {
+			font-size: 12px;
+			margin: 0;
+			padding: 0;
+		}
+
+		div {
+			box-sizing: border-box;
+		}
+
+		.view {
+			display: block;
+			--overflow-x: hidden;			
+			--border: 1px solid red;
+		}
+
+		.view > .innerview.h {
+			display: table;
+			width: 100%;
+		}
+
+		.view > .innerview.h > .cell {
+			display: table-cell;
+			position: relative;
+			width: 1px;
+			background: #ececec;
+		}
+
+		.view > .innerview.h > .viewcell {
+			
+		}
+
+		.entry {
+		}
+
+		.orange {
+			background-color: #F03A37;
+		}
+
+		.blue {
+			background-color: #044B8D;
+		}
+
+		.red {
+			background-color: #BA2425;
+		}
+		
+		.green {
+			background-color: #568052;
+		}
+	</style>
+	<body>
+		<!-- Vertical View, default -->
+		<h3>Vertical View, default</h3>
+		<div class="view" style="border: 3px dotted black;">
+			<div class="innerview">
+				<div class="cell">
+					<div class="entry blue">Component</div>
+				</div>
+				<div class="cell">
+					<div class="entry red" style="height: 80px;">Component</div>
+				</div>
+				<div class="cell">
+					<div class="entry green">Component</div>
+				</div>
+			</div>
+		</div>
+
+		<br/><br/>
+
+		<!-- Horizontal View, default -->
+		<h3>Horizontal View, default</h3>
+		<div class="view" style="border: 3px dotted black;">
+			<div class="innerview h">
+				<div class="cell">
+					<span class="entry blue" style="display:inline-block;height:100%;">Component</span>
+				</div>
+				<div class="cell">
+					<div class="entry red" style="height: 50px;">Component</div>
+				</div>
+				<div class="cell">
+					<div class="entry green">Component</div>
+				</div>
+				<div class="viewcell"></div>
+			</div>
+		</div>
+
+		<br/><br/>
+
+		<!-- Horizontal View, auto fit -->
+		<h3>Horizontal View, auto fit</h3>
+		<div class="view" style="border: 3px dotted black;">
+			<div class="innerview h">
+				<div class="cell">
+					<div class="entry blue">Component</div>
+				</div>
+				<div class="cell">
+					<div class="entry red">Component</div>
+				</div>
+				<div class="cell">
+					<div class="entry green">Component</div>
+				</div>
+			</div>
+		</div>
+
+		<br/><br/>
+
+		<!-- Horizontal View within Vertical -->
+		<h3>Horizontal View within Vertical</h3>
+		<div class="view" style="border: 3px dotted black;">
+			<div class="innerview h">
+				<div class="cell">
+					<div class="entry blue" style="width:350px;">Component</div>
+				</div>
+				<div class="cell" style="width:100px;">
+					<!-- 웹킷만 정상 표시, 높이를 셀에 가득 채우는 경우 스크립트로 맞춰줘야 한다.. -->
+					<div class="entry red" style="position:absolute;width:100%;height:100%;">Component</div>
+				</div>
+				<div class="viewcell">
+					<!-- Vertical View -->
+					<div class="view green">
+						<div class="innerview">
+							<div class="cell">
+								<div class="entry blue">Component</div>
+							</div>
+							<div class="cell">
+								<div class="entry red" style="height: 80px;">Component</div>
+							</div>
+							<div class="cell">
+								<div class="entry green">Component</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<br/><br/>
+
+		<div style="height:300px">
+			<div class="entry blue" style="height:100%">Component</div>
+		</div>
+	</body>
+</html>

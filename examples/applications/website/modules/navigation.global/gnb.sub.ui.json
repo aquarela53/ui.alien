@@ -1,0 +1,15 @@
+{
+	component: 'view',
+	name: 'root',
+	items: [
+		{
+			component: 'cmp',
+			name: 'cmp',
+			html: 'this is gnb sub!!!!'
+		}, {
+			component: 'cmp',
+			name: 'cmp',
+			html: 'this is gnb2 sub!!!!'
+		}
+	]
+}

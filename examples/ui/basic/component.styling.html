@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1081">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Component - Styling</title>
+		
+		<script type="text/javascript" src="../ui.debug.js"></script>
+		<script type="text/javascript">
+			// component style with custom class
+			var cmp1 = new Appbus.Component({
+				classes: 'bg-sprite pointer',
+				html: 'Hello Stranger!'
+			});
+			
+			// component style with style attribute
+			var cmp2 = new Appbus.Component({
+				style: {
+					'display': 'box',
+					'transition': 'all 2s',
+					'font-size': 29
+				},
+				html: 'Hello Stranger!'
+			});
+			
+			// component style with inline stylesheet
+			var cmp3 = new Appbus.View({
+				css: {
+					'display': 'box',
+					'transition': 'all 2s',
+					'font-size': 30,
+					'.box': 'border:1px solid'
+				},
+				items: [
+					'Hello Stranger!'
+				]
+			});
+			
+			// render components
+			Appbus.on('ready', function(e) {
+				cmp1.attachTo('#slot');
+				cmp2.attachTo('#slot');
+				cmp3.attachTo('#slot');
+			});
+			
+
+
+			// test functions
+			function applyElStyle() {
+				cmp2.style({
+					'display': 'box',
+					'background-color': 'black',
+					'transition': 'all 2s',
+					'color': 'white'
+				});
+			}
+
+			function changeElStyle() {
+				cmp2.style({
+					'transition': 'all 2s',
+					'background-color': 'orange',
+					'color': 'green'
+				});
+			}
+
+			function clearElStyle() {
+				cmp2.style(false);
+			}
+
+			function applyCSS() {
+				cmp3.css({
+					'display': 'box',
+					'background-color': 'black',
+					'color': 'white',
+					'transition': 'all 2s',
+					'font-size': 30,
+					'> *': {
+						'transition': 'all 2s',
+						'height': 100,
+						'overflow': 'hidden'
+					}
+				});
+			}
+
+			function changeCSS() {
+				cmp3.css({
+					'display': 'box',
+					'background-color': 'silver',
+					'color': 'red',
+					'transition': 'all 2s',
+					'font-size': 20,
+					'> *': {
+						'transition': 'all 2s',
+						'height': 50,
+						'overflow': 'hidden'
+					}
+				});
+			}
+
+			function clearCSS() {
+				cmp3.css(false);
+			}
+		</script>
+	</head>
+	<body>
+		<div id="slot"></div>
+		<a href="javascript:applyElStyle();">applyElStyle</a>
+		<a href="javascript:changeElStyle();">changeElStyle</a>
+		<a href="javascript:clearElStyle();">clearElStyle</a>
+		<a href="javascript:applyCSS();">applyCSS</a>
+		<a href="javascript:changeCSS();">changeCSS</a>
+		<a href="javascript:clearCSS();">clearCSS</a>
+	</body>
+</html>

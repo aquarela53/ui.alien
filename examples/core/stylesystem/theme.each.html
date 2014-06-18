@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1000">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Style System Basic</title>
+		
+		<script type="text/javascript" src="../ui.debug.js"></script>
+		<script type="text/javascript">
+			// define mytheme
+			var mytheme = new Appbus.Theme('mytheme');
+			
+			// you can set each component style. if not defined target name of component in theme, it will be created automatically.
+			mytheme.component('view').set({
+				'background': 'white',
+				'color': 'black',
+				'font-size': 10,
+				'..cls': {
+					'background': 'orange'
+				},
+				'.sub': {
+					'background': 'darkslateblue',
+					'cursor': ['pointer', 'hand']
+				},
+				'div': {
+					'background': 'silver'
+				},
+				'.string': 'background:silver;font-size   :   1em;a;background-image:url(data:image/png;base64,iVBORw0KGII=)',
+				'.hierachy': {
+					'color': 'grey',
+					'background': 'yellow',
+					'test': {
+						'font-size': 9
+					}
+				}
+			});
+
+			mytheme.component('table').set({
+				'background': 'white',
+				'color': 'black',
+				'font-size': 10,
+				'..cls': {
+					'background': 'orange'
+				}
+			});
+
+			console.log('mytheme', mytheme);
+			console.log('json', JSON.stringify(mytheme, null, '\t'));
+			console.log(mytheme.build());
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

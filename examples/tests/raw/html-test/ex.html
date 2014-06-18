@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<title>예제</title>
+<meta charset="utf-8">
+<style type="text/css">
+* { margin:0; padding:0; }
+#wrap { position:relative; }
+.leftGroup { position:absolute; left:0; top:0; width:50%; }
+.rightGroup { position:absolute; right:0; top:0; width:50%; }
+
+.a { background:red; }
+.b { background:green; }
+.c { background:blue; }
+.d { background:pink; }
+.e { background:black; color:#fff; }
+
+.leftGroup div { float:left; }
+.rightGroup div { float:right; }
+
+#wrap .grouping { overflow:hidden; zoom:1; width:10000px; }
+</style>
+</head>
+<body>
+<div id="wrap">
+	<div class="leftGroup">
+		<div class="grouping">
+			<div class="a">
+				asdsdsdsadad
+			</div>
+			<div class="b">
+				bsdaadasdasd
+			</div>
+			<div class="c">
+				casdasdasdsd
+			</div>
+		</div>
+	</div>
+
+	<div class="rightGroup">
+		<div class="grouping">
+			<div class="d">
+				dsadasdsadsa
+			</div>
+			<div class="e">
+				esadadasd
+			</div>
+			<div class="d">
+				dsadasdsadsa
+			</div>
+			<div class="e">
+				esadadasd
+			</div>
+			<div class="d">
+				dsadasdsadsa
+			</div>
+			<div class="e">
+				esadadasd
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

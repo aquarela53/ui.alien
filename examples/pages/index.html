@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1081">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="description" content="examples">
+		<title>Javascript UI 개발</title>
+		
+		<script type="text/javascript" src="../ui.debug.js"></script>
+
+		<script type="text/javascript">
+			var UI = require('ui');
+			
+
+			var Pages = new UI.ModuleConcrete('./src/Pages.js').component();
+
+			UI.on('ready', function(e) {
+				var app = new Pages({
+					fit: true,
+					title: '"Javascript UI 개발, 안녕들하십니까?"'
+				}).attachTo(document.body);
+				
+				require('buildinfo').print();
+			});
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

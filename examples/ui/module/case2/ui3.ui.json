@@ -1,0 +1,5 @@
+{
+	component: 'html',
+	name: 'cmp3',
+	html: 'ui3'
+}

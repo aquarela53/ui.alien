@@ -1,0 +1,23 @@
+<script type="text/javascript" singleton="true">
+	console.log('BBS list init');
+</script>
+
+<script type="text/javascript">
+	console.log('BBS list', page.path.hash);
+
+	El('#bbs tbody').html('<tr><td colspan="5" style="text-align:center;">' + page.path.hash + '의 데이터를 불러오는 중...</td></tr>');
+</script>
+
+<table id="bbs" class="table table-bordered">
+	<thead>
+		<tr>
+			<th></th>
+			<th>제목</th>
+			<th>작성자</th>
+			<th>작성일</th>
+			<th>조회</th>
+		</tr>
+	</thead>
+	<tbody>
+	</tbody>
+</table>

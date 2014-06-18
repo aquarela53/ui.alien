@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1081">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>CSS Rules</title>
+
+		<style>
+			/* reset inherits */
+			.x.view2 {
+				border-collapse: initial;
+				border-spacing: initial;
+				caption-side: initial;
+				color: initial;
+				cursor: initial;
+				direction: initial;
+				empty-cells: initial;
+				font-family: initial;
+				font-size: initial;
+				font-weight: initial;
+				font-style: initial;
+				font-variant: initial;
+				font: initial;
+				letter-spacing: initial;
+				list-style-type: initial;
+				list-style-position: initial;
+				list-style-image: initial;
+				list-style: initial;
+				line-height: initial;
+				orphans: initial;
+				page-break-inside: initial;
+				quotes: initial;
+				text-align: initial;
+				text-indent: initial;
+				text-transform: initial;
+				visibility: initial;
+				white-space: initial;
+				widows: initial;
+				word-spacing: initial;
+			}
+
+
+
+			.ctx-default.x.view {
+				border: 1px dotted silver;
+				color: black;
+			}
+
+			.theme-default.x.view {
+				background: white;	
+			}
+
+			.theme-android.x.view {
+				background: rgba(0,0,255,1);	
+			}
+
+			.theme-ios6.x.view {
+				background: rgba(255,0,0,1);
+			}
+
+			.theme-ios7.x.view {
+				background: rgba(0,255,0,1);
+			}
+
+			.ctx-101.x.view {
+				color: orange;
+			}
+
+			.ctx-102.x.view {
+				color: green;			
+			}
+		</style>
+	</head>
+	<body>
+		<!-- <div class="{framework} {theme} {context} {component.accessor}"></div> -->
+		
+		<div style="font-size:11px;">
+			<div class="x theme-android view" style="vertical-align:middle;width:10px;height:10px;margin:5px;display:inline-block;"></div> <span>android</span>
+			<div class="x theme-ios6 view" style="vertical-align:middle;width:10px;height:10px;margin:5px;display:inline-block;"></div> <span>ios6</span>
+			<div class="x theme-ios7 view" style="vertical-align:middle;width:10px;height:10px;margin:5px;display:inline-block;"></div> <span>ios7</span>
+		</div>
+
+		
+		<div class="x ctx-default theme-default view">
+			default(none, none)
+			<div class="x view">default(inherit, inherit)</div>
+		</div>
+		
+		<br/>
+		theme
+		<div class="x ctx-default theme-android view">
+			android(none, theme-android)
+			<div class="x view">default(inherit, inherit)</div>
+		</div>
+		
+		<br/>
+		ctx-101
+		<div class="x ctx-101 theme-ios6 view">
+			ios6(ctx-101, theme-ios6)
+			<div class="x theme-ios7 view">
+				ios7(inherit, theme-ios7)
+				<div class="x theme-android view">
+					android(inherit, theme-android)
+					<div class="x view">
+						default(inherit, inherit)
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<br/>
+		ctx-102
+		<div class="x ctx-102 theme-ios7 view">
+			ios7(ctx-102, theme-ios7)
+			<div class="x view">default(inherit, inherit)</div>
+		</div>
+
+		<br/>
+		complex
+		<div class="x ctx-101 theme-ios6 view">
+			ios6(ctx-101, theme-ios6)
+			<div class="x theme-ios7 view">
+				ios7(inherit, theme-ios7)
+				<div class="x theme-android view">
+					android(inherit, theme-android)
+					<div class="x ctx-default theme-default view">
+						default(default, default)
+						<div class="x ctx-102 theme-ios7 view">
+							ios7(ctx-102, theme-ios7)
+							<div class="x view">default(inherit, inherit)</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+
+
+<script>
+	// decrare
+	var View = function(){};
+	View.name = 'view';
+	View.accessor = 'box v';
+	View.style = {
+		'color': 'green'
+	};
+
+	// usage
+	{
+		component: 'view'
+	}
+
+
+	<div class="x theme-default ctx-default box v"></div>
+
+	.x.theme-default.ctx-default.box.v {
+	}
+
+	
+</script>

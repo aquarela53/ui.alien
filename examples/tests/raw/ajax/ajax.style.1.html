@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="Appbus Web UI Toolkit 5.0.0">
+		<title>Appbus.Ajax</title>
+
+		<script type="text/javascript" src="../../libs/attrs.ui-5.0.0/Appbus.Foundation.js"></script>
+		<script type="text/javascript" src="../../libs/attrs.ui-5.0.0/Appbus.Class.js"></script>
+		<script type="text/javascript" src="../../libs/attrs.ui-5.0.0/Appbus.EventProvider.js"></script>
+		<script type="text/javascript" src="../../libs/attrs.ui-5.0.0/util/Appbus.Ajax.js"></script>
+
+		<script type="text/javascript">
+			var Ajax = Appbus.Ajax;
+			// style 1
+			if( true ) {
+				console.error('- Style 1');
+				Ajax.ajax('/api/printingengine/ds')
+					.qry({key: 'value'})
+					.get()
+					.success(function(data) {
+							console.log('success', data);
+					})
+					.complete(function(err, data) {
+							console.log('complete', err, data);
+					})
+					.error(function(err, data) {
+							console.error('error', err, data);
+					});
+			}
+		</script>
+	</head>
+	<body>
+		<div id="frame"></div>
+	</body>
+</html>

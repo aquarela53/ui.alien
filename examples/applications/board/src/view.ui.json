@@ -1,0 +1,13 @@
+{
+	component: 'view',
+	items: [
+		{
+			component: 'cmp',
+			name: 'cmp1',
+			classes: 'cls',
+			style: {
+			},
+			html: 'this is view cmp1'
+		}
+	]
+}

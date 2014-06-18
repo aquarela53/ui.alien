@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1081">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Container Basic</title>
+		
+		<script type="text/javascript" src="../ui.debug.js"></script>
+		<script type="text/javascript">
+			var container = new Appbus.Container({
+				before: function() {
+					this.on('added', function(e) {
+						new Appbus.Component({html:e.item}).attachTo(e.src, e.index);
+					});
+				},
+				items: [
+					'item-by-options-1',
+					'item-by-options-2'
+				]
+			});
+
+			container.add('item-1');
+			container.add(['item-2','item-3','item-4']);
+			container.add('item-5', 2);
+			container.add(['item-6','item-7'], 1);
+
+			console.log('container', container);
+			console.log('container.name', container.name());
+			console.log('container.context', container.context());
+			
+			console.log('container.items()', container.items());
+			console.log('container.get(3)', container.get(3));
+			console.log('container.children()', container.children());
+			
+			Appbus.on('ready', function(e) {
+				container.attachTo('#slot');
+			});
+		</script>
+	</head>
+	<body>
+		<div id="slot"></div>
+	</body>
+</html>

@@ -1,0 +1,175 @@
+{
+	$: 'Window',
+	title: {text:'윈도우 테스트',align:'left'},
+	icon: '',
+	titlebar: true,
+	closable: true,
+	resizable: true,
+	modal: true,
+	movable: '.c > .tabview > .tabbar > .bg',
+	w: '50%',
+	h: '50%',
+	mw: 300,
+	mh: 150,
+	c: {
+		$: 'View',
+		c: [
+			{
+				$: 'TabView',
+				tabAlign: 'top',
+				c: [
+					{
+						$: 'View',
+						c: [
+							{
+								$: 'Bar',
+								c: {
+									$: 'Button',
+									text: 'btn'
+								}
+							}, {
+								$: 'Table',
+								id: 'table',
+								title: '리스트',
+								attrs: {name:'name'},
+								cols: {
+									seq: {
+										label: '번호',
+										align: 'right',
+										sortable: true,
+										width: 50,
+										type: 'number'
+									},
+									thumnail: {
+										label: '썸네일',
+										width: 50,
+										align: 'center',
+										type: function(v, def, col, row) {
+											return new Appbus.Image({
+												w: '100%',
+												src: 'http://icon.daumcdn.net/w/c/12/12/13648678630787703.jpeg'
+											});
+										}
+									},
+									title: {
+										label: '제목',
+										align: 'left',
+										sortable: true,
+										type: 'string'
+									},
+									posted: {
+										label: '작성일',
+										width: 100,
+										align: 'center',
+										sortable: true,
+										type: 'date.iso',
+										format: 'yyyy년 MM월 dd일'
+									},
+									author: {
+										label: '작성자',
+										width: 100,
+										align: 'center',
+										sortable: true,
+										type: function(v, item) {
+											return '관리자'
+										}
+									},
+									hit: {
+										label: '조회',
+										hidden: false,
+										width: 80,
+										align: 'center',
+										sortable: true,
+										type: 'decimal',
+										suffix: '회'
+									}
+								},
+								c: [
+									{
+										seq: 1123123,
+										title: '제목',
+										posted: new Date().toISOString(),
+										author: 'Developer',
+										hit: 345345
+									}
+								],
+								e: {
+									'table.select': function(table, row, index, item) {
+										console.log('table.select', arguments);
+									},
+									'table.unselect': function(table, row, index, item) {
+										console.log('table.unselect', arguments);
+									},
+									'table.doubletap': function(table, row, index, item) {
+										console.log('table.doubletap', arguments);
+									}
+								}
+							}
+						]
+					}
+				]
+			}, {
+				$: 'Bar',
+				c: [
+					{
+						$: 'Button',
+						text: '새로고침',
+						disabled: true,
+						e: {
+							action: function(btn, e) {
+								console.log(btn.text);
+							}
+						}
+					}, {
+						$: 'Button',
+						id: 'prev',
+						text: '이전',
+						align: 'center',
+						e: {
+							action: function(btn, e) {
+								console.log(btn.text);
+								Appbus.get('table').prev();
+							}
+						}
+					}, {
+						$: 'Button',
+						text: '다음',
+						align: 'center',
+						e: {
+							action: function(btn, e) {
+								console.log(btn.text);
+								Appbus.get('table').next();
+							}
+						}
+					}, {
+						$: 'Button',
+						text: '삭제',
+						align: 'right',
+						e: {
+							action: function(btn, e) {
+								var index = Appbus.get('table').getSelectedIndex();
+								if( index >= 0 ) Appbus.get('table').remove(index);
+								else alert('삭제할 행을 선택해주세요.');
+							}
+						}
+					}, {
+						$: 'Button',
+						text: '추가',
+						align: 'right',
+						e: {
+							action: function(btn, e) {
+								Appbus.get('table').add({
+									seq: 2,
+									title: '제목2',
+									posted: new Date().toISOString(),
+									author: 'Developer',
+									hit: 1
+								});
+							}
+						}
+					}
+				]
+			}
+		]
+	}
+}

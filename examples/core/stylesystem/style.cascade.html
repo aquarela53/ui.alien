@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1000">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Style System Basic</title>
+		
+		<script type="text/javascript" src="../ui.debug.js"></script>
+		<script type="text/javascript">
+			// define style
+			var style = new Appbus.Style({
+				'background': 'white',
+				'color': 'black',
+				'font-size': 10,
+				'..cls': {
+					'background': 'orange'
+				},
+				'.sub': {
+					'background': 'darkslateblue',
+					'cursor': ['pointer', 'hand']
+				},
+				'div': {
+					'background': 'silver'
+				},
+				' tag': {
+					'background': 'silver'
+				},
+				'tag': {
+					'background': 'silver'
+				},
+				'.string': 'background:silver;font-size: 1em;a;background-image:url(data:image/png;base64,iVBORw0KGII=)',
+				'.hierachy': {
+					'color': 'grey',
+					'background': 'yellow',
+					'test': {
+						'font-size': 9
+					}
+				}
+			});
+			
+			console.log('style', style);
+			console.log('json', JSON.stringify(style, null, '\t'));
+			
+			
+			// get element
+			console.log('get(color)', style.get('color'));
+			console.log('get(.hierachy)', style.get('.hierachy'));
+
+			
+			// append
+			style.set('..newcls', {
+				'background': 'lightorange',
+				'.hierachy': {
+					'': {
+						'color': 'red'
+					}
+				}
+			});
+
+			console.log('set', style);
+			console.log('json', JSON.stringify(style, null, '\t'));
+
+
+			// replace
+			style.set('..cls', {
+				'tag': 'value',
+				'p': {
+					'color': 'red'
+				}
+			});
+
+			console.log('replace', style);
+			console.log('json', JSON.stringify(style, null, '\t'));
+
+
+			
+			// remove
+			style.remove('div');
+			style.remove('font-size');
+
+			console.log('removed', style);
+			console.log('json', JSON.stringify(style, null, '\t'));
+			
+			
+			// merge element
+			style.merge('..cls', {
+				'display': '-ms-box',
+				'background-image': 'url("http://localhost/image.png")',
+				'transition': 'aa',
+				'p': {
+					'color': 'blue'
+				}
+			});
+
+			console.log('merged', style);
+			console.log('json', JSON.stringify(style, null, '\t'));
+			
+			
+			// build with prefix
+			var css = style.build('#myprefix');
+			console.log(css);
+
+			/*
+			// reset
+			style.reset({
+				'background': 'white'
+			});
+
+			console.log('reset', style);
+			console.log('json', JSON.stringify(style, null, '\t'));
+			*/
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

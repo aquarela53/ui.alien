@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="Shop API">
+		<title>function call speed test</title>
+		<script type="text/javascript">
+			var test = function() {
+				var starttime;
+
+				var el = document.createElement('div');
+				el.className = 'test';
+				el.style.background = 'black';
+				el.style.display = '-webkit-box';
+
+				for(var x=0; x < 3; x++) {
+					starttime = new Date().getTime();
+					for(var i=0; i < 100000; i++) {
+						el.style.visibility = 'hidden';
+						el.style.visibility = 'visible';
+					}
+					console.log('- visibility : ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+
+					starttime = new Date().getTime();
+					for(var i=0; i < 100000; i++) {
+						el.style.display = 'none';
+						el.style.display = '';
+					}
+					console.log('- display : ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+
+					starttime = new Date().getTime();
+					fn = function(num) {
+						el.style.opacity = '0';
+						el.style.opacity = '1';
+					}
+					for(var i=0; i < 100000; i++) {
+						fn(i);
+					}
+					console.log('- opacity : ' + (new Date().getTime() - starttime) + 'ms' + '----------------------------------------------');
+				}
+
+			};
+
+			test();
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1081">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Attriutes UI Examples">
+		<title>DOM Basic</title>
+		
+		<script type="text/javascript" src="../../ui.debug.js"></script>
+		<script type="text/javascript">
+			var $ = require('dom');
+
+			$.on('ready', function(e) {
+				// select by id
+				console.log('$("#contents")', $("#contents"));
+
+				// select by tagname
+				console.log('$("div")', $("div"));
+				console.log('$("p")', $("p"));
+
+				// select by class
+				console.log('$(".article")', $(".article"));
+
+				// select by query
+				console.log('$(".articles:first-child")', $(".articles:first-child"));
+				
+				var el;
+
+				// create new elements, single tag
+				el = $('<div class="new">new</div>');
+				console.log('$("<div class="new">new</div>")', el);
+				el.attachTo($('.article'));
+
+				// create new elements, multiple tags
+				el = $('<div class="multi">multi</div>text<p>this is multi</p>');
+				console.log('$("<div class="multi">multi</div>text<p>this is multi</p>")', el);
+				el.attachTo($('.article'));
+
+				// create new elements, another method
+				el = $.create('div', {
+					'class': 'cls',
+					'name': 'name',
+					'id': 'new-item'
+				});
+				console.log('$.create("div", {...})', el);
+				el.attachTo($('.article'));
+
+				// create new elements, by html with attributes
+				el = $.create('<div>A<p>B</p></div>', {
+					'class': 'cls',
+					'name': 'name',
+					'id': 'new-item'
+				});
+				console.log('$.create("<div>A<p>B</p></div>", {...})', el);
+				el.attachTo($('.article'));
+
+				// create new text node
+				el = $.eval('this is text');
+				console.log('$.eval("this is text")', el);
+				el.attachTo($('.article'));
+			});
+		</script>
+	</head>
+	<body>
+		<div id="contents" class="container">
+			<div class="articles">
+				<div class="article">
+					<h1>title</h1>
+					<p>contents</p>
+					<p>contents</p>
+				</div>
+				<div class="article">
+					<h1>title</h1>
+					<p>contents</p>
+					<p>contents</p>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

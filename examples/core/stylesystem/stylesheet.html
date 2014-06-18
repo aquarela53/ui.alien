@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1000">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>StyleSheet</title>
+		
+		<script type="text/javascript" src="../ui.debug.js"></script>
+		<script type="text/javascript">
+			// for message write to #console
+			function log(msg) {
+				El('#console').html(msg.split('\n').join('<br>'));
+			}
+
+			// create your custom stylesheet (new style tag will be create in head tag)
+			var mystylesheet = new Appbus.StyleSheet('mystylesheet', 'all', '.cls { color: orange; }');
+
+			// print current css
+			function current_css() {
+				log(mystylesheet.text());
+			}
+
+			// insert rule
+			var cnt = 0;
+			function insert_test() {
+				mystylesheet.insert('.cls2', 'color:blue;content:"' + cnt++ + '"');
+				log(mystylesheet.text());
+			}
+			
+			// change full css
+			function text_test() {
+				mystylesheet.text('.cls { color: darkred; }');
+				log(mystylesheet.text());
+			}
+			
+			// update rule
+			function update_test() {
+				mystylesheet.update('.cls2', 'color:silver;font-size:20px;');
+				log(mystylesheet.text());
+			}
+			
+			// remove rule
+			function remove_test() {
+				mystylesheet.remove('.cls2');
+				log(mystylesheet.text());
+			}
+			
+			// remove first rule
+			function removefirst_test() {
+				mystylesheet.removeFirst('.cls2');
+				log(mystylesheet.text());
+			}
+			
+			// remove last rule
+			function removelast_test() {
+				mystylesheet.removeLast('.cls2');
+				log(mystylesheet.text());
+			}
+			
+			// remove all
+			function clear_test() {
+				mystylesheet.clear();
+				log(mystylesheet.text());
+			}
+			
+			// detach stylesheet (it means detach style tag from head)
+			function attach_test() {
+				mystylesheet.attach();
+				log(mystylesheet.text());
+			}
+
+			// attach stylesheet (it means reattach style tag to head)
+			function detach_test() {
+				mystylesheet.detach();
+				log(mystylesheet.text());
+			}
+		</script>
+	</head>
+	<body>
+		<div class="cls">Hello StyleSheet!</div>
+		<div class="cls2">Hello Stranger!</div>
+		
+		<div id="console" class="o-cmp border" style="height:200px;"></div>
+		
+		<div onclick="current_css();">current css</div>
+		<div onclick="insert_test();">insert</div>
+		<div onclick="update_test();">update</div>
+		<div onclick="remove_test();">remove</div>
+		<div onclick="removefirst_test();">remove(first one)</div>
+		<div onclick="removelast_test();">remove(last one)</div>
+		<div onclick="text_test();">text</div>
+		<div onclick="clear_test();">clear</div>
+		<div onclick="detach_test();">detach</div>
+		<div onclick="attach_test();">attach</div>
+	</body>
+</html>

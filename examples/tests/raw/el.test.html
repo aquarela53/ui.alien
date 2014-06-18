@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="Shop API">
+		<title>Appbus.El test</title>
+		
+		<!-- <script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Class.js"></script> -->
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Foundation.js"></script>  
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Device.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Element.js"></script>
+
+		<script type="text/javascript">
+			function initEvent(label, el) {
+				if( El.isElement(el) ) el = El(el);
+				el.on('click', function(e) {
+					console.log('[' + label + '] click', e);
+					//e.stopPropagation();
+				});
+
+				el.on('resize', function(e) {
+					console.log('[' + label + '] resize', e);
+					e.stopPropagation();
+				});
+
+				el.on('staged', function(e) {
+					console.log('[' + label + '] staged', e.to, e.el);
+				});
+
+				el.on('unstaged', function(e) {
+					console.log('[' + label + '] unstaged', e.from, e.el);
+				});
+
+				el.on('attach', function(e) {
+					console.log('[' + label + '] attach', e.to, e.el);
+					//e.preventDefault();
+				});
+
+				el.on('attached', function(e) {
+					console.log('[' + label + '] attached', e.to, e.el);
+				});
+
+				el.on('detach', function(e) {
+					console.log('[' + label + '] detach', e.from, e.el);
+					//e.preventDefault();
+				});
+
+				el.on('detached', function(e) {
+					console.log('[' + label + '] detached', e.from, e.el);
+				});
+
+				el.on('add', function(e) {
+					console.log('[' + label + '] add', e.el);
+				});
+
+				el.on('added', function(e) {
+					console.log('[' + label + '] added', e.el);
+				});
+
+				el.on('remove', function(e) {
+					console.log('[' + label + '] remove', e.el);
+					//e.preventDefault();
+				});
+
+				el.on('removed', function(e) {
+					console.log('[' + label + '] removed', e.el);
+				});
+
+				el.on('cleared', function(e) {
+					console.log('[' + label + '] cleared', e);
+				});
+
+				el.on('changed.dom', function(e) {
+					console.log('[' + label + '] changed.dom', e);
+				});
+
+				el.on('changed.html', function(e) {
+					console.log('[' + label + '] changed.html', e.originValue, e.newValue);
+				});
+
+				el.on('changed.attr', function(e) {
+					console.log('[' + label + '] changed.attr', e.originValue, e.newValue);
+				});
+
+				el.on('changed.class', function(e) {
+					console.log('[' + label + '] changed.class', e.originValue, e.newValue);
+				});
+
+				el.on('changed.style', function(e) {
+					console.log('[' + label + '] changed.style', e.styleName, e.newValue);
+				});
+
+				el.on('changed.value', function(e) {
+					console.log('[' + label + '] changed.value', e.originValue, e.newValue);
+				});
+			}
+
+			function test() {
+				var body = El.find('body');
+				var el = El('<article name="el">article</article>');
+				var child = El('<div>child</div>');
+				var raw1 = document.createElement('span');
+				var raw2 = document.createElement('span');
+
+				raw1.innerHTML = 'raw1';
+				raw2.innerHTML = 'raw2';
+				
+				initEvent('body', body);
+				initEvent('el', el);
+				initEvent('child', child);
+				initEvent('raw1', raw1);
+				initEvent('raw2', raw2);
+			
+				el.ac('a').ac('b');
+				el.css('box-shadow', '5px 5px 3px rgba(33,33,33,0.8)');
+				
+				console.error('- body.attach(el) : ', el.stringify());
+				body.attach(el);
+
+				console.error('- el.detach() : ', el.stringify());
+				el.detach();
+				
+				console.error('- el.attach(child) : ', child.stringify());
+				el.attach(child);
+
+				console.error('- child.attach(raw1) : ', raw1.outerHTML);
+				child.attach(raw1);
+
+				console.error('- child.attach(raw2) : ', raw2.outerHTML);
+				child.attach(raw2);
+
+				console.error('- body.attach(el) : ', el.stringify());
+				body.attach(el);
+
+				console.error('- el.detach() : ', el.stringify());
+				el.detach();
+
+				console.error('- el.attachTo(body) : ', el.stringify());
+				el.attachTo(body);
+				
+				// visit test
+				if( true ) {
+					console.error('- visit upwards(include self)');
+					el.visit(function(el) {
+						console.log('** visit el', el);	
+					}, 'up', true);
+
+					console.error('- visit downwards(include self)');
+					el.visit(function(el) {
+						console.log('** visit el', el);	
+					}, 'down', true);
+
+					console.error('- visit upwards(exclude self)');
+					el.visit(function(el) {
+						console.log('** visit el', el);	
+					}, 'up');
+
+					console.error('- visit downwards(exclude self)');
+					el.visit(function(el) {
+						console.log('** visit el', el);	
+					}, 'down');
+
+					console.error('- visit default');
+					el.visit(function(el) {
+						console.log('** visit el', el);	
+					});
+				}
+			
+				// el setup test
+				if( true ) {
+					console.error('- misc');
+					el.attr('id', 'test');
+					el.ac('a');
+					el.html('content html');
+					el.css('box-shadow', '5px 5px 3px rgba(33,33,33,0.8)');
+					el.css('border', '1px dotted white');
+					el.css('transform', 'scale(1)');
+					el.css('transition', 'transform 2s ease-in-out');
+					el.css('background', 'linear-gradient(top, black 0%, silver 100%)');
+					el.ac('cmp');
+					el.ac('view');
+					el.ac('cards');
+					el.rc('cards');
+					el.css('border', '1px dotted black');
+					el.html('<div class="box">test</div>');
+					el.value('value');
+					
+					el.clear();
+				}
+			}
+
+			//test();
+			
+			window.onload = test;
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

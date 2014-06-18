@@ -1,0 +1,12 @@
+{
+	'global': {
+		'body': {
+			'font-size': 11,
+			'color': 'blue'
+		}
+	},
+	'html-': {
+		'font-size': 15,
+		'color': 'white'
+	}
+}

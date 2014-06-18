@@ -1,0 +1,159 @@
+{
+	component: 'view',
+	name: 'layout-test',
+	items: [
+		{
+			component: 'view',
+			name: 'top',
+			items: [
+				{
+					component: 'text',
+					title: 'Modules',
+					text: 'Top'
+				}
+			]
+		}, {
+			component: 'view',
+			name: 'gnb',
+			items: [
+				{
+					component: 'text',
+					title: 'Modules',
+					text: 'Global Navigation'
+				}
+			]
+		}, {
+			component: 'view',
+			name: 'contents-top',
+			items: [
+				{
+					component: 'text',
+					title: 'Modules',
+					text: 'Contents Top'
+				}, {
+					component: 'text',
+					title: 'Modules',
+					text: 'Contents Top2'
+				}, {
+					component: 'view',
+					name: 'contents',			
+					horizontal: true,
+					items: [
+						{
+							component: 'text',
+							title: 'Modules',
+							width: 150,
+							minWidth: 50,
+							text: 'Side A'
+						}, {
+							component: 'view',
+							name: 'contents',			
+							horizontal: true,
+							items: [
+								{
+									component: 'text',
+									title: 'Modules',
+									width: 150,
+									minWidth: 50,
+									text: 'Side A'
+								}, {
+									component: 'view',
+									name: 'contents',			
+									horizontal: true,
+									items: [
+										{
+											component: 'text',
+											title: 'Modules',
+											width: 150,
+											minWidth: 50,
+											text: 'Side A'
+										}, {
+											component: 'text',
+											title: 'Modules',
+											text: 'Contents Body '
+										}, {
+											component: 'text',
+											title: 'Modules',
+											width: 100,
+											text: 'Side B'
+										}
+									]
+								}, {
+									component: 'text',
+									title: 'Modules',
+									width: 100,
+									text: 'Side B'
+								}
+							]
+						}, {
+							component: 'text',
+							title: 'Modules',
+							width: 100,
+							text: 'Side B'
+						}
+					]
+				}
+			]
+		}, {
+			component: 'view',
+			name: 'contents-body',			
+			horizontal: true,
+			items: [
+				{
+					component: 'text',
+					title: 'Modules',
+					width: 150,
+					minWidth: 50,
+					text: 'Side A'
+				}, {
+					component: 'view',
+					name: 'contents',			
+					horizontal: true,
+					items: [
+						{
+							component: 'text',
+							title: 'Modules',
+							width: 150,
+							minWidth: 50,
+							text: 'Side A'
+						}, {
+							component: 'text',
+							title: 'Modules',
+							text: 'Contents Body '
+						}, {
+							component: 'text',
+							title: 'Modules',
+							width: 100,
+							text: 'Side B'
+						}
+					]
+				}, {
+					component: 'text',
+					title: 'Modules',
+					width: 100,
+					text: 'Side B'
+				}
+			]
+		}, {
+			component: 'view',
+			name: 'contents-bottom',
+			items: [
+				{
+					component: 'text',
+					title: 'Modules',
+					text: 'Contents Bottom'
+				}
+			]
+		}, {
+			component: 'view',
+			name: 'footer',
+			items: [
+				{
+					component: 'text',
+					title: 'Modules',
+					text: 'Footer '
+				}
+			]
+		}
+	]
+}

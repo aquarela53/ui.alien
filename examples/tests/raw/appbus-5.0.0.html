@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="Appbus Web UI Toolkit 5.0.0">
+		<title>Appbus Web UI Toolkit 5</title>
+		
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/Appbus.Class.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/Appbus.Foundation.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/Appbus.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/Appbus.Device.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/Appbus.EventProvider.js"></script>		
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/Appbus.Styles.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/Appbus.Element.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/Appbus.Scroller.js"></script>
+
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/util/Appbus.Options.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/util/Appbus.Tpl.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/util/Appbus.Color.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/util/Appbus.Ajax.js"></script>
+		
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/ui/Appbus.UIComponent.js"></script>
+
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/ui/application/Appbus.Application.js"></script>
+
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/ui/views/Appbus.View.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/ui/views/Appbus.Card.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/ui/views/Appbus.Slide.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/ui/views/Appbus.Stack.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/ui/views/Appbus.Window.js"></script>
+		
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/ui/parts/Appbus.Box.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/ui/parts/Appbus.List.js"></script>		
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/ui/parts/Appbus.Bar.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/ui/parts/Appbus.NavigationBar.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/ui/parts/Appbus.Button.js"></script>
+
+		<script type="text/javascript">
+			(function() {
+				var application = new Appbus.Application({
+					id: 'myapp',
+					title: 'Appbus 5.0.0',
+					description: 'Appbus 5.0.0 sample application',
+					debug: true,
+					platform: 'a5',
+					thumnail: 'http://cdn.printingengine.com/resources/sample-114.png',
+					icons: {
+						'icon72': {},
+						'icon114': {},
+						'icon512': {}
+					},
+					screenshots: [
+						{}
+					],
+					imports: [
+						{
+							type: 'package',
+							src: 'components/attrs.auth/attrs.auth.js'
+						}, {
+							type: 'package',
+							src: 'components/attrs.ds/attrs.ds.js'
+						}, {
+							type: 'package',
+							src: 'components/attrs.ds/attrs.shop.js'
+						}, {
+							type: 'application',
+							src: ''
+						}
+					],
+					styles: {
+					},
+					source: {
+						$: 'View',
+						id: 'rootview',
+						c: [
+							{
+								$: 'NavigationBar',
+								style: 'glass_blue',
+								title: 'AppBus 5',
+								c: [
+									{
+										$: 'Button',
+										style: '',
+										text: '',
+										icon: {
+											$: 'Icon',
+											w: 50,
+											h: 50,
+											image: '',
+											masking: {from:'', to:''}
+										}
+									}
+								]
+							}, {
+								$: 'View',
+								id: 'contents',
+								scroll: true,
+								c: {
+									$: 'Box',
+									id: 'box',
+									html: 'contents'
+								}
+							}, {
+								$: 'Bar',
+								id: 'bottombar',
+								style: 'glass_black',
+								c: [
+									{
+										$: 'Button',
+										style: '',
+										text: '',
+										icon: {
+											$: 'Icon',
+											w: 50,
+											h: 50,
+											image: '',
+											masking: {from:'', to:''}
+										}
+									}
+								]
+							}
+						]
+					}
+				});
+				
+				Appbus.on('ready', function(e) {
+					application.attachTo('#frame');
+
+					if( false ) {
+						Appbus.get('bottombar').detach();
+						Appbus.get('bottombar').attachTo('.a div');
+						Appbus.get('bottombar').detach();
+						Appbus.get('bottombar').attachTo('.a');
+
+						Appbus.get('rootview').add({
+							$: 'Box',
+							html: '박스추가'
+						});
+
+						Appbus.get('rootview').add(new Appbus.Box({
+							html: '박스추가2'
+						}));
+					}
+				});
+			})();
+		</script>
+	</head>
+	<body>
+		<div id="frame"></div>
+	</body>
+</html>

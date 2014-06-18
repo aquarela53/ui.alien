@@ -1,0 +1,165 @@
+{
+	$: 'View',
+	title: '리스트',
+	c: [
+		{
+			$: 'Bar',
+			c: [
+				{
+					$: 'Button',
+					css: 'flat',
+					text: '새로고침',
+					e: {
+						action: function(e) {
+							Appbus.get('sample-table').refresh();
+						}
+					}
+				}, {
+					$: 'Button',
+					text: '이전',
+					align: 'center',
+					disabled: true,
+					e: {
+						action: function(e) {
+							Appbus.get('sample-table').prev();
+						}
+					}
+				}, {
+					$: 'Button',
+					text: '다음',
+					align: 'center',
+					e: {
+						action: function(e) {
+							Appbus.get('sample-table').next();
+						}
+					}
+				}, {
+					$: 'Button',
+					text: '삭제',
+					align: 'right',
+					e: {
+						action: function(e) {
+							var index = Appbus.get('sample-table').getSelectedIndex();
+							if( index >= 0 ) Appbus.get('sample-table').remove(index);
+							else alert('삭제할 행을 선택해주세요.');
+						}
+					}
+				}, {
+					$: 'Button',
+					text: '추가',
+					align: 'right',
+					e: {
+						action: function(e) {
+							Appbus.get('sample-table').add({
+								seq: 2,
+								title: '제목2',
+								posted: new Date().toISOString(),
+								author: 'Developer',
+								hit: 1
+							});
+						}
+					}
+				}, {
+					$: 'Button',
+					text: '등록하기',
+					align: 'right',
+					e: {
+						action: function(e) {
+							var win = Appbus.get('sample-registration-window') || new Appbus.Window({
+								id: 'sample-registration-window',
+								title: '등록하기',
+								closable: true,
+								resizable: true,
+								modal: true,
+								w: 600,
+								h: 400,
+								c: {
+									$: 'remote',
+									url: 'src/modules/SampleForm.json'
+								}
+							});
+
+							win.open(e.src.getApplication());
+						}
+					}
+				}
+			]
+		}, {
+			$: 'Table',
+			id: 'sample-table',
+			title: '리스트',
+			cols: {
+				seq: {
+					label: '번호',
+					align: 'right',
+					sortable: true,
+					width: 50,
+					type: 'number'
+				},
+				thumnail: {
+					label: '썸네일',
+					width: 50,
+					align: 'center',
+					type: function(v, def, col, row) {
+						return new Appbus.Image({
+							w: '100%',
+							src: 'http://icon.daumcdn.net/w/c/12/12/13648678630787703.jpeg'
+						});
+					}
+				},
+				title: {
+					label: '제목',
+					align: 'left',
+					sortable: true,
+					type: 'string'
+				},
+				posted: {
+					label: '작성일',
+					width: 100,
+					align: 'center',
+					sortable: true,
+					type: 'date.iso',
+					format: 'yyyy년 MM월 dd일'
+				},
+				author: {
+					label: '작성자',
+					width: 100,
+					align: 'center',
+					sortable: true,
+					type: function(v, item) {
+						return '관리자'
+					}
+				},
+				hit: {
+					label: '조회',
+					hidden: false,
+					width: 80,
+					align: 'center',
+					sortable: true,
+					type: 'decimal',
+					suffix: '회'
+				}
+			},
+			c: [
+				{
+					seq: 1123123,
+					title: '제목',
+					posted: new Date().toISOString(),
+					author: 'Developer',
+					hit: 345345
+				}
+			],
+			e: {
+				'table.select': function(table, row, index, item) {
+					console.log('table.select', arguments);
+				},
+				'table.unselect': function(table, row, index, item) {
+					console.log('table.unselect', arguments);
+				},
+				'table.doubletap': function(table, row, index, item) {
+					console.log('table.doubletap', arguments);
+				}
+			}
+		}
+	]
+}

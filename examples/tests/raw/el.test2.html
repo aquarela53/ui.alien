@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="Shop API">
+		<title>Appbus.El test</title>
+		
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Class.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Foundation.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Device.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Element.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.Styles.js"></script>
+
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.js"></script>
+		<script type="text/javascript" src="../libs/attrs.ui-5.0.0/Appbus.EventProvider.js"></script>
+
+		<script type="text/javascript">
+			Appbus.on('load', function() {
+				var test = El('#test');
+				console.log(test);
+
+				test.html('테스트');
+				test.ac('a cls');
+
+				console.log('test.has(cls)', test.has('cls'));
+				console.log('test.gc()', test.gc());
+
+				test.rc('cls');
+
+				console.log('test.has(cls)', test.has('cls'));
+				console.log('test.gc()', test.gc());
+
+				console.log('test.gc()', test.gc());
+
+				var tt = El('<div class="tt">123</div>');
+				tt.on('staged', function(e) {
+					console.log('tt staged', e.src);
+
+					var el = e.src;
+					console.log(el.boundary());
+				});
+				tt.on('unstaged', function(e) {
+					console.log('tt unstaged');
+
+					var el = e.src;
+					console.log(el.boundary());
+				});
+				tt.on('attached', function(e) {
+					console.log('tt attached');
+				});
+				tt.on('detached', function(e) {
+					console.log('tt detached');
+				});
+				tt.on('click', function(e) {
+					console.log('tt click');
+				});
+				tt.on('load', function(e) {
+					
+				});
+				test.attach(tt);
+				tt.detach();
+				tt.attachTo(test);
+
+
+				test.detach();
+
+
+				/*var arg = El('.a');
+				console.log('arg', arg);
+
+				console.log('a', document.body.querySelectorAll('.a'));
+				
+				arg.forEach(function(test) {
+					test.html('테스트');
+					test.ac('a cls');
+
+					console.log('test.has(cls)', test.has('cls'));
+					console.log('test.gc()', test.gc());
+
+					test.rc('cls');
+
+					console.log('test.has(cls)', test.has('cls'));
+					console.log('test.gc()', test.gc());
+
+					console.log('test.gc()', test.gc());
+				});*/
+				
+			});
+		</script>
+	</head>
+	<body>
+		<div id="test">
+			<div class="a">asd
+			</div>
+			<div class="a">asd
+			</div>
+			<div class="a">asd
+			</div>
+		</div>
+	</body>
+</html>

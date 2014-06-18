@@ -1,0 +1,141 @@
+{
+	component: 'boxview',
+	name: 'editor-root',
+	items: [
+		{
+			component: 'boxview',
+			horizontal: true,
+			reverse: true,
+			items: [
+				{
+					component: 'boxview',
+					width: 275,
+					items: [
+						{
+							component: 'tabview',
+							context: 'test',
+							name: 'tab',
+							classes: 'boxshadow',
+							items: [
+								{
+									component: 'text',
+									title: 'Components',
+									src: 'resources/text.txt'
+								}, {
+									component: 'text',
+									title: 'Themes',
+									classes: 'darkshadow',
+									src: 'resources/text.txt'
+								}, {
+									component: 'text',
+									title: 'Modules',
+									classes: 'center',
+									text: '<a>모듈 목록</a>'
+								}
+							]
+						}
+					]
+				}, {
+					component: 'boxsplitter',
+					thickness: 2
+				}, {
+					component: 'boxview',
+					classes: 'boxshadow',
+					style: {
+						'border': '1px solid rgb(55, 55, 55)'
+					},
+					minWidth: 300,
+					items: [
+						{
+							component: 'bar',
+							style: {
+								'border-bottom': '1px solid rgb(11, 11, 11)'
+							},
+							items: [
+								{
+									component: 'button',
+									text: '버튼'
+								}
+							]
+						}, {
+							component: 'boxview',
+							name: 'editing-area',
+							style: {
+								'border-top': '1px solid rgb(55, 55, 55)'
+							},
+							items: [
+								{
+									component: 'boxview',
+									classes: 'bg-transparent'
+								}
+							]
+						}
+					]
+				}
+			]
+		}, {
+			component: 'boxsplitter',
+			thickness: 2
+		}, {
+			component: 'boxview',
+			horizontal: true,
+			items: [
+				{
+					component: 'tabview',
+					name: 'tab',
+					classes: 'boxshadow',
+					items: [
+						{
+							component: 'cmp',
+							title: 'HTML',
+							html: '현재 렌더링 되는 컴포넌트의 내부 HTML'
+						}, {
+							component: 'cmp',
+							title: 'Options',
+							html: '현재 렌더링 되는 컴포넌트의 실행 옵션'
+						}, {
+							component: 'cmp',
+							title: 'Events',
+							html: '현재 렌더링 되는 컴포넌트의 이벤트'
+						}, {
+							component: 'cmp',
+							title: 'Logs',
+							html: '현재 렌더링 되는 컴포넌트의 로그'
+						}
+					]
+				}, {
+					component: 'boxsplitter',
+					thickness: 2
+				}, {
+					component: 'tabview',
+					name: 'tab',
+					width: 80,
+					classes: 'boxshadow',
+					items: [
+						{
+							component: 'cmp',
+							title: 'CSS',
+							html: '컴포넌트의 CSS 를 편집'
+						}, {
+							component: 'cmp',
+							title: 'Classes',
+							html: '컴포넌트 CSS 의 클래스를 편집'
+						}, {
+							component: 'cmp',
+							title: 'Animations',
+							html: '컴포넌트 애니메이션 CSS 를 편집'
+						}
+					]
+				}, {
+					component: 'boxsplitter',
+					thickness: 2
+				}, {
+					component: 'cmp',
+					title: 'Logs',
+					width: 80,
+					html: '현재 렌더링 되는 컴포넌트의 로그'
+				}
+			]
+		}
+	]
+}

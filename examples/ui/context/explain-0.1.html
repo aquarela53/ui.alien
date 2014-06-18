@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1081">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Context Explain</title>		
+	</head>
+	<body>		
+		<!-- component & context 구조 -->
+		<div name="attrs.ui">							<!-- cmp.context() : 기본 context -->
+			<div></div>								<!-- cmp.context() : 기본 context -->
+			<div name="a.name">						<!-- Context.get('a').get('name') -->
+				<div><div>							<!-- cmp.context() : a context -->
+				<div name="c"><div>					<!-- cmp.context() : c context -->
+				<div>
+					<div name="b.name a">			<!-- Context.get('b').get('name') -->
+						<div><div>					<!-- cmp.context() : b context -->
+						<div name="c">				<!-- Context.get('c').get() -->
+							<div><div>				<!-- cmp.context() : c context -->
+						</div>
+					</div>
+					<div id="view-100"><div>		<!-- cmp.context() : a context // custom style 이 있을 경우, css 를 적용하기 위해 id 가 지정된다.  -->
+				<div>
+			<div>
+		</div>
+
+		<!--
+			- id 는 options 에서 직접 지정할 수 없다. 필요할 떄 자동으로 unique 값이 생성된다.
+			- id 의 경우 css 를 적용하기 위한 수단으로써만 존재한다. 그 외엔 id 를 element 에 별도로 mark 하지 않는다.
+			- context 의 id 는 중복될 수 없다.
+			- 기본 context 의 id 는 attrs.ui 이다.
+			- 같은 context 에 name 이 중복될 경우 get 은 최초발견, all 은 모두 찾아 배열로 반환한다.
+			- context 의 all 혹은 visit 을 통해 현재 context에 있는 모든 컴포넌트에 접근할 수 있다.
+			  이때, context 는 컴포넌트의 모든 레퍼런스를 갖고 있진 않고, name 이 mark 된 컴포넌트만 가지고 있으므로,
+			  name 이 마크된 컴포넌트를 기준으로 하위의 context 가 지정되지 않은 모든 컴포넌트들을 찾아서 반환하거나 visit 한다.
+
+			- 컴포넌트를 context에 추가하기 위한 몇 가지 방법
+				- 생성시 지정
+					// a context 로 생성, 지정된 context id 가 없을 경우 오류가 발생.
+					var cmp = new View({
+						name: 'name',
+						context: 'a'
+					});
+
+					// a context 를 옵션에 지정
+					var actx = Appbus.Context.get('a');
+					var cmp = new View({
+						name: 'name',
+						context: actx
+					});
+
+					// cmp 에 직접 지정, 아래의 방법은 기본 context 를 변경한다.
+					var actx = Appbus.Context.get('a');
+					cmp.context(actx[, name]);
+
+					// 다른 컨텍스트를 서브로 추가하려면.. 
+					// 원래 a 컨텍스트의 컴포넌트였다면, name="a.name b.name"
+					// 이때, 원래 context 가 지정되지 않은 컴포넌트의 경우 기본 context 가 name 에 마킹된다.
+					// 예) name="attrs.ui b.name"
+					var bctx = Appbus.Context.get('b');
+					cmp.contexts().add(bctx[, name]);
+
+
+			- 하나의 컴포넌트는 여러개의 context에 속할 수 있다.
+			- 여러개의 context를 가진 컴포넌트 하위의 context는 최초의 context를 기준으로 한다.
+			- 여러개의 context를 가진 컴포넌트의 각 context의 name 을 알기 위해선 cmp.name(context) 형태로 호출한다.
+			- 여러개의 context를 가진 컴포넌트에 cmp.name() 을 할 경우 기본 context의 name 을 돌려준다.
+		-->
+	</body>
+</html>

@@ -1,0 +1,140 @@
+{
+	component: 'view',
+	items: [
+		{
+			component: 'bar',
+			classes: 'boxshadow border',
+			items: [
+				{
+					component: 'button',
+					text: '버튼'
+				}
+			]
+		}, {
+			component: 'boxsplitter',
+			thickness: 3
+		}, {
+			component: 'view',
+			horizontal: true,
+			reverse: false,
+			items: [
+				{
+					component: 'space',
+					style: {
+						width: 3
+					}
+				}, {
+					component: 'view',
+					classes: 'boxshadow border',
+					style: {
+						'max-width': 280
+					},
+					items: [
+						{
+							component: 'view',
+							classes: 'boxshadow border',
+							style: {
+								'min-height': 150
+							},
+							items: [
+								{
+									component: 'tabview',
+									items: [
+										{
+											component: 'cmp',
+											title: '제목11',
+											html: '내용11'
+										}, {
+											component: 'cmp',
+											title: '제목12',
+											html: '내용12'
+										}, {
+											component: 'cmp',
+											title: '제목13',
+											html: '내용13'
+										}
+									]
+								}
+							]
+						}
+					]
+				}, {
+					component: 'boxsplitter',
+					thickness: 2
+				}, {
+					component: 'view',
+					style: {
+						'min-width': 300
+					},
+					classes: 'boxshadow border',
+					items: [
+						{
+							component: 'tabview',
+							items: [
+								{
+									component: 'cmp',
+									title: '제목21',
+									html: '내용21'
+								}, {
+									component: 'cmp',
+									title: '제목22',
+									html: '내용22'
+								}, {
+									component: 'cmp',
+									title: '제목23',
+									html: '내용23'
+								}
+							]
+						}
+					]
+				}, {
+					component: 'boxsplitter',
+					thickness: 2
+				}, {
+					component: 'view',
+					classes: 'boxshadow border',
+					style: {
+						'max-width': 300
+					},
+					items: [
+						{
+							component: 'tabview',
+							items: [
+								{
+									component: 'cmp',
+									title: '대기열1',
+									html: '대기열1'
+								}, {
+									component: 'cmp',
+									title: '대기열2',
+									html: '대기열2'
+								}, {
+									component: 'cmp',
+									title: '대기열3',
+									html: '대기열3'
+								}
+							]
+						}
+					]
+				}, {
+					component: 'space',
+					style: {
+						'width': 3
+					}
+				}
+			]
+		}, {
+			component: 'space',
+			style: {
+				'height': 3
+			}
+		}, {
+			component: 'view',
+			style: {
+				'background-color': '#181818',
+				'border': '1px solid rgba(15,15,15,0.65)',
+				'max-height': 24
+			}
+		}
+	]
+}

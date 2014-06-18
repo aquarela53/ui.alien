@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1000">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Style System Basic</title>
+		
+		<script type="text/javascript" src="../ui.debug.js"></script>
+		<script type="text/javascript">
+			// define style
+			var style = new Appbus.Style({
+				'background': 'white',
+				'color': 'black',
+				'font-size': 10,
+				'.hierachy': {
+					'color': 'grey',
+					'background': 'yellow',
+					'test': {
+						'font-size': 9
+					}
+				}
+			});
+
+			console.log('style', style);
+
+			style.on('*', function(e) {
+				console.log('[' + e.type + '] event occured');
+				console.log('src', e.src);
+				console.log('values', e.values);
+				console.log('\n\n');
+			});
+			
+			// append
+			style.set('..newcls', {
+				'background': 'lightorange',
+				'.hierachy': {
+					'': {
+						'color': 'red'
+					}
+				}
+			});
+
+			// replace
+			style.set('color', 'grey');
+			
+			// remove
+			style.remove('font-size');
+			
+			// merge element
+			style.merge('..cls', {
+				'display': 'box',
+				'background-image': 'url("http://localhost/image.png")',
+				'transition': 'aa',
+				'p': {
+					'color': 'blue'
+				}
+			});
+
+			
+			// sub style replace
+			style.get('..cls').set('color', 'grey');
+			
+			// sub style remove
+			style.get('..cls').remove('color');
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

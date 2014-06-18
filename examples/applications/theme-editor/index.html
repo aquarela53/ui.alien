@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Appbus Theme Creator">
+
+		<script type="text/javascript" src="../../ui.debug.js"></script>
+		<script type="text/javascript">
+			var ThemeEditor = Appbus.UIModule.build('./modules/main.js', true);
+
+			Appbus.on('load', function() {
+				var editor = new ThemeEditor();
+
+				var app = new Appbus.Application({
+					title: 'Appbus Theme Creator',
+					icon: '',
+					items: editor
+				});
+
+				app.attachTo(document.body);
+
+				
+				// for performence debug
+				console.log('- build time ------------------');
+				console.log('version:', Appbus.info.version);
+				console.log('core:', Appbus.info.buildtime + ' ms');
+				console.log('app:', (new Date().getTime() - Appbus.info.finishtime) + ' ms');
+				console.log('total:', (new Date().getTime() - Appbus.info.starttime) + ' ms');
+			});
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

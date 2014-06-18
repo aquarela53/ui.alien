@@ -1,0 +1,123 @@
+{
+	component: 'view',
+	name: 'slot',					
+	padding: 15,
+	css: {
+		'text-align': 'center'
+	},
+	items: [
+		{
+			component: 'html',
+			html: '아직 해결되지 않은 문제.',
+			height: 100,
+			effects: {
+				staged: [
+					{
+						duration: 0,
+						'opacity': 0.1
+					}, {
+						delay: 200,
+						duration: 750,
+						'font-size': 30,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '1. 길어지는 코드, 복잡해지는 코드, HTML 안에서 마구마구 뒤섞여버린 네임스페이스들.',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '2. A개발자가 만든 부분을 B개발자가 재사용하기 위해 파일을 열었습니다. 하아..나는 누구인가..',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '3. 이 페이지에선 a 라는 id 를 가진 개체가 이미 있어. 코드를 수정해주세요.',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			}
+		}, {
+			component: 'html',
+			height: 50,
+			css: {
+				opacity: 0.1
+			},
+			html: '4. 이 페이지의 CSS에 내가 만든 모듈의 CSS를 붙여넣었더니.. 그냥 다시 작성하자. ',
+			effects: {
+				click: [
+					{
+						duration: 750,
+						'font-size': 15,
+						'font-weight': 'bold',
+						'opacity': 1
+					}
+				]
+			},
+			e: {
+				click: function() {
+					var root = this.context().find('root');
+					console.log('root', root);
+					
+					root.anim({
+						duration: 750,
+						color: 'white',
+						'background-color': 'darkred'
+					}).run();
+				}
+			}
+		}
+	]
+}
+
+/*
+아직 해결되지 않은 문제.
+
+1. 길어지는 코드, 복잡해지는 코드, HTML 안에서 마구마구 뒤섞여버린 네임스페이스들.
+
+2. A개발자가 만든 부분을 B개발자가 재사용하기 위해 파일을 열었습니다. holy shim!
+
+3. 이 페이지에선 a 라는 id 를 가진 개체가 이미 있어. 코드를 수정해주세요.
+
+4. 이 페이지의 CSS에 내가 만든 모듈의 CSS를 붙여넣었더니.. 그냥 다시 작성하자. 
+
+(배경 녹색으로)
+*/

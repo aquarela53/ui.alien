@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>Style - Element</title>
+		
+		<script type="text/javascript" src="/attrs.ui/ui.debug.js"></script>
+		<script type="text/javascript">
+			window.onload = function() {
+				var el = document.getElementById('item');
+
+				el = $(el);
+				el.style('display', 'box');
+				
+				console.log('style', el.style());
+				console.log('display', el.style('display'));
+
+				el.style({
+					'box-flex': 1,
+					'box-align': 'start',
+					'background': '#888',
+					'margin': 0,
+					'height': 100,
+					'transition-duration': '1s',
+					'transition-property': 'transform, width',
+					'font-weight': 'bold'
+				});
+
+				console.log('style', el.style());
+				console.log('display', el.style('display'));
+				console.log('box-flex', el.style('box-flex'));
+				console.log('margin', el.style('margin'));
+				console.log('height', el.style('height'));
+				console.log('transition-duration', el.style('transition-duration'));
+				console.log('transition-property', el.style('transition-property'));
+				console.log('font-weight', el.style('font-weight'));
+			}
+		</script>
+	</head>
+	<body>
+		<div id="item"></div>
+	</body>
+</html>

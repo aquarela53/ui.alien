@@ -1,0 +1,16 @@
+{
+	component: 'view',
+	items: [
+		{
+			component: 'html',
+			name: 'cmp',
+			html: 'ui1'
+		}, {
+			component: 'view',
+			src: 'ui2.ui.json'
+		}, {
+			component: 'mycmp',
+			msg: 'this is custom component'
+		}
+	]
+}

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1081">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Attriutes UI Examples">
+		<title>DOM Basic</title>
+		
+		<script type="text/javascript" src="../../ui.debug.js"></script>
+		<script type="text/javascript">
+			var $ = require('dom');
+			
+			var el;
+			$.on('ready', function(e) {
+				el = $("#contents");
+			});
+
+			function setAttribute() {
+				console.log('\n-- setAttribute');
+				el.attr('name', 'test');
+				el.attr('id', 'test');
+				el.attr('title', 'test');
+				el.attr('style', 'border:1px solid black;');
+				el.attr('custom', 'test');
+				console.log('name', el.attr('name'));
+				console.log('id', el.attr('id'));
+				console.log('title', el.attr('title'));
+				console.log('style', el.attr('style'));
+				console.log(el[0]);
+			}
+
+			function removeAttributes() {
+				console.log('\n-- removeAttributes');
+				el.attr('id', false);
+				el.attr('name', false);
+				el.attr('title', false);
+				el.attr('style', false);
+				console.log(el[0]);
+			}
+
+			function setAttributes() {
+				console.log('\n-- setAttributes');
+				el.attr({
+					id: 'test',
+					name: 'test',
+					title: 'test',
+					style: 'border:1px solid orange;'
+				});
+				console.log(el[0]);
+			}
+
+			function clearAttributes() {
+				console.log('\n-- clearAttributes');
+				el.attr(false);
+				console.log(el[0]);
+			}
+
+			function empty() {
+				console.log('\n-- empty');
+				el.empty();
+				console.log(el[0]);
+			}
+
+			function setHTML() {
+				console.log('\n-- setHTML', el.html());
+				el.html('<div><span>title</span><p>This is HTML</p></div><span>test</span>text<!-- comment --><div>div</div>');
+				console.log(el[0]);
+			}
+
+			function attach() {
+				console.log('\n-- attach');
+				$('#attach-target').attach(el);
+			}
+
+			function attachTo() {
+				console.log('\n-- attachTo');
+				el.attachTo($('#wrapper'));
+			}
+
+			function attachToAtIndex() {
+				console.log('\n-- attachToAtIndex');
+				el.attachTo($('#wrapper'), 0);
+			}
+
+			function detach() {
+				console.log('\n-- detach');
+				el.detach();
+			}
+
+			function isStaged() {
+				console.log('\n-- isStaged');
+				console.log('isStaged', el.isStaged());
+			}
+
+			function setText() {
+				console.log('\n-- setText');
+				el.text('<p>This is Text</p>');
+				console.log(el[0]);
+			}
+
+			function setStyle() {
+				console.log('\n-- setStyle');
+				el.style('transition', 'all .5s ease-in');
+				el.style('font-size', '20px');
+				
+				el.style({
+					'background-color': '#ccc',
+					'font-weight': 'bold',
+					'width': 300
+				});
+
+				console.log(el[0]);
+			}
+
+			function removeStyle() {
+				console.log('\n-- removeStyle');
+				el.style('transition', false);
+				el.style('background-color', false);
+				console.log(el.style());
+			}
+
+			function clearStyles() {
+				console.log('\n-- clearStyles');
+				el.style(false);
+				console.log(el[0]);
+			}
+
+			function computedStyles() {
+				console.log('\n-- computedStyles');
+				console.log('display', el.computed('display'));
+				console.log('width', el.computed('width'));
+			}
+
+			function addClass() {
+				console.log('\n-- addClass');
+				el.addClass('a');
+				el.ac('b');
+				el.ac('c');
+				console.log(el[0]);
+			}
+
+			function getClass() {
+				console.log('\n-- getClass');
+				console.log('el.classes', el.classes());
+			}
+
+			function hasClass() {
+				console.log('\n-- hasClass');
+				console.log('el.hasClass', el.hasClass('a'));
+				console.log('el.hc', el.hc('d'));
+			}
+
+			function removeClass() {
+				console.log('\n-- removeClass');
+				el.removeClass('a');
+				el.rc('b');
+				console.log(el[0]);
+			}
+
+			function classes() {
+				console.log('\n-- classes');
+				el.classes('a b c');
+				console.log(el[0]);
+			}
+
+			function clearClass() {
+				console.log('\n-- clearClass');
+				el.classes(false);
+				console.log(el[0]);
+			}
+
+			function getOuterHTML() {
+				console.log('\n-- getOuterHTML');
+				console.log(el.outer());
+			}
+
+			function show() {
+				console.log('\n-- show');
+				el.show();
+				console.log(el[0]);
+			}
+
+			function hide() {
+				console.log('\n-- hide');
+				el.hide();
+				console.log(el[0]);
+			}
+
+			function invisible() {
+				console.log('\n-- invisible');
+				el.invisible();
+				console.log(el[0]);
+			}
+
+			
+
+			function clear() {
+				console.log('\n-- clear');
+				el.clear();
+				console.log(el[0]);
+			}
+
+			function clone() {
+				console.log('\n-- clone');
+				var newel = el.clone();
+				newel.attachTo(el.parent() || $('#wrapper'));
+			}
+
+			function dataBinding() {
+				console.log('\n-- dataBinding');
+				el.data('test.data', {something:'contents'});
+				console.log('test.data', el.data('test.data'));
+			}
+
+			function printSizes() {
+				console.log('\n-- printSizes');
+				console.log('boundary', el.boundary());
+				console.log('width', el.width());
+				console.log('height', el.height());
+				console.log('clientWidth', el.clientWidth());
+				console.log('clientHeight', el.clientHeight());
+				console.log('offsetWidth', el.offsetWidth());
+				console.log('offsetHeight', el.offsetHeight());
+				console.log('scrollWidth', el.scrollWidth());
+				console.log('scrollHeight', el.scrollHeight());
+			}
+
+			function parent() {
+				console.log('\n-- parent');
+				console.log('parent', el.parent());
+			}
+
+			function children() {
+				console.log('\n-- children');
+				console.log('count', el.count());
+				console.log('count(include text node)', el.count(true));
+				console.log('children', el.children());
+				console.log('children(include text node)', el.children(true));
+			}
+
+			function forEach() {
+				console.log('\n-- forEach');
+				el.forEach(function(index) {
+					console.log('iteration', index, $(this));
+				});
+				
+				var argc = el.children();
+				argc.forEach(function(index) {
+					console.log('iteration(children)', index, $(this));
+				});
+				
+				var argc = el.children(true);
+				argc.forEach(function(index) {
+					console.log('iteration(children include all)', index, $(this));
+				});
+			}
+
+			function find() {
+				console.log('\n-- find');
+				var found = el.find('div');
+				console.log('found', found);
+			}
+
+			function finds() {
+				console.log('\n-- finds');
+				var found = el.finds('div');
+				console.log('found', found);
+			}
+
+			function visitUp() {
+				console.log('\n-- visitUp');
+				el.visit(function(el) {
+					console.log(el);
+				}, 'up');
+			}
+
+			function visitDown() {
+				console.log('\n-- visitDown');
+				el.visit(function(el) {
+					console.log(el);
+				}, 'down');
+				
+				el.visit(function(el) {
+					console.log('contain self', el);
+				}, 'down', true);
+				
+				el.visit(function(el) {
+					console.log('stop visit', el);
+					return false;
+				}, 'down', true);
+			}
+			
+			var click_handler = function(e) {
+				console.log('click', this);
+			};
+			function addEvent() {
+				console.log('\n-- addEvent');
+				el.on('click', click_handler);
+			}
+
+			function removeEvent() {
+				console.log('\n-- removeEvent');
+				el.un('click', click_handler);
+			}
+
+			function addEventCascadeDown() {
+				el.on('click', click_handler, true);
+			}
+
+			function removeEventCascadeDown() {
+				console.log('\n-- removeEvent');
+				el.un('click', click_handler, true);
+			}
+		</script>
+	</head>
+	<body>
+		<div id="wrapper">
+			<div id="contents">
+				Element test
+			</div>
+
+			<div id="attach-target" style="margin:10px;border: 1px dotted #333;">
+			</div>
+		</div>
+
+		<ul>
+			<li><a href="javascript:setAttribute();">set attribute</a></li>
+			<li><a href="javascript:removeAttributes();">remove attributes</a></li>
+			<li><a href="javascript:setAttributes();">set attributes</a></li>
+			<li><a href="javascript:clearAttributes();">clear attributes</a></li>
+			<li><a href="javascript:empty();">empty</a></li>
+			<li><a href="javascript:setHTML();">set html</a></li>
+			<li><a href="javascript:attach();">attach</a></li>
+			<li><a href="javascript:attachTo();">attachTo</a></li>
+			<li><a href="javascript:attachToAtIndex();">attachToAtIndex</a></li>
+			<li><a href="javascript:detach();">detach</a></li>
+			<li><a href="javascript:isStaged();">check is staged</a></li>
+			<li><a href="javascript:setText();">set text</a></li>
+			<li><a href="javascript:setStyle();">set style</a></li>
+			<li><a href="javascript:computedStyles();">computed styles</a></li>
+			<li><a href="javascript:removeStyle();">remove style</a></li>
+			<li><a href="javascript:clearStyles();">clear styles</a></li>
+			<li><a href="javascript:addClass();">add class</a></li>
+			<li><a href="javascript:getClass();">get class</a></li>
+			<li><a href="javascript:hasClass();">has class</a></li>
+			<li><a href="javascript:removeClass();">remove class</a></li>
+			<li><a href="javascript:classes();">classes</a></li>
+			<li><a href="javascript:clearClass();">clear class</a></li>
+			<li><a href="javascript:getOuterHTML();">get outerhtml</a></li>
+			<li><a href="javascript:show();">show</a></li>
+			<li><a href="javascript:hide();">hide</a></li>
+			<li><a href="javascript:invisible();">invisible</a></li>
+			<li><a href="javascript:clear();">clear</a></li>
+			<li><a href="javascript:clone();">clone</a></li>
+			<li><a href="javascript:dataBinding();">data binding</a></li>
+			<li><a href="javascript:printSizes();">print sizes</a></li>
+			
+			<li><a href="javascript:parent();">parent</a></li>
+			<li><a href="javascript:children();">children</a></li>
+			<li><a href="javascript:forEach();">iteration(forEach)</a></li>
+
+			<li><a href="javascript:find();">find</a></li>
+			<li><a href="javascript:finds();">finds</a></li>
+			<li><a href="javascript:visitUp();">visit(up)</a></li>
+			<li><a href="javascript:visitDown();">visit(down)</a></li>
+			<li><a href="javascript:addEvent();">add event</a></li>
+			<li><a href="javascript:removeEvent();">remove event</a></li>
+			<li><a href="javascript:addEventCascadeDown();">add event(cascade down)</a></li>
+			<li><a href="javascript:removeEventCascadeDown();">remove event(cascade down)</a></li>
+		</ul>
+	</body>
+</html>

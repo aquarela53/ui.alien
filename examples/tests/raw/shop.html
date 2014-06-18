@@ -1,0 +1,283 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="author" content="attrs.io">
+		<meta name="description" content="Shop API">
+		<title>Shop API</title>
+
+		
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/Appbus.Foundation.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/Appbus.Class.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/Appbus.EventProvider.js"></script>
+		<script type="text/javascript" src="libs/attrs.ui-5.0.0/util/Appbus.Ajax.js"></script>
+		
+		
+		<script type="text/javascript" src="components/attrs.auth/attrs.auth.js"></script>
+		<script type="text/javascript" src="components/attrs.shop/attrs.shop.Category.js"></script>
+		<script type="text/javascript" src="components/attrs.shop/attrs.shop.ShopInformation.js"></script>
+		<script type="text/javascript" src="components/attrs.shop/attrs.shop.Product.js"></script>
+		<script type="text/javascript" src="components/attrs.shop/attrs.shop.Cart.js"></script>
+		<script type="text/javascript" src="components/attrs.shop/attrs.shop.Order.js"></script>
+		<script type="text/javascript" src="components/attrs.shop/attrs.shop.Shop.js"></script>
+
+		<script type="text/javascript">
+			var api = attrs.shop.Shop('test');
+			api.login('test', '1111');
+			// or
+			attrs.shop.Shop('test').login('test', '1111');
+
+
+			/*var fn = function(p, o ) {
+				var a = 0;
+				p.vaaa = '1111';
+			};
+
+			console.log(fn.toString());*/
+
+			// 사용자
+			var user = api.user;
+			if( true ) {
+				console.log('name', user.name);
+				console.log('userId', user.userId);
+				console.log('loginId', user.loginId);
+				console.log('tel', user.tel);
+				console.log('mobile', user.mobile);
+				console.log('email', user.email);
+				console.log('data', user.data);
+
+				console.log('isOperator', user.hasPermission('*'));					// 오퍼레이터 권한
+				console.log('isProductAdmin', user.hasPermission('product', '*'));	// 상품관리자 권한
+				console.log('isOrderAdmin', user.hasPermission('order', '*'));		// 주문관리자 권한
+				
+				console.dir(user);
+				user.on('logout', function(user) {
+					console.log('logouted');
+				});
+			}
+
+			// 카테고리
+			if( true ) {
+				var $category = api.get('category');
+				
+				var products = $category.get('products');
+				console.log('products', $category.get('products'));
+
+				var namecards = $category.get('products.namecards');
+				console.log('namecards', $category.get('products.namecards'));
+
+				$category.add('products.namecard', {
+					id: 'basic',
+					name: '베이직'
+				});
+
+				$category.edit('products.namecard.basic', {
+					name: '기본형'
+				});
+
+				var removed = $category.remove('products.namecard.basic');
+			}
+
+			// 상품
+			if( false ) {
+				var $product = api.get('product');
+				var list = $product.list(0, 10, [{category:1},{posted:-1}], {category: ['1', '2']});
+				var disabled = $product.disabled(0, 10, [{category:1},{posted:-1}], {category: ['1', '2']});
+				var items = $product.find({category:'3'});
+				
+				var item = $product.add({
+					id: '',
+					name: '새 상품',
+					categories: 'namecard business',
+					price: 2000,
+					flags: ['discount', 'new', 'hot'],
+					prices: {
+						original: 3000,
+						description: '할인행사중입니다.'
+					},
+					description: '새로운 상품입니다',
+					vendor: {
+						id: 'printingengine',
+						label: '프린팅엔진'
+					},
+					detail: {
+						basic: '기본정보...어쩌고저쩌고',
+						introduce: '어쩌고저쩌고 HTML...'
+					},
+					options: {
+						//options scheme
+					},
+					thumnail: {
+						url: 'http://cdn.printingengine.com/resources/sample-114.png',
+						path: '/resources/sample-114.png',
+						label: 'sample.png',
+						type: 'png',
+						size: {w:114,h:114},
+						length: 4458
+					},
+					images: [
+						{
+							url: 'http://cdn.printingengine.com/resources/sample.png',
+							path: '/resources/sample.png',
+							label: 'sample.png',
+							type: 'png',
+							size: {w:1000,h:500},
+							length: 49302
+						}
+					],
+					calculators: {
+						'product': function(product, options) {
+						}						
+					}
+					//_id, userId, remoteip, modified, posted, 
+				});
+				
+				item = $product.get(item.id);
+				
+				item = $product.edit('itemid', {
+					name: item.name + '(수정)'
+				});
+
+				var removed = $product.remove('itemid');
+
+				//주문
+				var preorder = $product.order({
+					options: {
+						paper: 1,
+						design: true
+					},
+					deliveryChargeInAdvance: false,
+					qty: 2,
+					files: [
+						{url:'...',path:'/upload/users/userid/temp/myfile.jpg',length:234234,type:'jpg'},
+						{url:'...',path:'/upload/users/userid/temp/myfile.doc',length:123123,type:'doc'}
+					]
+				});
+				
+				
+				// Product UI Views
+				var target = document.body;
+				var view = $product.ui.getListView({
+					style: '',
+					tpl: '',
+					data: list,
+					e: {
+						selected: function(cmp, item, e) {
+						}
+					}
+				});
+				view.attachTo(target);
+
+				var view = $product.ui.getImageView({
+					style: '',
+					tpl: '',
+					data: item
+				});
+				view.attachTo(target);
+
+				var view = $product.ui.getDetailView({
+					style: '',
+					tpl: '',
+					data: item
+				});
+				view.attachTo(target);
+
+				var view = $product.ui.getInfoView({
+					style: '',
+					tpl: '',
+					data: item
+				});
+				view.attachTo(target);
+
+				var view = $product.ui.getOptionView({
+					style: '',
+					tpl: '',
+					data: item
+				});
+				view.attachTo(target);
+			}
+
+			// 카트
+			if( false ) {
+				var $cart = api.get('cart');
+				var $product = api.get('product');
+
+				var product = $product.get(item.id);
+
+				var list = $cart.list();
+				var item = $cart.get('cartItemId');
+				
+				item = $cart.add(product, {
+					options: {
+						paper: 1,
+						design: true
+					},
+					deliveryChargeInAdvance: false,
+					qty: 2,
+					files: [
+						{url:'...',path:'/upload/users/userid/temp/myfile.jpg',length:234234,type:'jpg'},
+						{url:'...',path:'/upload/users/userid/temp/myfile.doc',length:123123,type:'doc'}
+					]
+				});
+				
+				item = $cart.edit('itemid', {
+					qry: 1
+				})
+				var b = $cart.remove('itemid');
+
+				var preorder = $cart.order();
+
+				$cart.clear();
+			}
+
+			// 주문
+			if( false ) {
+				var $order = api.get('order');
+
+				var order = preorder.commit(preorder, {
+					payment: {
+						method: 'pg',				// pg, 
+						paid: 5000,
+						tid: 'pg transaction id',	//승인번호
+						pg: {
+							//pg data
+							method: 'VCard',
+							tid: '123123123',
+							price: '5000',
+							title: 'A상품 외 3건',
+							orderId: 'orderid',
+							fulltext: 'asdasdasd'
+						}
+					},
+					shipping: {
+						method: 'delivery-inadvance',			//'quick':퀵서비스, 'direct':직접배송, 'free':무료배송, ''
+						charge: 4000,
+						address: '',
+						tel: '',
+						mobile: ''
+					}
+				});
+			}
+
+
+			// 주문 조회
+			if( false ) {
+				var $order = api.get('order');
+
+				var waitings = $order.list('wait', 0, 10, [{category:1},{posted:-1}], {category: ['1', '2']});
+				var completed = $order.list('complete', 0, 10, [{category:1},{posted:-1}], {category: ['1', '2']});
+				var canceled = $order.list('cancel', 0, 10, [{category:1},{posted:-1}], {category: ['1', '2']});
+
+				var items = $order.find({status:'cancel'}, func);
+				var item = $order.get('orderid');
+
+				item = $order.cancel(item, 'reason');			//취소처리 (PG 취소 X)
+				item = $order.status(item, 'wait');				//상태변경 (상태 플래그만 변경)
+				item = $order.cancel(item, 'reason', true);		//취소처리 (PG 결제 order 의 경우 pg 연동 취소)
+			}
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

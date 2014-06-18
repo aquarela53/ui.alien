@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1081">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Context Basic</title>
+		
+		<script type="text/javascript" src="../../ui.debug.js"></script>
+		<script type="text/javascript">
+			var UI = require('ui');
+
+			// setting component with name (this case will assign to default context)
+			console.log('--- setting component with name (this case will assign to default context)');
+			
+			var cmp = new UI.HTML({
+				name: 'test',
+				html: 'context test 1'
+			});
+
+			var context = new UI.Context();			
+			
+			console.log('\n- context connect(with cmp.context)');
+			cmp.context(context);
+			console.log('cmp', cmp);
+			console.log('cmp.name', cmp.name());
+			console.log('cmp.context', cmp.context());
+			console.log('cmp.context().finds(test)', context.finds('test'));
+			
+			cmp.context(false);
+			console.log('\n- context disconnect(with cmp.context(false))');
+			console.log('cmp', cmp);
+			console.log('cmp.name', cmp.name());
+			console.log('cmp.context', cmp.context());
+			console.log('cmp.context().finds(test)', context.finds('test'));
+
+			context.connect(cmp);
+			console.log('\n- context connect(with context.connect)');
+			console.log('cmp', cmp);
+			console.log('cmp.name', cmp.name());
+			console.log('cmp.context', cmp.context());
+			console.log('cmp.context().finds(test)', context.finds('test'));
+
+			context.disconnect(cmp);
+			console.log('\n- context connect(with context.disconnect)');
+			console.log('cmp', cmp);
+			console.log('cmp.name', cmp.name());
+			console.log('cmp.context', cmp.context());
+			console.log('cmp.context().finds(test)', context.finds('test'));
+
+			
+			// setting component with new context
+			console.log('\n\n--- setting component with new context, case 1');
+			var cmp2 = new UI.HTML({
+				context: true,
+				name: 'test',
+				html: 'context test 2'
+			});
+
+			console.log('cmp2', cmp2);
+			console.log('cmp2.name', cmp2.name());
+			console.log('cmp2.context', cmp2.context());
+			console.log('cmp2.context().finds(test)', cmp2.context().finds('test'));
+
+
+			UI.on('ready', function(e) {
+				cmp.attachTo('#slot');
+				cmp2.attachTo('#slot');
+			});
+		</script>
+	</head>
+	<body>
+		<div id="slot"></div>
+	</body>
+</html>

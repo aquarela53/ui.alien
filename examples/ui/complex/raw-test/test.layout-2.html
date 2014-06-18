@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="CSS Test">
+	</head>
+
+	<style>
+		.cmp {
+			box-sizing: border-box;
+			background-color: #eee;
+
+			border: 1px solid yellow;
+		}
+
+		.view {
+			display: block;
+			width: 100%;
+			overflow-x: hidden;
+			
+			border: 1px solid red;
+		}
+
+		.view.h {
+			display: table;
+		}
+
+		.view.h > * {
+			display: table-cell;
+			position: relative;
+			border: 1px solid blue;
+		}
+
+		.boxview {
+			width: 100%;
+
+			display: box;
+			box-orient: vertical;
+			box-direction: normal;
+			box-lines: initial;
+			box-align: initial;
+			box-pack: initial;
+
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-box-direction: normal;
+			-webkit-box-lines: initial;
+			-webkit-box-align: initial;
+			-webkit-box-pack: initial;
+			
+			display: -moz-box;
+			-moz-box-orient: vertical;
+			-moz-box-direction: normal;
+			-moz-box-lines: initial;
+			-moz-box-align: initial;
+			-moz-box-pack: initial;
+
+			display: -ms-flexbox;			
+			-ms-flex-orient: vertical;
+			-ms-flex-direction: normal;
+			-ms-flex-lines: initial;
+			-ms-flex-align: initial;
+			-ms-flex-pack: initial;
+
+			border: 1px dotted red;
+		}
+
+		.boxview.h {
+			box-orient: horizontal;
+			-webkit-box-orient: horizontal;
+			-moz-box-orient: horizontal;
+			-ms-flex-orient: horizontal;
+		}
+
+		.boxview > * {
+			box-flex: 1;
+			-webkit-box-flex: 1;
+			-moz-box-flex: 1;
+			-ms-flex-flex: 1;
+
+			border: 1px solid black;
+			background-color: #eec;
+			
+			--webkit-box-align: stretch;
+			--webkit-box-pack: stretch;
+		}
+
+		.application {
+			width: 100%;
+			border: 1px solid green;
+		}
+	</style>
+	<body>
+		<!-- 
+			view 자체의 display 를 table 로 하고
+			하위 컴포넌트를 <div class="cell"> 로 랩핑해서 붙임.
+			하지만 view 자체 display 가 table 이라 여전히 다른 컨테이너에 뷰가 속했을 때 이상작동이 될 수 있다.
+			table-cell 안에서의 position: absolute 가 webkit 을 제외한 브라우져에서 비정상 작동을 하는 문제가 발생.
+		-->
+		<div class="cmp view application">
+			<div class="cmp view">
+				<div class="cell">
+					<div>Top</div>
+				</div>
+				<div class="cell">
+					<div class="cmp view h">
+						<div class="cmp view">Logo</div>
+						<div class="cmp"><div style="width:100px;text-overflow: ellipsis;overflow: hidden;white-space: no-wrap;">empty area</div></div>
+						<div class="cmp view" style="min-width: 650px;max-width: 650px;width: 650px;">Naigation</div>
+					</div>
+				</div>
+			</div>
+			<div class="cmp view h">
+				<div class="cell" style="width:250px;">
+					<div style="background:orange;position:relative;width:100%;height:300px;">Contents Top</div>
+				</div>
+				<div class="cell">
+					<div class="cmp boxview">
+						<div class="cmp" style="min-height:30px;max-height:30px;height:30px;">Top</div>
+						<div class="cmp boxview h">
+							<div class="cmp" style="min-width: 150px;max-width: 150px;width: 150px;">Left</div>
+							<div class="cmp view">
+								<!-- inner table -->
+								<div class="cmp view h" style="height:100%;">
+									<div class="cmp view" style="min-width: 50px;max-width: 50px;width: 50px;">A Side</div>
+									<div class="cmp view">
+										<div class="cmp text">Contents<br/>Contents<br/>Contents<br/>Contents<br/>Contents<br/>Contents<br/>Contents<br/></div>
+									</div>
+									<div class="cmp view" style="min-width: 20px;max-width: 20px;width: 20px;">B Side</div>
+								</div>
+								<!-- // inner table -->
+							</div>
+							<div class="cmp" style="min-width: 150px;max-width: 150px;width: 150px;">Right</div>
+						</div>
+						<div class="cmp boxview" style="min-height:30px;max-height:30px;height:30px;">Bottom</div>
+					</div>
+				</div>
+			</div>
+			<div class="cmp view h">
+				<div class="cell" style="width: 250px;">
+					<div class="cmp">A Side</div>
+				</div>
+				<div class="cell">
+					<div class="cmp view">
+						<div class="cell">
+							<div class="cmp text">
+								Contents<br/>
+								Contents<br/>
+								Contents<br/>
+								Contents<br/>
+								Contents<br/>
+								Contents<br/>
+							</div>
+						</div>
+						<div class="cell">
+							<div class="cmp view h">
+								<div class="cell">
+									<div class="cmp">Component1</div>
+								</div>
+								<div class="cell">
+									<div class="cmp">Component2</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="cell" style="width: 150px;">
+					<div class="cmp">B Side</div>
+				</div>
+			</div>
+			<div class="cmp view">
+				<div class="cell">
+					<div class="cmp text">Footer</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

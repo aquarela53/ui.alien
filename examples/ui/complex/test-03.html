@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Appbus Theme Creator">
+
+		<script type="text/javascript" src="../ui.debug.js"></script>
+		<script type="text/javascript">
+			// global style setup
+			var css = {
+				"@font-face": [
+					{
+						"font-family": "Ubuntu Mono",
+						"font-style": "normal",
+						"font-weight": "400",
+						"src": "local('Ubuntu Mono'), local('UbuntuMono-Regular'), url(http://themes.googleusercontent.com/static/fonts/ubuntumono/v3/ViZhet7Ak-LRXZMXzuAfkYbN6UDyHWBl620a-IRfuBk.woff) format('woff')"
+					}
+				],
+				'*': {
+					'margin': 0,
+					'padding': 0
+				},
+				'body': {
+					'font-family': '"Ubuntu Mono", "나눔 고딕", "맑은 고딕"',
+					'font-size': 14,
+					'padding': 0,
+					'margin': 0,
+					'background-color': '#ECE9E2'
+				}
+			};
+			Appbus.StyleSystem.global.reset(css);
+
+
+			// load ui file & attach
+			Appbus.on('ready', function() {
+				var cmp = Appbus.Component.build(Appbus.require('test-03.ui.json'));
+				cmp.attachTo('#slot');
+			});
+		</script>
+	</head>
+	<body>
+		<div id="slot" style="box-sizing:border-box;display:-webkit-box;position:absolute;width:100%;height:100%;padding:3px;"></div>
+	</body>
+</html>

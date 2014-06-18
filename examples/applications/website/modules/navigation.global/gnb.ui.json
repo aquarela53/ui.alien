@@ -1,0 +1,49 @@
+{
+	component: 'view',
+	horizontal: true,
+	items: [
+		{
+			component: 'cmp',
+			name: 'menu',
+			classes: 'border',
+			html: '제작상품',
+			width: 120,
+			height: 35
+		}, {
+			component: 'cmp',
+			name: 'menu',
+			classes: 'border',
+			html: '디자인',
+			width: 120,
+			height: 35
+		}, {
+			component: 'cmp',
+			name: 'menu',
+			classes: 'border',
+			html: '빠른주문',
+			width: 120,
+			height: 35
+		}, {
+			component: 'cmp',
+			name: 'menu',
+			classes: 'border',
+			html: '이용안내',
+			width: 120,
+			height: 35
+		}, {
+			component: 'cmp',
+			name: 'menu',
+			classes: 'border',
+			html: '고객센터',
+			width: 120,
+			height: 35
+		}, {
+			component: 'cmp',
+			name: 'menu',
+			classes: 'border',
+			html: '마이페이지',
+			width: 120,
+			height: 35
+		}
+	]
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1000">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Remote Theme</title>
+		
+		<script type="text/javascript" src="../ui.debug.js"></script>
+		<script type="text/javascript">
+			// load theme async (with original theme name)
+			Appbus.Theme.load('themes/mytheme.theme.json').async(function(err, theme) {
+				if( err ) return console.error('theme load error(async)', err);
+
+				console.log('async loaded', theme);				
+			});
+			
+			// load theme sync (with user defined theme name 'newname')
+			var theme = Appbus.Theme.load('themes/mytheme.theme.json', 'newname').sync();
+			console.log('theme', theme);
+
+			console.log('json', JSON.stringify(theme, null, '\t'));
+				
+			console.log('\n\n');
+			console.error('- as selected theme css');
+			console.log(theme.build(false));
+			console.log('\n\n');
+			console.error('- theme css');
+			console.log(theme.build());
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

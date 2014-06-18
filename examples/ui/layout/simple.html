@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="viewport" content="width=1081">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="Examples">
+		<title>Layout</title>
+		
+		<script type="text/javascript" src="../../ui.debug.js"></script>
+
+		<script type="text/javascript">
+			var UI = require('ui');
+
+			var ui = {
+				component: 'view',
+				name: 'root',
+				fit: true,
+				items: [
+					{
+						component: 'view',
+						name: 'top',
+						bg: '#333',							
+						padding: 15,
+						color: 'white',
+						items: [
+							{
+								component: 'html',
+								name: 'gnb',
+								message: 'this is GNB!!'
+							}
+						]
+					}, {
+						component: 'view',
+						name: 'center',
+						bg: '#555',
+						flex: 1,
+						horizontal: true,
+						items: [
+							{
+								component: 'view',
+								name: 'side',
+								bg: '#777',
+								width: 250,
+								items: [
+									{
+										component: 'html',
+										flex: 1,
+										theme: 'test',
+										name: 'snb',
+										html: 'side'
+									}
+								]
+							}, {
+								component: 'view',
+								name: 'contents',
+								context: true,
+								width: 'auto',
+								bg: 'white',
+								css: {
+									padding: 10,
+									flex: 1
+								},
+								style: {
+								},
+								items: [
+									{
+										component: 'html',
+										name: 'contents-html',
+										theme: 'test',
+										margin: '0 auto',
+										width: 736,
+										html: 'contents'
+										// src: 'contents/contents.html'
+									}
+								]
+							}
+						]
+					}, {
+						component: 'view',
+						name: 'footer',
+						bg: '#333',
+						height: 30,
+						e: {
+							'click': function(e) {
+								console.log(e.type, this, e);
+							}
+						},
+						html: 'footer'
+					}
+				]
+			};
+
+			var app = new UI.Module({
+				items: ui,
+				fit: true,
+				routes: {
+					'contents-html': {
+						'html.changed': function(e) {
+							console.log(e.src.boundary());
+						}
+					}
+				}
+			});
+
+			// apply context default theme
+			app.context().theme().src({
+				'html': {
+					'font-weight': 'bold'
+				}
+			});
+			
+			// apply additional context theme, other way
+			app.context().theme('test').component('html').set({
+				background: 'orange'
+			});
+			
+			UI.on('ready', function(e) {
+				app.attachTo(document.body);
+				
+				require('buildinfo').print();
+				
+				console.log(app.find('contents'));
+				console.log(app.find('contents-html'));
+			});
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

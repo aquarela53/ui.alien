@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<meta name="description" content="CSS Test">
+	</head>
+
+	<style>
+		.cmp {
+			box-sizing: border-box;
+		}
+
+		.entry {
+			box-sizing: border-box;
+			background-color: #eee;
+		}
+
+		.view {
+			display: block;
+			position:relative;
+			--overflow-x: hidden;
+			
+			border: 1px solid red;
+		}
+
+		.view.h {
+			display: table;
+			width: 100%;
+		}
+
+		.view.h > div {
+			display: table-cell;
+			position:relative;
+
+			border: 1px solid blue;
+		}
+
+		.boxview {
+			width: 100%;
+
+			display: box;
+			box-orient: vertical;
+			box-direction: normal;
+			box-lines: initial;
+			box-align: initial;
+			box-pack: initial;
+
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-box-direction: normal;
+			-webkit-box-lines: initial;
+			-webkit-box-align: initial;
+			-webkit-box-pack: initial;
+			
+			display: -moz-box;
+			-moz-box-orient: vertical;
+			-moz-box-direction: normal;
+			-moz-box-lines: initial;
+			-moz-box-align: initial;
+			-moz-box-pack: initial;
+
+			display: -ms-flexbox;			
+			-ms-flex-orient: vertical;
+			-ms-flex-direction: normal;
+			-ms-flex-lines: initial;
+			-ms-flex-align: initial;
+			-ms-flex-pack: initial;
+
+			border: 1px dotted red;
+		}
+
+		.boxview.h {
+			box-orient: horizontal;
+			-webkit-box-orient: horizontal;
+			-moz-box-orient: horizontal;
+			-ms-flex-orient: horizontal;
+		}
+
+		.boxview > * {
+			box-flex: 1;
+			-webkit-box-flex: 1;
+			-moz-box-flex: 1;
+			-ms-flex-flex: 1;
+
+			border: 1px solid black;
+			background-color: #eec;
+			
+			--webkit-box-align: stretch;
+			--webkit-box-pack: stretch;
+		}
+
+		.application {
+			width: 100%;
+			border: 1px solid green;
+		}
+	</style>
+	<body>
+		<!-- 
+			view 자체의 display 를 table 로 하고
+			하위에 바로 컴포넌트를 붙이면서 컴포넌트의 display 를 table-cell 로 했을 경우
+			얼핏 IE8, FF, Webkit 모두 지원하는 것 처럼 보이지만,
+			컴포넌트의 display 가 table-cell 이 되어버리는 문제와
+			table-cell 안에서의 position: absolute 가 webkit 을 제외한 브라우져에서 비정상 작동을 하는 문제가 발생.
+		-->
+		<div class="cmp view application">
+			<div class="cmp view">
+				<div class="entry">Top</div>
+				<div class="cmp view h">
+					<div class="entry">Logo</div>
+					<div class="entry"><div style="width:100px;text-overflow: ellipsis;overflow: hidden;white-space: no-wrap;">empty area</div></div>
+					<div class="entry" style="min-width: 650px;max-width: 650px;width: 650px;">Naigation</div>
+				</div>
+			</div>
+			<div class="cmp view h">
+				<div class="cmp" style="width: 50%;">
+					<div class="entry" style="display:block;position:absolute;left:0;top:0;width:100%;height:100%;background:#ccc;border:1px dotted red;padding:25px;">Contents Top</div>
+				</div>
+				<div class="cmp view">
+					<div class="cmp boxview" style="height:300px;">
+						<div class="cmp" style="min-height:30px;max-height:30px;height:30px;">Top</div>
+						<div class="cmp boxview h">
+							<div class="cmp" style="min-width: 150px;max-width: 150px;width: 150px;">Left</div>
+							<div class="cmp view">
+								<!-- inner table -->
+								<div class="cmp view h" style="height:100%;">
+									<div class="cmp view" style="min-width: 50px;max-width: 50px;width: 50px;">A Side</div>
+									<div class="cmp view">
+										<div class="cmp text">Contents<br/>Contents<br/>Contents<br/>Contents<br/>Contents<br/>Contents<br/>Contents<br/></div>
+									</div>
+									<div class="cmp view" style="min-width: 20px;max-width: 20px;width: 20px;">B Side</div>
+								</div>
+								<!-- // inner table -->
+							</div>
+							<div class="entry" style="min-width: 150px;max-width: 150px;width: 150px;">Right</div>
+						</div>
+						<div class="entry" style="min-height:30px;max-height:30px;height:30px;">Bottom</div>
+					</div>
+				</div>
+			</div>
+			<div class="cmp view h">
+				<div class="entry" style="min-width: 150px;max-width: 150px;width: 150px;">A Side</div>
+				<div class="cmp view">
+					<div class="entry">
+						Contents<br/>
+						Contents<br/>
+						Contents<br/>
+						Contents<br/>
+						Contents<br/>
+					</div>
+					<div class="cmp view h">
+						<div class="entry">Component1</div><div class="entry">Component2</div>
+					</div>
+				</div>
+				<div class="entry" style="min-width: 150px;max-width: 150px;width: 150px;">B Side</div>
+			</div>
+			<div class="cmp view">
+				<div class="entry">Bottom Navigation</div>
+				<div class="entry">Copyright</div>
+			</div>
+		</div>
+	</body>
+</html>

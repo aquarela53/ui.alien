@@ -1,0 +1,22 @@
+{
+	"bundleId": "attrs.ui",
+	"version": "0.6.0",
+	"description": "Attributes Web UI Framework",
+	"activator": "activator.js",
+	"imports": {
+		"http": "*"
+	},
+	
+	"vendor": "attributes",
+	"author": {
+		"name": "joje",
+		"email": "joje.attrs@gmail.com",
+		"url": "https://github.com/joje6"
+	},
+	"licenses": [
+		{
+		  "type": "MIT",
+		  "url": "http://www.opensource.org/licenses/MIT"
+		}
+	]
+}

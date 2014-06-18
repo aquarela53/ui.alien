@@ -1,0 +1,124 @@
+{
+	"name": "mytheme",
+	"description": "Appbus Sample Theme",
+	"version": "1.0.0",
+	"author": {
+		"name": "joje",
+		"email": "joje.attrs@gmail.com",
+		"url": "https://github.com/joje6"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/joje6/appbus.git"
+	},
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "http://www.opensource.org/licenses/MIT"
+		}
+	],
+	"keywords": [
+		"tag"
+	],
+	"styles": {
+		"@define": {
+			"foreground": "#333",
+			"background": "#fff",
+			"border.color.light": "",
+			"border.color.dark": "",
+			"gradient": function() {
+			}
+		},
+		"global": {
+			"@font-face": [
+				"\"case if array contains string\"",
+				{
+					"font-family": "Droid Sans",
+					"font-style": "normal",
+					"font-weight": "400",
+					"src": "local('Droid Sans'), local('DroidSans'), url(http://themes.googleusercontent.com/static/fonts/droidsans/v3/s-BiyweUPV0v-yRb-cjciBsxEYwM7FgeyaSgU71cLG0.woff) format('woff')"
+				}, {
+					"font-family": "Lekton",
+					"font-style": "normal",
+					"font-weight": "400",
+					"src": "local('Lekton'), local('Lekton-Regular'), url(http://themes.googleusercontent.com/static/fonts/lekton/v4/Gv78TXgMRvGbTrqT_eA_TQ.woff) format('woff')"
+				}, {
+					"font-family": "Ubuntu Mono",
+					"font-style": "normal",
+					"font-weight": "400",
+					"src": "local('Ubuntu Mono'), local('UbuntuMono-Regular'), url(http://themes.googleusercontent.com/static/fonts/ubuntumono/v3/ViZhet7Ak-LRXZMXzuAfkYbN6UDyHWBl620a-IRfuBk.woff) format('woff')"
+				}, {
+					"font-family": "Ubuntu Mono",
+					"font-style": "normal",
+					"font-weight": "400",
+					"src": "local('Ubuntu Mono Bold'), local('UbuntuMono-Bold'), url(http://themes.googleusercontent.com/static/fonts/ubuntumono/v3/ceqTZGKHipo8pJj4molytjqR_3kx9_hJXbbyU8S6IN0.woff) format('woff')"
+				}
+			],
+			"body": {
+				"font-family": "\"Ubuntu Mono\", \"나눔 고딕\", \"맑은 고딕\", \"Apple Gothic\"",
+				"font": "11px"
+			},
+			'.g': {
+				"font": "11px"
+			}
+		},
+		"view": {
+			"border": "1px solid black",
+			"border-bottom": "none",
+			"padding": 5,
+			"cursor": "pointer",
+			"> *": {
+				"border": "1px solid black",
+				"border-bottom": "none",
+				"padding": 5,
+				"cursor": "pointer"
+			},
+			"..cls": {
+				"cursor": "pointer"
+			},
+			".cls": {
+				"cursor": "pointer"
+			},
+			// @ 로 시작하는 요소는 최상위에 등록되므로 name 이 지정되는 @ 요소는 prefix 를 붙여 중복되지 않도록 고려해야한다.
+			// 아래의 예는 {테마명-애니메이션명}
+			// ! 는 keyframe 내부 구조처럼 비정규 구조의 하위 노드를 가졌을 경우 문자열 그 자체로 내용을 표현해야 할 때 사용하면 된다.
+			"@keyframes mytheme-anim": {	
+				"!": "\t0%   {background: red;}\n" + 
+				"\t25%  {background: yellow;}\n" + 
+				"\t50%  {background: blue;}\n" + 
+				"\t100% {background: green;}"
+			}
+		},
+		"tab": {
+			"border": "1px solid black",
+			"border-bottom": "none",
+			"padding": 5,
+			"cursor": "pointer"
+		},
+		"tabitem": {
+			"border": "1px solid black",
+			"border-bottom": "none",
+			"padding": 5,
+			"cursor": "pointer",
+			":last-child": {
+				"border-bottom": "1px solid black"
+			},
+			"..active": {
+				"background": "silver"
+			}
+		},
+		"table": {
+			"border": "1px solid black",
+			"border-bottom": "none",
+			"padding": 5,
+			"cursor": "pointer"
+		},
+		"row": {
+			"inherit": false,
+			"border": "1px solid black",
+			"border-bottom": "none",
+			"padding": 5,
+			"cursor": "pointer"
+		}
+	}
+}
