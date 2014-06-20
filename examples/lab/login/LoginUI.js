@@ -1,4 +1,4 @@
-var UI = require('ui').context();
+var UI = require('ui').current();
 
 var ui_login = new UI.HTML('login.html');
 var ui_logout = new UI.HTML('logout.html');
@@ -30,4 +30,4 @@ LoginUI.prototype = {
 
 LoginUI.style = './login.css';
 
-module.exports = LoginUI = UI.component('login', LoginUI);
+module.exports = LoginUI; // = UI.component('login', LoginUI);

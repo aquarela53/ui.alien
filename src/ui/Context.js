@@ -4,22 +4,32 @@
 	var HashController = require('hash');
 	var Util = require('util');
 	var $ = require('dom');
+	var CONTEXTS = [];
+	var DefaultContext;
 	
 	// regist default tag handler
 	var DefaultTagHandler = function(cls, el, attrs) {
 		return attrs;
 	};
 	
+	function loadContent(src) {
+		return null;
+	}
+	
 	var Context = (function() {
 		var seq = 0;
 
 		function Context(src) {			
-			if( typeof(src) !== 'string' ) throw new Error('invliad src:' + src);
+			if( !src ) throw new Error('error:src cannot be null:' + src);
+			
+			src = Path.join(location.href, src);
+			
+			console.log('Context init', src);
 						
 			this._id = 'ctx-' + (seq++);
 			this._src = src;
 			this._uri = Path.uri(src);
-			this._accessor = 'aui ctx-' + this._id;
+			this._accessor = 'aui ' + this._id;
 			this._children = [];
 			this._tagtranslator = new TagTranslator(this);
 			
@@ -30,21 +40,55 @@
 			this.Container = Context.Container;
 			
 			this._dispatcher = new EventDispatcher(this);
+			
+			this.translator(BUNDLES.translators);
+			for(var k in BUNDLES.components) {
+				this.component(k, BUNDLES.components[k]);
+			}
+			
+			if(src === location.href) {
+				var self = this;
+				
+				this._id = 'ctx-local';
+				this._accessor = 'aui ' + this._id;
+				
+				$.on('ready', function(e) {
+					var body = document.body;
+					if( Framework.parameters['tagtranslate'].toLowerCase() !== 'false' ) {
+						if( debug('ui') ) console.log('tag translation on');
+						self.translate(body);
+					}
+										
+					self._content = $(body);
+					
+					self.fire('load', {
+						content: self.content()
+					});
+				});
+			} else if( typeof(src) === 'string' ) {				
+				try {
+					current = this;
+					this._contents = loadContent.call(this, src);
+					
+					this.fire('load', {
+						content: this.content()
+					});
+				} catch(e) {
+					throw new Error('content "' + src + '" load failure/' + e.toString());
+				} finally {
+					current = DefaultContext;
+				}
+			}
+			
+			CONTEXTS.push(this);
 		}
 
 		Context.prototype = {
 			id: function() {
 				return this._id;
 			},
-			owner: function(owner) {
-				if( !arguments.length ) return this._owner;
-				
-				if( owner instanceof Component ) this._owner = owner;
-				else if( owner instanceof $.EL ) this._owner = owner;
-				else if( $.isElement(owner) ) this._owner = $(owner);
-				else return console.error('unsupported owner type', owner);
-				
-				return this;
+			content: function(content) {
+				return this._content;
 			},
 			accessor: function() {
 				return this._accessor;
@@ -227,6 +271,13 @@
 				if( debug('ui') ) {
 					console.info('[' + this.id() + '] component registerd', '[' + cmp.id() + ',' + fname + ']', Util.outline(cmp));
 				}
+				
+				if( cls.translator ) {
+					this.translator(cls.translator);
+				}
+				cmp.translator = function() {
+					return cls.translator;
+				};
 					
 				this.fire('component.registered', {
 					component: cmp
@@ -240,9 +291,28 @@
 				var translator = this._tagtranslator;
 				
 				if( !arguments.length ) return translator;
+								
+				if( arguments.length === 1 && typeof(selector) === 'object' ) {
+					if( Array.isArray(selector) ) {
+						for(var i=0; i < selector.length; i++) {
+							this.translator(selector[i]);
+						}
+						return this;
+					} else {
+						var o = selector;
+						selector = o.selector;
+						fn = o.fn;
+					}
+				}
+				
 				if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('invalid parameter(string, function)', arguments);
-					
-				translator.add(selector, fn);
+								
+				var self = this;
+				translator.add(selector, function() {
+					var result = fn.apply(self, arguments);
+					if( result instanceof Component ) return result.dom();
+					return result;
+				});
 				return this;
 			},
 			translate: function(el) {
@@ -251,19 +321,9 @@
 			},
 			
 			// load remote component or application through new ui context
-			load: function(source) {
-				if( !source ) return console.error('invalid source', source);
-				
-				if( typeof(source) === 'string' ) {
-					var path = this.path(source);				
-					var source = Require.sync(path);
-				}
-				
-				if( $.isElement(source) ) {
-					
-				} else {
-					
-				}
+			load: function(src) {
+				if( !src ) return console.error('invalid src', src);				
+				return new Context(src);
 			},
 						
 			// translate from ui json to component
@@ -289,7 +349,7 @@
 			},
 			
 			// component selector
-			find: function(qry) {			
+			find: function(qry) {
 				return null;
 			},
 			finds: function(qry) {
@@ -309,6 +369,9 @@
 				return true;
 			},
 			destroy: function() {
+				var index = CONTEXTS.indexOf(this);
+				if( ~index ) CONTEXTS.splice(index, 1);
+				
 				var src = this.src();
 				var id = this.id();
 				for(var k in this) {
@@ -319,62 +382,93 @@
 				if( this.__proto__ ) this.__proto__ = null;
 			}
 		};
+	
+		Context.Component = Component;
+		Context.Container = Container;
 		
-		return Context = Class.inherit(Context);
+		Context.contexts = function contexts() {
+			return CONTEXTS;
+		};
+		
+		var BUNDLES = {
+			components: {},
+			translators: []
+		};
+		
+		Context.component = function component(id, cls, instantiatable) {
+			if( typeof(id) !== 'string' || typeof(cls) !== 'function' ) return console.error('invalid parameter', id, cls);
+			
+			BUNDLES.components[id] = cls;
+			CONTEXTS.forEach(function(context) {
+				context.component(id, cls, instantiatable);
+			});
+		};
+		
+		Context.translator = function(selector, fn) {
+			if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('invalid parameter', selector, fn);
+			
+			BUNDLES.translators.push({
+				selector: selector,
+				fn: fn
+			});
+			CONTEXTS.forEach(function(context) {
+				context.translator(selector, fn);
+			});
+		};
+		
+		var current;
+		Context.current = function context() {
+			return current || DefaultContext;
+		};
+		
+		return Context;
 	})();
 	
-	// setup component impl
-	Context.Component = Component;
-	Context.Container = Container;
+	// initializing default context
+	var local = DefaultContext = new Context(location.href);
 	
-	// define local context class
-	var LocalContext = (function() {
-		function LocalContext() {
-			this.$super(location.href);
-			this._id = 'local';
-			this._accessor = 'aui ctx-local';
-		}
+	// regist bundle translators
+	Context.translator('page', function(el, attrs) {
+		var ctx = this;
 	
-		return LocalContext = Class.inherit(LocalContext, Context);
-	})();
+		var hash = attrs.hash;
+		var target = attrs.target;
+		var src = attrs.src;
+		if( typeof(hash) !== 'string' ) return console.warn('attributes "hash" required', el);
+		if( typeof(target) !== 'string' ) return console.warn('attributes "target" required', el);
+		if( typeof(src) !== 'string' ) return console.warn('attributes "src" required', el);
+	
+		ctx.pages(hash, function(e) {
+			var el = $(target);
+			if( !el ) return console.error('unknown element during processing hash page "' + hash + '"', el);
+		
+			var app = this.load(src);
+		
+			if( app ) {
+				var cmp = el.data('component');
+				if( cmp ) {
+					console.log('target cmp', cmp);
+				} else {
+					console.log('target el', el);
+				}
+			}
+		});
+	});
 	
 	// regist hash control	
 	HashController.regist(function(hash, location) {
+		if( debug('hash') ) console.log('hash changed "' + hash + '"');
 		local.pages().propagation(hash);
 	});
-
-	// create & export root context
-	var local = new LocalContext();
-	var current = local;
-
-	Context.context = function context() {		
-		return current;
-	};
-
-	Context.component = function component() {
-		var cmp = local.component.apply(local, arguments);
-		if( cmp ) {
-			if( Context[cmp.fname()] ) console.warn('global component fname conflict, so overwrited. before=', Context[cmp.fname()], '/after=', cmp);
-			Context[cmp.fname()] = cmp;
-		}
-		return this;
-	};
 	
+	// exports module 'ui'
 	define('ui', function(module) {
 		module.exports = Context;
 	});
-
-	// attach document.body inspecting
-	if( Framework.parameters['tagtranslate'].toLowerCase() !== 'false' ) {
-		if( debug('ui') ) console.log('tag translation on');
-		
-		require('dom').on('ready', function(e) {
-			local.owner(document.body);
-			local.fire('load');
-			
-			// invoke current hash
-			HashController.invoke();
-		});
-	}
+	
+	$.on('ready', function(e) {
+		// invoke current hash
+		HashController.invoke();
+	});
 })();
 

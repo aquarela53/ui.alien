@@ -44,7 +44,7 @@ var TagTranslator = (function() {
 						}
 					}
 					
-					el.parentNode.removeChild(el);
+					if( el !== replaced ) el.parentNode.removeChild(el);
 				});
 			}
 		}

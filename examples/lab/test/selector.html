@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="keywords" content="attrs.ui">
+		<meta name="author" content="joje.attrs@gmail.com">
+		<title>Selector</title>
+		
+		<script type="text/javascript">
+			window.onload = function() {
+				var el = document.querySelector('#test');
+				
+				console.log('el', el);
+				
+				var a = el.querySelectorAll('.a:not(.fmark *)'); // X, css4 부터 지원...
+				console.log('a', a);
+			};
+		</script>
+	</head>
+	<body>
+		<div id="test" class="cmp fmark">
+			<div class="a">...</div>
+			<div class="b">...</div>
+			<div class="cmp fmark">
+				<div class="a">...</div>
+				<div class="b">...</div>
+			</div>
+		</div>
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

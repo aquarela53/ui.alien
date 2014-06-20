@@ -77,7 +77,7 @@ var Component = (function() {
 		if( o.id ) this.id(o.id);
 		if( o.name ) this.name(o.name);
 		if( o.title ) this.title(o.title);
-		if( o.classes ) this.classes(o.classes);
+		if( o.classes || o.class ) this.classes(o.classes || o.class);
 		if( o.origin ) this.origin(o.origin);
 
 		// setup status

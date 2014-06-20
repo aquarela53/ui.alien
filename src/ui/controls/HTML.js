@@ -18,7 +18,7 @@
 			else if( o.src ) this.src(o.src, o.cache, 'html');
 		},
 		src: function(url, cache, mode, append) {
-			//console.log('html', this.base(), url, this.context().base());
+			console.log('html', this.base(), url, this.context().base());
 			url = this.path(url);
 
 			var self = this;
@@ -79,11 +79,10 @@
 		}
 	};
 	
-	HTML.tagsupport = {
-		selector: 'import',
-		extractor: function(cls, el, attrs) {
-			attrs.html = el;
-			return new cls(attrs);
+	HTML.translator = {
+		selector: 'markup',
+		fn: function(el, attrs) {
+			return new this.HTML(attrs);
 		}
 	};
 		

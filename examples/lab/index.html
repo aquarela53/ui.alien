@@ -20,22 +20,20 @@
 		<script type="text/javascript">
 		//<![CDATA[
 			(function() {
-				var UI = require('ui').context();
+				var UI = require('ui').current();
 				var $ = require('dom');
 				var Util = require('util');
 				var debug = require('debug');
+				
+				console.log('UI', UI);
 						
 				UI.pages({
 					'guide': function(e) {
 						this.find('#content').load('guide.html');
-						this.find('side-navigation').load('./data/guide.json');
+						this.find('side-navigation').load('./data/guide.ui.json');
 					
 						return false;
 					}
-				});
-			
-				UI.translator().add('a', function(el, attrs) {
-					return new UI.Button(attrs).dom();
 				});
 			
 				UI.on('build', function(e) {
@@ -50,7 +48,7 @@
 		</script>
 	</head>
 	<body>
-		<page hash="" target="#content" src="./main/main.js"></page>
+		<page hash="test" target="#content" src="html/page2.html"></page>
 		
 		<div id="header">
 			<a id="logo" href="#">&nbsp;</a>
@@ -70,6 +68,7 @@
 		</div>
 		<div id="center">
 			<div id="side">
+				<import id="login" src="login/LoginUI.js"></import>
 				<list name="side-navigation" data="./data/default.json" style="inner-border-color:#333;outer-border:none;">
 					<template>
 						<li class="row">
@@ -79,11 +78,11 @@
 					</template>
 				</list>
 			</div>
-			<div id="content" data-as="html">
+			<div id="content">
 				<div>
 					<h1>Contents</h1>
-					<module id="control1" src="uijson/ui.json" style="border:1px solid orange;"></module>
-					<markup id="html1" src="html/sample.html"></markup>
+					<import id="control1" src="uijson/ui.json" style="border:1px solid orange;"></import>
+					<markup id="html1" src="html/page1.html"></markup>
 					<div class="c">c</div>
 					<btn id="btn1">버튼</btn>
 					<div id="slot"></div>

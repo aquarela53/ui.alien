@@ -129,11 +129,11 @@
 		}
 	};
 	
-	Button.tagsupport = {
+	Button.translator = {
 		selector: 'btn',
-		extractor: function(cls, el, attrs) {
-			attrs.text = el;
-			return new cls(attrs);
+		fn: function(el, attrs) {
+			attrs.text = el.innerText;
+			return new this.Button(attrs);
 		}
 	};
 
