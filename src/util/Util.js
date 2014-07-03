@@ -97,7 +97,7 @@ var Util = (function() {
 })();
 
 
-Require.define('util', function(module) {
+define('attrs.util', function(module) {
 	module.exports = Util;
 });
 

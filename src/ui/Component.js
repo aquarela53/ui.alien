@@ -1,8 +1,8 @@
 var Component = (function() { 
 	"use strict"
 	
-	var Util = require('util');
-	var $ = require('dom');
+	var Util = require('attrs.util');
+	var $ = require('attrs.dom');
 
 	var DOM_EVENTS = [
 		'click', 'dblclick', 'contextmenu', 'blur', 'focus', 

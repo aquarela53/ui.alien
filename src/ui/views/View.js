@@ -68,12 +68,17 @@
 		}
 	};
 	
-	View.tagsupport = {
-		selector: 'view',
-		extractor: function(cls, el, attrs) {
-			attrs.text = el;
-			return new cls(attrs);
+	View.translator = function(el, attrs) {
+		var view = new this.View();
+		var children = el.children;
+		var items = [];
+		for(var i=0; i < children.length; i++) {
+			this.translate(children[i]);
 		}
+		
+		view.add(items);
+		console.log('view', view);
+		return view;
 	};
 	
 	View.inherit = UI.Container;

@@ -1,42 +1,18 @@
-var require_package = [
-	'./src/shims/json.js',
-	'./src/shims/es5-shim.js',
-	'./src/shims/es6.js',
-	'./src/util/EventDispatcher.js',
-	'./src/ajax/Path.js',
-	'./src/ajax/Ajax.js',
-	'./src/ajax/Require.js'
-];
-
-var ui_package = [
+var files = [
 	'./src/shims/es6.js',
 	'./src/BOF.js',
-
-	// ajax
-	'./src/ajax/Path.js',
-	'./src/ajax/Ajax.js',
-	'./src/ajax/Require.js',
+	
+	// dep
+	'./build/attrs.dom.js',
 
 	// util
 	'./src/util/Util.js',
-	'./src/util/DateUtil.js',
 	'./src/util/Color.js',
 	'./src/util/EventDispatcher.js',
 	'./src/util/Options.js',
 	'./src/util/Class.js',
+	'./src/util/TagTranslator.js',
 	'./src/util/HashController.js',
-
-	// device
-	'./src/device/CSS3Calibrator.js',
-	'./src/device/Device.js',
-
-	// dom
-	'./src/dom/DOM.js',
-	'./src/dom/TagTranslator.js',
-	'./src/dom/Template.js', 
-	'./src/dom/StyleSession.js',
-	'./src/dom/Animator.js',
-	'./src/dom/Scroller.js',
 
 	// style system
 	'./src/style/StyleSheetManager.js',
@@ -98,6 +74,14 @@ module.exports = function(grunt) {
 	
 	grunt.initConfig({
 		pkg: pkg,
+		http: {
+			'attrs.dom': {
+				options: {
+					url: 'https://raw.githubusercontent.com/attrs/attrs.dom/master/build/attrs.dom.js',
+				},
+				dest: './build/attrs.dom.js'
+			}
+		},
 		concat: {
 			options: {
 				separator: '\n\n',
@@ -125,10 +109,8 @@ module.exports = function(grunt) {
 			},
 			basic_and_extras: {
 		      files: {
-		        'dist/ui.js': ui_package,
-		        'dist/require.js': require_package,
-		        'dist/ui-<%= pkg.version %>.js': ui_package,
-		        'dist/require-<%= pkg.version %>.js': require_package				
+		        'build/ui.alien.js': files,
+		        'build/ui.alien-<%= pkg.version %>.js': files				
 		      }
 		    }
 		},
@@ -138,10 +120,8 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				files: {
-					'dist/ui.min.js': ['dist/ui.js'],
-					'dist/require.min.js': ['dist/require.js'],
-					'dist/ui-<%= pkg.version %>.min.js': ['dist/ui.js'],
-					'dist/require-<%= pkg.version %>.min.js': ['dist/require.js']
+					'build/ui.alien.min.js': ['build/ui.alien.js'],
+					'build/ui.alien-<%= pkg.version %>.min.js': ['build/ui.alien.js']
 				}
 			}
 		},
@@ -153,7 +133,6 @@ module.exports = function(grunt) {
 			options: {
 				// options here to override JSHint defaults
 				globals: {
-					jQuery: true,
 					console: true,
 					module: true,
 					document: true
@@ -162,7 +141,7 @@ module.exports = function(grunt) {
 		},
 		watch: {
 			files: ['Gruntfile.js', 'src/**/*'],
-			tasks: ['concat'],
+			tasks: ['concat', 'uglify'],
 		}
 	});
 
@@ -171,7 +150,10 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-qunit');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-http');
 
-	grunt.registerTask('test', ['concat', 'uglify', 'jshint', 'qunit']);
+	grunt.registerTask('refresh', ['http', 'concat', 'uglify']);
 	grunt.registerTask('default', ['concat', 'uglify', 'jshint']);
+	grunt.registerTask('lint', ['http', 'concat', 'uglify', 'jshint']);
+	grunt.registerTask('test', ['http', 'concat', 'uglify', 'jshint', 'qunit']);	
 };

@@ -1,7 +1,6 @@
-var UI = require('ui').current();
-
-var ui_login = new UI.HTML('login.html');
-var ui_logout = new UI.HTML('logout.html');
+var $ = require('attrs.dom');
+var Ajax = require('ajax');
+var Path = require('path');
 
 function LoginUI(options) {
 	this.$super(options);	
@@ -9,25 +8,29 @@ function LoginUI(options) {
 
 LoginUI.prototype = {
 	build: function() {
+		var UI = this.context(); //.component('html');
+		
+		this.ui_login = new UI.HTML('login.html');
+		this.ui_logout = new UI.HTML('logout.html');
+		
 		this.logout();
 		
 		var self = this;
-		ui_login.find('btn_logout').on('click', function(e) {
+		this.ui_login.find('.btn_logout').on('click', function(e) {
 			self.logout();
 		});
-		ui_logout.find('btn_login').on('click', function(e) {
+		this.ui_logout.find('.btn_login').on('click', function(e) {
 			self.login();
 		});
 	},
 	login: function() {
-		this.items(ui_login);
+		this.items(this.ui_login);
 	},
 	logout: function() {
-		this.items(ui_logout);		
-		this.find('username').value('saved_userid');
+		this.items(this.ui_logout);
 	}
 };
 
-LoginUI.style = './login.css';
+LoginUI.style = Ajax.text(Path.join(__dirname, 'login.less'));
 
-module.exports = LoginUI; // = UI.component('login', LoginUI);
+module.exports = LoginUI;

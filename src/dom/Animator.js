@@ -18,7 +18,7 @@ var Animator = (function() {
 		if( o.use3d !== false ) session.set('transform-style', 'preserve-3d');
 		if( o.backface === 'hidden' ) session.set('backface-visibility', 'hidden');
 		if( o.origin ) session.set('transform-origin', o.origin);
-		if( parent && typeof(o.perspective) === 'number' ) parent.style('perspective', o.perspective);
+		if( typeof(o.perspective) === 'number' ) parent.style('perspective', o.perspective);
 		session.set('transition-timing-function', o.easing || Animator.DEFAULT_EASING || 'ease-in-out');		
 		session.set('transition-duration', (o.duration || Animator.DEFAULT_DURATION) + 'ms');
 		

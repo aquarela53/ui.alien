@@ -1,7 +1,7 @@
 var Container = (function() {
 	"use strict"
 
-	var Util = require('util');
+	var Util = require('attrs.util');
 
 	// class container
 	function Container(options) {

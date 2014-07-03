@@ -348,7 +348,7 @@ var CSS3Calibrator = (function() {
 
 			key = key.substring(0,1).toLowerCase() + key.substring(1);
 		} catch(e) {
-			console.error('WARN:style key camelcase translation error', key, e);
+			console.error('WARN:style key camelcase converting fail', key, e);
 		}
 
 		return key;

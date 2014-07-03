@@ -97,6 +97,6 @@ var HashController = (function() {
 })();
 
 
-Require.define('hash', function(module) {
+define('attrs.hash', function(module) {
 	module.exports = HashController;
 });

@@ -58,7 +58,7 @@
 var Style = (function() {
 	"use strict"
 
-	var calibrator = Device.calibrator;
+	var calibrator = require('attrs.dom').device.calibrator;
 
 	function parse(s, forceobjectify) {
 		s = s.trim();

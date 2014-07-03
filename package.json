@@ -31,7 +31,7 @@
     "web ui",
     "web application",
     "mobile app",
-	"ui alien",
+    "ui alien",
     "ui toolkit"
   ],
   "devDependencies": {
@@ -41,6 +41,7 @@
     "grunt-contrib-watch": "~0.5.3",
     "grunt-jsdoc": "~0.5.4",
     "grunt-contrib-jshint": "~0.8.0",
-    "grunt-contrib-qunit": "~0.4.0"
+    "grunt-contrib-qunit": "~0.4.0",
+    "grunt-http": "~1.4.0"
   }
 }

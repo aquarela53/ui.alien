@@ -1,21 +1,15 @@
 (function() {
 	"use strict"
 	
-	var HashController = require('hash');
-	var Util = require('util');
-	var $ = require('dom');
+	var HashController = require('attrs.hash');
+	var Util = require('attrs.util');
+	var $ = require('attrs.dom');
+	var Path = require('path');
 	var CONTEXTS = [];
 	var DefaultContext;
-	
-	// regist default tag handler
-	var DefaultTagHandler = function(cls, el, attrs) {
-		return attrs;
-	};
-	
-	function loadContent(src) {
-		return null;
-	}
-	
+		
+		
+	// class Context
 	var Context = (function() {
 		var seq = 0;
 
@@ -23,15 +17,13 @@
 			if( !src ) throw new Error('error:src cannot be null:' + src);
 			
 			src = Path.join(location.href, src);
-			
-			console.log('Context init', src);
 						
 			this._id = 'ctx-' + (seq++);
 			this._src = src;
 			this._uri = Path.uri(src);
 			this._accessor = 'aui ' + this._id;
 			this._children = [];
-			this._tagtranslator = new TagTranslator(this);
+			this.translator = new TagTranslator(this);
 			
 			this._cmps = {};
 			this._instances = [];
@@ -41,7 +33,10 @@
 			
 			this._dispatcher = new EventDispatcher(this);
 			
-			this.translator(BUNDLES.translators);
+			for(var k in BUNDLES.translators) {
+				this.tag(k, BUNDLES.translators[k]);
+			}
+			
 			for(var k in BUNDLES.components) {
 				this.component(k, BUNDLES.components[k]);
 			}
@@ -52,32 +47,16 @@
 				this._id = 'ctx-local';
 				this._accessor = 'aui ' + this._id;
 				
-				$.on('ready', function(e) {
-					var body = document.body;
-					if( Framework.parameters['tagtranslate'].toLowerCase() !== 'false' ) {
+				$.on('DOMContentLoaded', function(e) {					
+					var translation = true;
+					if( Framework.parameters['tagtranslate'].toLowerCase() === 'false' ) {
 						if( debug('ui') ) console.log('tag translation on');
-						self.translate(body);
+						translation = false;
 					}
-										
-					self._content = $(body);
-					
-					self.fire('load', {
-						content: self.content()
-					});
+					self.content(document.body, translation);
 				});
-			} else if( typeof(src) === 'string' ) {				
-				try {
-					current = this;
-					this._contents = loadContent.call(this, src);
-					
-					this.fire('load', {
-						content: this.content()
-					});
-				} catch(e) {
-					throw new Error('content "' + src + '" load failure/' + e.toString());
-				} finally {
-					current = DefaultContext;
-				}
+			} else {
+				this.content(src, true);
 			}
 			
 			CONTEXTS.push(this);
@@ -87,8 +66,38 @@
 			id: function() {
 				return this._id;
 			},
-			content: function(content) {
-				return this._content;
+			content: function(content, translation) {
+				if( !arguments.length ) return this._content;
+				
+				if( !content ) return console.error('null content', content);
+				
+				var self = this;
+				var resolve = function(content) {
+					self.fire('prepare');						
+					self._content = content;
+					if( $.util.isElement(content) ) self.translate(content);
+					self.fire('ready', {
+						content: content
+					});
+				};
+				
+				if( typeof(content) === 'string' ) {
+					current = this;					
+					Ajax.get(content).done(function(err, data) {
+						current = DefaultContext;
+						if( err ) return console.error('content "' + content + '" load failure', err);
+						
+						resolve(data);
+					});
+				} else if( $.util.isElement(content) ) {
+					setTimeout(function() {
+						resolve(content);
+					}, 1);
+				} else {
+					return console.error('unsupported content type', content);
+				}
+				
+				return this;
 			},
 			accessor: function() {
 				return this._accessor;
@@ -126,6 +135,9 @@
 				var d = this._dispatcher;
 				if( !d ) return;
 				return d.fireSync.apply(d, arguments);
+			},
+			ready: function(fn) {
+				this.on('ready', fn);	
 			},
 			
 			// page mapping by url hash
@@ -188,7 +200,7 @@
 			},
 			
 			// define ui component
-			component: function(id, cls, instantiatable) {
+			component: function(id, cls) {
 				if( typeof(id) !== 'string' || ~id.indexOf('.') ) return console.error('illegal component id:' + id);			
 				if( arguments.length === 1 ) {
 					var cmp = this._cmps[id];					
@@ -197,7 +209,7 @@
 					var pcmp = local.component(id);
 					if( pcmp ) cls = pcmp.source();
 					
-					if( !cls )return console.error('[WARN] cannot found component:' + id);
+					if( !cls ) return console.error('[WARN] cannot found component:' + id);
 				}
 				
 				if( typeof(cls) === 'string' ) cls = require(cls);
@@ -215,7 +227,7 @@
 				
 				if( !superclass ) return console.error('illegal state, cannot find superclass', superclass, this.Component);
 				
-				var cmp = Class.inherit(cls, superclass, ((instantiatable === false) ? false: true) );
+				var cmp = Class.inherit(cls, superclass );
 				var style = null;	//this.theme().component(id).reset(cls.style);
 				var acceptable = cls.acceptable;
 				acceptable = (acceptable === false) ? false : true;
@@ -231,6 +243,19 @@
 				}
 				
 				var accessor = (this.accessor() + ' ' + ids.reverse().join(' ')).trim();
+				
+				
+				// reserve
+				if( false ) {
+					var parser = new less.Parser({});
+					parser.parse(Ajax.get('login/login.less'), function (err, root) { 
+						if( err ) return console.error(err);
+						console.log(root);
+					   	var css = root.toCSS(); 
+						console.log(css);
+					});
+				}
+				
 				
 				cmp.source = function() {
 					return cls;
@@ -273,13 +298,14 @@
 				}
 				
 				if( cls.translator ) {
-					this.translator(cls.translator);
+					this.tag(id, cls.translator);
 				}
+				
 				cmp.translator = function() {
 					return cls.translator;
 				};
-					
-				this.fire('component.registered', {
+				
+				this.fire('component', {
 					component: cmp
 				});
 
@@ -287,28 +313,14 @@
 			},
 			
 			// inspects DOM Elements for translates as component
-			translator: function(selector, fn) {
-				var translator = this._tagtranslator;
-				
+			tag: function(selector, fn) {
 				if( !arguments.length ) return translator;
-								
-				if( arguments.length === 1 && typeof(selector) === 'object' ) {
-					if( Array.isArray(selector) ) {
-						for(var i=0; i < selector.length; i++) {
-							this.translator(selector[i]);
-						}
-						return this;
-					} else {
-						var o = selector;
-						selector = o.selector;
-						fn = o.fn;
-					}
-				}
 				
+				var translator = this.translator;				
 				if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('invalid parameter(string, function)', arguments);
-								
+
 				var self = this;
-				translator.add(selector, function() {
+				this.translator.add(selector, function() {
 					var result = fn.apply(self, arguments);
 					if( result instanceof Component ) return result.dom();
 					return result;
@@ -316,7 +328,7 @@
 				return this;
 			},
 			translate: function(el) {
-				this._tagtranslator.translate(el);
+				this.translator.translate(el);
 				return this;
 			},
 			
@@ -325,7 +337,7 @@
 				if( !src ) return console.error('invalid src', src);				
 				return new Context(src);
 			},
-						
+			
 			// translate from ui json to component
 			build: function(source) {
 				if( $.isElement(source) || typeof(source) === 'string' ) {
@@ -392,27 +404,25 @@
 		
 		var BUNDLES = {
 			components: {},
-			translators: []
+			translators: {}
 		};
 		
-		Context.component = function component(id, cls, instantiatable) {
+		Context.component = function component(id, cls) {
 			if( typeof(id) !== 'string' || typeof(cls) !== 'function' ) return console.error('invalid parameter', id, cls);
 			
 			BUNDLES.components[id] = cls;
 			CONTEXTS.forEach(function(context) {
-				context.component(id, cls, instantiatable);
+				context.component(id, cls);
 			});
 		};
 		
 		Context.translator = function(selector, fn) {
 			if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('invalid parameter', selector, fn);
 			
-			BUNDLES.translators.push({
-				selector: selector,
-				fn: fn
-			});
+			BUNDLES.translators[selector] = fn;
+			
 			CONTEXTS.forEach(function(context) {
-				context.translator(selector, fn);
+				context.tag(selector, fn);
 			});
 		};
 		
@@ -428,19 +438,24 @@
 	var local = DefaultContext = new Context(location.href);
 	
 	// regist bundle translators
+	// <page hash="test">
+	// 	<action type="import" target="#content" src="html/page.html"></action>
+	// </page>
 	Context.translator('page', function(el, attrs) {
 		var ctx = this;
 	
 		var hash = attrs.hash;
-		var target = attrs.target;
-		var src = attrs.src;
 		if( typeof(hash) !== 'string' ) return console.warn('attributes "hash" required', el);
-		if( typeof(target) !== 'string' ) return console.warn('attributes "target" required', el);
-		if( typeof(src) !== 'string' ) return console.warn('attributes "src" required', el);
 	
 		ctx.pages(hash, function(e) {
-			var el = $(target);
-			if( !el ) return console.error('unknown element during processing hash page "' + hash + '"', el);
+			var actions = $(target).children('action');
+			
+			console.log('actions', actions);
+			
+			var target = attrs.target;
+			var src = attrs.src;
+			if( typeof(target) !== 'string' ) return console.warn('attributes "target" required', el);
+			if( typeof(src) !== 'string' ) return console.warn('attributes "src" required', el);
 		
 			var app = this.load(src);
 		
@@ -453,6 +468,14 @@
 				}
 			}
 		});
+	});
+	
+	// <component id="cmpid" src="dir/file.js"></component>
+	Context.translator('component', function(el, attrs) {
+		var ctx = this;
+		var id = attrs.id;
+		var src = attrs.src;		
+		ctx.component(id, src);
 	});
 	
 	// regist hash control	

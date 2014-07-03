@@ -78,13 +78,6 @@
 			'font-size': 13
 		}
 	};
-	
-	HTML.translator = {
-		selector: 'markup',
-		fn: function(el, attrs) {
-			return new this.HTML(attrs);
-		}
-	};
 		
 	return HTML = UI.component('html', HTML);
 })();

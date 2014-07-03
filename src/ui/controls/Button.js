@@ -129,12 +129,9 @@
 		}
 	};
 	
-	Button.translator = {
-		selector: 'btn',
-		fn: function(el, attrs) {
-			attrs.text = el.innerText;
-			return new this.Button(attrs);
-		}
+	Button.translator = function(el, attrs) {
+		attrs.text = el.innerText;
+		return new this.Button(attrs);
 	};
 
 	Button.acceptable = true;

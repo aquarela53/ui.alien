@@ -10,45 +10,97 @@
 		
 		<!-- attrs.ui initial paramters -->
 		<meta name="attrs.ui.tagtranslate" content="true">
-		<meta name="attrs.ui.debug" content="true">
+		<meta name="attrs.ui.debug" content="false">
 		<meta name="attrs.ui.debug.mutation" content="false">
 		
 		<title>UI.Alien</title>
 
-		<script type="text/javascript" src="../../dist/ui.js"></script>
+		<script type="text/javascript" src="../../build/ui.alien.js"></script>
+		
+		<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.3/less.min.js"></script>
 		
 		<script type="text/javascript">
 		//<![CDATA[
+			/*
+			호출순서
+			 content loading
+			 fire load
+			 content inspecting
+			 fire
+			 fire page
+			 fire ready
+			*/
+			
 			(function() {
 				var UI = require('ui').current();
-				var $ = require('dom');
-				var Util = require('util');
+				var $ = require('attrs.dom');
+				var Ajax = require('ajax');
+				var Util = require('attrs.util');
 				var debug = require('debug');
 				
-				console.log('UI', UI);
-						
-				UI.pages({
-					'guide': function(e) {
-						this.find('#content').load('guide.html');
-						this.find('side-navigation').load('./data/guide.ui.json');
+				UI.on('prepare', function(e) {
+					console.log('[' + this.id() + '] prepare', e);
 					
-						return false;
-					}
+					this.pages({
+						'guide': function(e) {
+							this.find('#content').load('guide.html');
+							this.find('side-navigation').load('./data/guide.ui.json');
+					
+							return false;
+						}
+					});
 				});
 			
+				UI.on('ready', function(e) {
+					console.log('[' + this.id() + '] ready', e);
+				});
+				
+
+				/*
 				UI.on('build', function(e) {
-					console.log('Context.build', e);
+					console.log('[' + this.id() + '] build', e);
 				});
 			
-				UI.on('load', function(e) {
-					console.log('Context.load', e);
+				UI.on('component', function(e) {
+					console.log('[' + this.id() + '] component', e);
 				});
+			
+				UI.on('page', function(e) {
+					console.log('[' + this.id() + '] page', e);
+				});
+				*/
 			})();
 		//]]>
 		</script>
 	</head>
 	<body>
-		<page hash="test" target="#content" src="html/page2.html"></page>
+		<page hash="test">
+			<action type="import" target="#content" src="html/page2.html"></action>
+		</page>
+		
+		<component id="login" src="./login/LoginUI.js" tag="login"></component>
+		
+		<!-- test -->
+		<view id="view">
+			<div class="pre">a</div>
+			<view name="content">
+				<h1>제목</h1>
+				<div>
+					내용
+					<view horizontal="true">
+						<btn align="left">버튼</btn>
+						<btn align="center">버튼</btn>
+						<btn align="right">버튼</btn>
+					</view>
+				</div>
+			</view>
+			<bar>
+				<btn align="left">버튼</btn>
+				<btn align="center">버튼</btn>
+				<btn align="right">버튼</btn>
+			</bar>
+		</view>
+		
 		
 		<div id="header">
 			<a id="logo" href="#">&nbsp;</a>
@@ -68,8 +120,7 @@
 		</div>
 		<div id="center">
 			<div id="side">
-				<import id="login" src="login/LoginUI.js"></import>
-				<list name="side-navigation" data="./data/default.json" style="inner-border-color:#333;outer-border:none;">
+				<list name="side-navigation" data="./data/ia.json" style="inner-border-color:#333;outer-border:none;">
 					<template>
 						<li class="row">
 							<div class="icon">{icon}</div>
@@ -82,20 +133,20 @@
 				<div>
 					<h1>Contents</h1>
 					<import id="control1" src="uijson/ui.json" style="border:1px solid orange;"></import>
-					<markup id="html1" src="html/page1.html"></markup>
+					<import id="html1" src="html/page1.html"></import>
 					<div class="c">c</div>
 					<btn id="btn1">버튼</btn>
 					<div id="slot"></div>
 				</div>
 			</div>
 			<div id="rside">
-				<module id="login" src="controller/LoginUI.js" style="border:1px solid orange;"></module>
+				<login id="login" style="border:1px solid orange;"></login>
 			</div>
 		</div>
 		<div id="footer">
 			<div id="footer-wrapper">
 				<div class="info">
-					Copyright 2014 <a href="http://attrs.io">Team Attrs.</a><br>
+					Copyright 2014 <a href="https://github.com/attrs" target="_blank">Team Attrs.</a><br>
 					<a href="/team">Core Team</a> | <a href="/sponsors">Project Sponsors</a>
 				</div>
 				<div class="links">
