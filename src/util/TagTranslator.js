@@ -1,6 +1,8 @@
 var TagTranslator = (function() {
 	"use strict"
 	
+	var $ = require('attrs.dom');
+	
 	function isNode(o){
 		return (typeof(Node) === "object") ? o instanceof Node : 
 			(o && typeof(o.nodeType) === 'number' && typeof(o.nodeName) === 'string');
@@ -40,6 +42,12 @@ var TagTranslator = (function() {
 					}
 					
 					var replaced = translator.apply(scope, [el, o]);
+					
+					return;
+					
+					//console.log('el', el);
+					//console.log('replaced', replaced);
+					//console.log('parent', el && el.parentNode);
 					
 					if( replaced && el !== replaced ) {
 						if( !isNode(replaced) ) return console.error('illegal returned node at ', selector, replaced);

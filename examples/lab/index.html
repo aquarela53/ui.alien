@@ -9,7 +9,7 @@
 		<meta name="description" content="attrs.ui examples - Lab">
 		
 		<!-- attrs.ui initial paramters -->
-		<meta name="attrs.ui.tagtranslate" content="true">
+		<meta name="attrs.ui.autopack" content="true">
 		<meta name="attrs.ui.debug" content="false">
 		<meta name="attrs.ui.debug.mutation" content="false">
 		
@@ -32,53 +32,51 @@
 			*/
 			
 			(function() {
-				var UI = require('ui').current();
+				var app = require('ui').application();
 				var $ = require('attrs.dom');
 				var Ajax = require('ajax');
 				var Util = require('attrs.util');
 				var debug = require('debug');
 				
-				UI.on('prepare', function(e) {
-					console.log('[' + this.id() + '] prepare', e);
-					
-					this.pages({
-						'guide': function(e) {
-							this.find('#content').load('guide.html');
-							this.find('side-navigation').load('./data/guide.ui.json');
-					
-							return false;
-						}
-					});
-				});
-			
-				UI.on('ready', function(e) {
-					console.log('[' + this.id() + '] ready', e);
+				// event monitoring
+				app.on('*', function(e) {
+					//console.log('[' + this.id() + '] event fired', e.type, e);
 				});
 				
-
-				/*
-				UI.on('build', function(e) {
-					console.log('[' + this.id() + '] build', e);
-				});
+				app.page('guide', function(e) {
+					this.find('#content').load('guide.html');
+					this.find('side-navigation').load('./data/guide.ui.json');
 			
-				UI.on('component', function(e) {
-					console.log('[' + this.id() + '] component', e);
+					return false;
 				});
-			
-				UI.on('page', function(e) {
-					console.log('[' + this.id() + '] page', e);
+				
+				var view = app.pack({
+					component: 'view',
+					horizontal: true,
+					items: [
+						{
+							component: 'html',
+							html: 'html!'
+						}, {
+							component: 'btn',
+							text: '버튼!'
+						}
+					]
 				});
-				*/
+				
+				app.on('ready', function(e) {
+					console.log('ready');		
+					view.attachTo('#content', 1);
+				});
 			})();
 		//]]>
 		</script>
 	</head>
 	<body>
+		<component id="login" src="./login/LoginUI.js" tag="login"></component>
 		<page hash="test">
 			<action type="import" target="#content" src="html/page2.html"></action>
 		</page>
-		
-		<component id="login" src="./login/LoginUI.js" tag="login"></component>
 		
 		<!-- test -->
 		<view id="view">
@@ -132,11 +130,13 @@
 			<div id="content">
 				<div>
 					<h1>Contents</h1>
-					<import id="control1" src="uijson/ui.json" style="border:1px solid orange;"></import>
-					<import id="html1" src="html/page1.html"></import>
+					<include id="control1" src="uijson/ui.json" style="border:1px solid orange;"></include>
+					<include id="html1" src="html/page1.html"></include>
 					<div class="c">c</div>
 					<btn id="btn1">버튼</btn>
-					<div id="slot"></div>
+					<div id="slot">
+						<application id="control1" src="application/index.js" style="border:1px solid orange;"></application>
+					</div>
 				</div>
 			</div>
 			<div id="rside">

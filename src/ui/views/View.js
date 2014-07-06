@@ -68,16 +68,20 @@
 		}
 	};
 	
+	var $ = require('attrs.dom');
 	View.translator = function(el, attrs) {
 		var view = new this.View();
 		var children = el.children;
 		var items = [];
+		
 		for(var i=0; i < children.length; i++) {
-			this.translate(children[i]);
+			var c = children[i];
+			var cmp = $(c).data('component');
+			if( cmp ) items.push(cmp);
+			else items.push(c);
 		}
 		
 		view.add(items);
-		console.log('view', view);
 		return view;
 	};
 	

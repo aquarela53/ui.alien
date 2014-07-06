@@ -4,16 +4,17 @@
 	var HashController = require('attrs.hash');
 	var Util = require('attrs.util');
 	var $ = require('attrs.dom');
+	var Ajax = require('ajax');
 	var Path = require('path');
-	var CONTEXTS = [];
-	var DefaultContext;
+	var APPLICATIONS = [];
+	var DefaultApplication;
 		
 		
-	// class Context
-	var Context = (function() {
+	// class Application
+	var Application = (function() {
 		var seq = 0;
 
-		function Context(src) {			
+		function Application(src) {			
 			if( !src ) throw new Error('error:src cannot be null:' + src);
 			
 			src = Path.join(location.href, src);
@@ -28,8 +29,8 @@
 			this._cmps = {};
 			this._instances = [];
 		
-			this.Component = Context.Component;
-			this.Container = Context.Container;
+			this.Component = Application.Component;
+			this.Container = Application.Container;
 			
 			this._dispatcher = new EventDispatcher(this);
 			
@@ -47,26 +48,27 @@
 				this._id = 'ctx-local';
 				this._accessor = 'aui ' + this._id;
 				
-				$.on('DOMContentLoaded', function(e) {					
-					var translation = true;
-					if( Framework.parameters['tagtranslate'].toLowerCase() === 'false' ) {
-						if( debug('ui') ) console.log('tag translation on');
-						translation = false;
-					}
-					self.content(document.body, translation);
-				});
+				var autopack = Framework.parameters['autopack'];
+				if( autopack && autopack.toLowerCase() === 'false' ) {
+					if( debug('ui') ) console.log('autopack on');
+					$.ready(function(e) {							
+						self.content(document.body);
+					});
+				} else {
+					console.log('autopack off');
+				}
 			} else {
 				this.content(src, true);
 			}
 			
-			CONTEXTS.push(this);
+			APPLICATIONS.push(this);
 		}
 
-		Context.prototype = {
+		Application.prototype = {
 			id: function() {
 				return this._id;
 			},
-			content: function(content, translation) {
+			content: function(content) {
 				if( !arguments.length ) return this._content;
 				
 				if( !content ) return console.error('null content', content);
@@ -84,15 +86,13 @@
 				if( typeof(content) === 'string' ) {
 					current = this;					
 					Ajax.get(content).done(function(err, data) {
-						current = DefaultContext;
+						current = DefaultApplication;
 						if( err ) return console.error('content "' + content + '" load failure', err);
 						
 						resolve(data);
 					});
 				} else if( $.util.isElement(content) ) {
-					setTimeout(function() {
-						resolve(content);
-					}, 1);
+					resolve(content);
 				} else {
 					return console.error('unsupported content type', content);
 				}
@@ -141,27 +141,23 @@
 			},
 			
 			// page mapping by url hash
-			pages: function(mapping, fn) {
-				if( !this._pages ) this._pages = {};
-				var self = this;
-				this._pages.propagation = function(hash) {
-					(this[hash] || function() {}).call(self, {
-						hash: hash
-					});
-				};
+			page: function(hash, fn) {
+				var pages = this._pages;
+				if( !pages ) pages = this._pages = {};
 				
-				if( !arguments.length ) return this._pages;
-				if( arguments.length === 1 && typeof(mapping) === 'string' ) return this._pages[mapping];
+				if( !arguments.length ) return pages;
+				if( arguments.length === 1 && typeof(hash) === 'string' ) return pages[hash];
+				if( typeof(hash) !== 'string' || typeof(fn) !== 'function' ) return console.error('illegal parameter', hash, fn);
+												
+				var arr = pages[hash];
+				if( !arr ) arr = pages[hash] = [];
 				
-				if( typeof(mapping) === 'string' && typeof(fn) == 'function' ) {
-					var name = mapping;
-					mapping = {};
-					mapping[name] = fn;				
-				}
+				arr.push(fn);
 				
-				if( typeof(mapping) !== 'object' ) return console.error('page mapping must be an object');
-								
-				this._pages = Util.merge(this._pages, mapping);
+				this.fire('page.added', {
+					hash: hash,
+					fn: fn
+				});
 				
 				return this;
 			},
@@ -206,10 +202,12 @@
 					var cmp = this._cmps[id];					
 					if( cmp ) return cmp;
 					
+					if( this === local ) return console.error('[WARN] not exists component:' + id);
+					
 					var pcmp = local.component(id);
 					if( pcmp ) cls = pcmp.source();
 					
-					if( !cls ) return console.error('[WARN] cannot found component:' + id);
+					if( !cls ) return console.error('[WARN] not exists component:' + id);
 				}
 				
 				if( typeof(cls) === 'string' ) cls = require(cls);
@@ -260,7 +258,7 @@
 				cmp.source = function() {
 					return cls;
 				};
-				cmp.context = function() {
+				cmp.application = function() {
 					return self;
 				};
 				cmp.id = function() {
@@ -305,7 +303,7 @@
 					return cls.translator;
 				};
 				
-				this.fire('component', {
+				this.fire('component.added', {
 					component: cmp
 				});
 
@@ -325,6 +323,12 @@
 					if( result instanceof Component ) return result.dom();
 					return result;
 				});
+				
+				this.fire('tag.added', {
+					selector: selector,
+					fn: fn
+				});
+				
 				return this;
 			},
 			translate: function(el) {
@@ -332,21 +336,25 @@
 				return this;
 			},
 			
-			// load remote component or application through new ui context
+			// load remote component or application through new ui application
 			load: function(src) {
 				if( !src ) return console.error('invalid src', src);				
-				return new Context(src);
+				return new Application(src);
 			},
 			
 			// translate from ui json to component
 			build: function(source) {
-				if( $.isElement(source) || typeof(source) === 'string' ) {
+				if( $.util.isElement(source) ) {
 					source = {
-						component: 'html',
-						html: source
-					};
-				} else if( !source || typeof(source) !== 'object' || typeof(source.component) !== 'string' ) {
-					return console.error('source must be \'ui json\'', source);
+						component: (type || 'html'),
+						el: source
+					};					
+				} else if( typeof(source) === 'string' ) {
+					source = Ajax.json(source);
+				}
+				
+				if( !(source && typeof(source.component) === 'string') ) {
+					return console.error('unsupported source type', source);
 				}
 				
 				var cmp = this.component(source.component);
@@ -381,8 +389,8 @@
 				return true;
 			},
 			destroy: function() {
-				var index = CONTEXTS.indexOf(this);
-				if( ~index ) CONTEXTS.splice(index, 1);
+				var index = APPLICATIONS.indexOf(this);
+				if( ~index ) APPLICATIONS.splice(index, 1);
 				
 				var src = this.src();
 				var id = this.id();
@@ -395,11 +403,11 @@
 			}
 		};
 	
-		Context.Component = Component;
-		Context.Container = Container;
+		Application.Component = Component;
+		Application.Container = Container;
 		
-		Context.contexts = function contexts() {
-			return CONTEXTS;
+		Application.applications = function() {
+			return APPLICATIONS;
 		};
 		
 		var BUNDLES = {
@@ -407,48 +415,48 @@
 			translators: {}
 		};
 		
-		Context.component = function component(id, cls) {
+		Application.component = function(id, cls) {
 			if( typeof(id) !== 'string' || typeof(cls) !== 'function' ) return console.error('invalid parameter', id, cls);
 			
 			BUNDLES.components[id] = cls;
-			CONTEXTS.forEach(function(context) {
-				context.component(id, cls);
+			APPLICATIONS.forEach(function(application) {
+				application.component(id, cls);
 			});
 		};
 		
-		Context.translator = function(selector, fn) {
+		Application.translator = function(selector, fn) {
 			if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('invalid parameter', selector, fn);
 			
 			BUNDLES.translators[selector] = fn;
 			
-			CONTEXTS.forEach(function(context) {
-				context.tag(selector, fn);
+			APPLICATIONS.forEach(function(application) {
+				application.tag(selector, fn);
 			});
 		};
 		
 		var current;
-		Context.current = function context() {
-			return current || DefaultContext;
+		Application.application = function() {
+			return current || DefaultApplication;
 		};
 		
-		return Context;
+		return Application;
 	})();
 	
-	// initializing default context
-	var local = DefaultContext = new Context(location.href);
+	// initializing default application
+	var local = DefaultApplication = new Application(location.href);
 	
 	// regist bundle translators
 	// <page hash="test">
 	// 	<action type="import" target="#content" src="html/page.html"></action>
 	// </page>
-	Context.translator('page', function(el, attrs) {
+	Application.translator('page', function(el, attrs) {
 		var ctx = this;
 	
 		var hash = attrs.hash;
 		if( typeof(hash) !== 'string' ) return console.warn('attributes "hash" required', el);
 	
-		ctx.pages(hash, function(e) {
-			var actions = $(target).children('action');
+		ctx.page(hash, function(e) {
+			var actions = $(this).children('action');
 			
 			console.log('actions', actions);
 			
@@ -471,7 +479,7 @@
 	});
 	
 	// <component id="cmpid" src="dir/file.js"></component>
-	Context.translator('component', function(el, attrs) {
+	Application.translator('component', function(el, attrs) {
 		var ctx = this;
 		var id = attrs.id;
 		var src = attrs.src;		
@@ -481,15 +489,17 @@
 	// regist hash control	
 	HashController.regist(function(hash, location) {
 		if( debug('hash') ) console.log('hash changed "' + hash + '"');
-		local.pages().propagation(hash);
+		$(document.body).visit(function() {
+			//console.log('visiting for page controlling', this);
+		});
 	});
 	
 	// exports module 'ui'
 	define('ui', function(module) {
-		module.exports = Context;
+		module.exports = Application;
 	});
 	
-	$.on('ready', function(e) {
+	$.ready(function(e) {
 		// invoke current hash
 		HashController.invoke();
 	});

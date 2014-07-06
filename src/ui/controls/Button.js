@@ -136,5 +136,5 @@
 
 	Button.acceptable = true;
 	
-	return Button = UI.component('button', Button);
+	return Button = UI.component('btn', Button);
 })();

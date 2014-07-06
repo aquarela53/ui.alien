@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-02 23:13:1
+ * @date: 2014-07-04 18:30:16
 */
 
 /*!
@@ -4154,6 +4154,12 @@ var $ = (function() {
 			(o && typeof(o.nodeType) === 'number' && typeof(o.nodeName) === 'string');
 	}
 	
+	function isElement(el) {
+		if( typeof(el) !== 'object' ) return false;
+		else if( !(window.attachEvent && !window.opera) ) return (el instanceof window.Element);
+		else return (el.nodeType == 1 && el.tagName);
+	}
+	
 	function merge(o) {
 		if( !isNode(o) && typeof(o.length) === 'number' ) {
 			for(var i=0; i < o.length; i++) {
@@ -4189,12 +4195,6 @@ var $ = (function() {
 		if( !arr || !arr.length ) return null;
 		if( arr.length === 1 ) return arr[0];
 		return arr;
-	}
-	
-	function isElement(el) {
-		if( typeof(el) !== 'object' ) return false;
-		else if( !(window.attachEvent && !window.opera) ) return (el instanceof window.Element);
-		else return (el.nodeType == 1 && el.tagName);
 	}
 	
 	function isHtml(html) {
@@ -4402,6 +4402,11 @@ var $ = (function() {
 		return this;
 	};
 	
+	prototype.reverse = function() {
+		this.reverse();
+		return this;
+	};
+	
 	prototype.clear = function() {
 		var len = this.length;
 		if( len > 0 ) {
@@ -4596,6 +4601,8 @@ var $ = (function() {
 				if( key.hasOwnProperty(k) ) this.attr(k, key[k]);
 			}
 			return this;
+		} else if( !key ) {
+			return this;
 		}
 		
 		if( typeof(key) !== 'string' ) return console.error('invalid key', key);
@@ -4671,7 +4678,7 @@ var $ = (function() {
 	
 	function findChild(method, selector, arr) {
 		if( typeof(selector) === 'number' ) {
-			var c = this[method][selector - 1];
+			var c = this[method][selector];
 			if( c ) arr.push(c);
 		} else if( typeof(selector) === 'string' && !selector.startsWith('arg:') ) {	// find by selector
 			var children = this[method];
@@ -5220,7 +5227,6 @@ var $ = (function() {
 			if( !(els instanceof $) ) els = $(els);
 			
 			var target = this.parentNode;
-			console.log(target.children);
 			if( target ) {
 				var before = this.nextSibling; //;target.children[target.children.indexOf(this) + 1];
 				els.each(function() {

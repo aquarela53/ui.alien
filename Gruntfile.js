@@ -22,7 +22,7 @@ var files = [
 	// ui
 	'./src/ui/Component.js',
 	'./src/ui/Container.js',
-	'./src/ui/Context.js',
+	'./src/ui/Application.js',
 	'./src/ui/Theme.js',
 	'./src/ui/BaseStyle.js',
 	'./src/ui/views/View.js',

@@ -3,9 +3,12 @@ var Component = (function() {
 	
 	var Util = require('attrs.util');
 	var $ = require('attrs.dom');
+	var Path = require('path');
+	
+	var isElement = $.util.isElement;
 
 	var DOM_EVENTS = [
-		'click', 'dblclick', 'contextmenu', 'blur', 'focus', 
+		'click', 'dblclick', 'applicationmenu', 'blur', 'focus', 
 		'tap', 'dbltap', 'shorttap', 'longtap',
 		'touchstart', 'touchmove', 'touchend', 'touchstop',
 		'mouseup', 'mousedown', 'mouseover', 'mousemove', 'mouseout', 'mouseout',
@@ -26,11 +29,11 @@ var Component = (function() {
 		if( o.debug ) this.debug = true;
 
 		// create el
-		if( !this.el ) this.el = $.create((o.tag || cls.tag || 'div'), o.attrs);
-		else this.el.clear();
-		
+		if( !this.el ) this.el = $.create((o.tag || cls.tag || 'div'));
+		else if( !o.el ) this.el.restore('#create');
+				
 		// setup el
-		var el = this.el.data('component', this).classes(cls.accessor());
+		var el = this.el.attr(o.attrs).data('component', this).classes(cls.accessor());
 		
 		// confirm event scope
 		var events = o.e || o.events;
@@ -49,33 +52,10 @@ var Component = (function() {
 			if( typeof(fn) === 'function' ) this.on(k, fn);
 		}
 		
-		/* event listener for mutation events
-		$(el).on('detached', function(e) {
-			//console.log('detached', this, e.from);			
-			var parent = e.from;
-			var pcmp = $(e.from).data('component');
-			
-			var cmp = $(this).data('component');
-			console.log('detached', cmp);
-			
-			if( pcmp && ~pcmp._children.indexOf(cmp) ) {
-				pcmp._children = Util.array.removeByItem(pcmp._children, cmp);
-			}
-			
-			cmp._parent = null;
-		});
-		
-		$(el).on('attached', function(e) {
-			//console.log('attached', this, e.to);
-			var cmp = $(this).data('component');
-			console.log('attached', cmp);
-		});
-		*/
-		
-		
-		// setup context & name
+		// setup application & name
 		if( o.id ) this.id(o.id);
 		if( o.name ) this.name(o.name);
+		if( o.origin ) this.origin(o.origin);
 		if( o.title ) this.title(o.title);
 		if( o.classes || o.class ) this.classes(o.classes || o.class);
 		if( o.origin ) this.origin(o.origin);
@@ -97,10 +77,10 @@ var Component = (function() {
 		
 		// bg 와 width height font 에 대해서는 편의적 메소드를 제공하기로...
 		if( o.bg || o.background ) el.bg(o.bg || o.background);
+		if( o.font ) el.font(o.font);
 		if( o.color ) el.color(o.color);
 		if( o.flex ) el.flex(o.flex);
 		if( o['float'] ) this['float'](o['float']);
-		if( o.font ) el.font(o.font);
 		if( o.margin ) el.margin(o.margin);
 		if( o.padding ) el.padding(o.padding);
 		if( o.border ) el.border(o.border);
@@ -158,18 +138,34 @@ var Component = (function() {
 			return this;
 		},
 		
-		// context
-		getClass: function() {
+		// application
+		concrete: function() {
 			return this.constructor;
 		},
-		context: function() {
-			return this.constructor.context();
+		application: function() {
+			return this.constructor.application();
+		},
+		origin: function(origin) {
+			if( !arguments.length ) return this._origin || this.application().origin();
+			
+			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);
+			
+			this._origin = Path.join(this.application().origin(), origin);
+			return this; 
 		},
 		base: function() {
-			return this.constructor.context().base();
+			return Path.dir(this.origin());
 		},
 		path: function(src) {
-			return this.constructor.context().path(src);
+			return Path.join(this.base(), src);
+		},
+		
+		// selector
+		finds: function(selector) {
+			return null;			
+		},
+		find: function(selector) {
+			return null;
 		},
 		
 		// attach
@@ -182,13 +178,13 @@ var Component = (function() {
 		},
 		acceptable: function() {
 			if( typeof(this._acceptable) === 'boolean' ) return this._acceptable;
-			return this.constructor.acceptable();
+			return this.concrete().acceptable();
 		},
 		attachTarget: function(attachTarget) {
 			if( !this.acceptable() ) return null;
 			if( !arguments.length ) return this._attachTarget || this.dom();
 			
-			if( $.isElement(attachTarget) ) this._attachTarget = attachTarget;
+			if( isElement(attachTarget) ) this._attachTarget = attachTarget;
 			else console.error('illegal attach target, target must be an element', attachTarget);
 			return this;
 		},
@@ -197,7 +193,9 @@ var Component = (function() {
 			if( !target ) return console.error('component cannot acceptable', this);
 			
 			if( typeof(child) == 'string' || (!(child instanceof Component) && typeof(child.component) === 'string') ) {
-				child = this.context().build(child);
+				var cmp = this.application().component(child.component);
+				if( !cmp ) return console.error('unknown component [' + child.component + ']');
+				child = new cmp(child);
 			}
 			
 			var el;
@@ -205,11 +203,18 @@ var Component = (function() {
 			//console.log('attach', child, (child instanceof Component));
 			
 			if( child instanceof Component ) el = child.dom();
-			else if( child instanceof $.EL ) el = child[0];
-			else return console.error('illegal child', child);
+			else if( child instanceof $ ) el = child[0];
+			else el = child;
 			
-			if( !$.isElement(el) ) return console.error('illegal child type', child);
-			$(target).attach(el, index);
+			if( !isElement(el) ) return console.error('illegal child type', child);
+			
+			if( typeof(index) === 'number' ) {
+				var ref = target.children(index);
+				if( ref.length ) ref.before(el);
+				else $(target).append(el);
+			} else { 
+				$(target).append(el);
+			}
 						
 			if( child instanceof Component ) {
 				var prevp = child._parent;
@@ -225,7 +230,7 @@ var Component = (function() {
 				var self = this;
 				var listener = function(e){
 					self._children = Util.array.removeByItem(self._children, $(this));
-					child.un('detached', listener);
+					child.off('detached', listener);
 				};
 				child.on('detached', listener);
 			}
@@ -238,13 +243,21 @@ var Component = (function() {
 		attachTo: function(target, index) {
 			if( !target ) return console.error('attach target must be a component or dom element', target);
 			
-			if( $.isElement(target) ) target = $(target);			
-			else if( typeof(target) === 'string' ) target = this.context().find(target) || $(target);
+			if( isElement(target) ) target = $(target);			
+			else if( typeof(target) === 'string' ) target = this.application().find(target) || $(target);
 			
 			if( target instanceof Component ) {
 				target.attach(this, index);
-			} else if( target instanceof $.EL ) {
-				target.attach(this.dom(), index);
+			} else if( target instanceof $ ) {
+				var el = this.dom();
+				
+				if( typeof(index) === 'number' ) {
+					var ref = target.children(index);
+					if( ref.length ) ref.before(el);
+					else target.append(el);
+				} else { 
+					target.append(el);
+				}
 			} else {
 				console.error('illegal target(available only Element or EL or Component)', target);
 			}
@@ -268,7 +281,7 @@ var Component = (function() {
 		accessor: function() {
 			var themecls = this._theme || '';
 			if( themecls ) themecls = ' theme-' + themecls;
-			return this.constructor.accessor() + themecls;
+			return this.concrete().accessor() + themecls;
 		},
 		classes: function(classes) {
 			var el = this.el;
@@ -321,12 +334,12 @@ var Component = (function() {
 		css: function(css) {
 			var el = this.el;
 			var id = el.id();
-			var stylesheet = this.context().stylesheet();
+			var stylesheet = this.application().stylesheet();
 
 			if( !arguments.length ) return id ? stylesheet.get('#' + id) : null;	
 			
 			if( typeof(css) === 'object' ) {
-				id = id || ('gen-' + (this.constructor.cmpname || 'nemo') + '-' + (seq++));
+				id = id || ('gen-' + (this.concrete().id() || 'nemo') + '-' + (seq++));
 				el.id(id);
 				stylesheet.update('#' + id, css);
 				if( css.debug ) console.log('#' + id, stylesheet.build());
@@ -445,14 +458,14 @@ var Component = (function() {
 				var script = href.substring(11);
 				var self = this;
 				(function() {
-					var context = self.context();
+					var application = self.application();
 					var o = eval.call(self, script);
 					if( o ) console.log('href script call has result', o);
 				})();
 			} else if( href.startsWith('this:') ) {
 				var path = href.substring(5);
-				var context = self.context();
-				if( context ) url = context.path(path);
+				var application = self.application();
+				if( application ) url = application.path(path);
 				location.href = path;
 			} else {
 				location.href = href;
@@ -533,7 +546,7 @@ var Component = (function() {
 			var o = this.options.toJSON();
 
 			var json = {
-				component: this.constructor.id()
+				component: this.concrete().id()
 			};
 
 			for(var k in o) {
@@ -544,17 +557,15 @@ var Component = (function() {
 		},
 		destroy: function() {
 			this.detach();
-			var ns = this.constructor.namespace;
 			var name = this.name() || '(unknown)';
-			var context = this.context();
-			if( context ) context.disconnect(this);
-			this.el.clear();
+			var appid = this.application().id();
+			this.el.empty().classes(false).attr(false);
 			for(var k in this) {
 				if( this.hasOwnProperty(k) ) continue;
 				var v = this[k];
 				this[k] = null;
 				try { delete this[k]; } catch(e) {}
-				if( typeof(v) === 'function' ) this[k] = function() {throw new Error(ns + ' ui control [' + name + '] was destroyed.');};
+				if( typeof(v) === 'function' ) this[k] = function() {throw new Error(appid + ' ui control [' + name + '] was destroyed.');};
 			}
 		},
 		framework: function framework() {
@@ -563,7 +574,7 @@ var Component = (function() {
 		debug: function() {
 			var cmp = this;
 			var clazz = this.getClass();
-			var context = this.context();
+			var application = this.application();
 			console.log('= Instanceof ' + clazz.fname() + ' ======================================');
 			
 			console.log('- Framework');
@@ -575,7 +586,7 @@ var Component = (function() {
 			console.log('instance.id()', cmp.id());
 			console.log('instance.name()', cmp.name());
 			console.log('instance.title()', cmp.title());
-			console.log('instance.context()', cmp.context());
+			console.log('instance.application()', cmp.application());
 			console.log('instance.parent()', cmp.parent());
 			console.log('instance.children()', cmp.children());
 			console.log('instance.acceptable()', cmp.acceptable());
@@ -593,17 +604,17 @@ var Component = (function() {
 			console.log('class.id()', clazz.id());
 			console.log('class.fname()', clazz.fname());
 			console.log('class.accessor()', clazz.accessor());
-			console.log('class.context()', clazz.context());
+			console.log('class.application()', clazz.application());
 			console.log('class.style()', clazz.style());
 			console.log('class.source()', clazz.source());
 			
-			console.log('\n- context');
-			console.log('context', context);
-			console.log('context.id()', context.id());
-			console.log('context.src()', context.src());
-			console.log('context.base()', context.base());
-			console.log('context.accessor()', context.accessor());
-			console.log('context.parent()', context.parent());
+			console.log('\n- application');
+			console.log('application', application);
+			console.log('application.id()', application.id());
+			console.log('application.src()', application.src());
+			console.log('application.base()', application.base());
+			console.log('application.accessor()', application.accessor());
+			console.log('application.parent()', application.parent());
 			
 			console.log('==============================================');
 		}

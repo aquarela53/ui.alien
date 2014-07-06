@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-03 18:40:15
+ * @date: 2014-07-07 2:3:10
 */
 
 // es6 shim
@@ -189,7 +189,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-02 23:13:1
+ * @date: 2014-07-04 18:30:16
 */
 
 /*!
@@ -4340,6 +4340,12 @@ var $ = (function() {
 			(o && typeof(o.nodeType) === 'number' && typeof(o.nodeName) === 'string');
 	}
 	
+	function isElement(el) {
+		if( typeof(el) !== 'object' ) return false;
+		else if( !(window.attachEvent && !window.opera) ) return (el instanceof window.Element);
+		else return (el.nodeType == 1 && el.tagName);
+	}
+	
 	function merge(o) {
 		if( !isNode(o) && typeof(o.length) === 'number' ) {
 			for(var i=0; i < o.length; i++) {
@@ -4375,12 +4381,6 @@ var $ = (function() {
 		if( !arr || !arr.length ) return null;
 		if( arr.length === 1 ) return arr[0];
 		return arr;
-	}
-	
-	function isElement(el) {
-		if( typeof(el) !== 'object' ) return false;
-		else if( !(window.attachEvent && !window.opera) ) return (el instanceof window.Element);
-		else return (el.nodeType == 1 && el.tagName);
 	}
 	
 	function isHtml(html) {
@@ -4588,6 +4588,11 @@ var $ = (function() {
 		return this;
 	};
 	
+	prototype.reverse = function() {
+		this.reverse();
+		return this;
+	};
+	
 	prototype.clear = function() {
 		var len = this.length;
 		if( len > 0 ) {
@@ -4782,6 +4787,8 @@ var $ = (function() {
 				if( key.hasOwnProperty(k) ) this.attr(k, key[k]);
 			}
 			return this;
+		} else if( !key ) {
+			return this;
 		}
 		
 		if( typeof(key) !== 'string' ) return console.error('invalid key', key);
@@ -4857,7 +4864,7 @@ var $ = (function() {
 	
 	function findChild(method, selector, arr) {
 		if( typeof(selector) === 'number' ) {
-			var c = this[method][selector - 1];
+			var c = this[method][selector];
 			if( c ) arr.push(c);
 		} else if( typeof(selector) === 'string' && !selector.startsWith('arg:') ) {	// find by selector
 			var children = this[method];
@@ -5406,7 +5413,6 @@ var $ = (function() {
 			if( !(els instanceof $) ) els = $(els);
 			
 			var target = this.parentNode;
-			console.log(target.children);
 			if( target ) {
 				var before = this.nextSibling; //;target.children[target.children.indexOf(this) + 1];
 				els.each(function() {
@@ -6958,6 +6964,8 @@ var Class = (function() {
 var TagTranslator = (function() {
 	"use strict"
 	
+	var $ = require('attrs.dom');
+	
 	function isNode(o){
 		return (typeof(Node) === "object") ? o instanceof Node : 
 			(o && typeof(o.nodeType) === 'number' && typeof(o.nodeName) === 'string');
@@ -6997,6 +7005,12 @@ var TagTranslator = (function() {
 					}
 					
 					var replaced = translator.apply(scope, [el, o]);
+					
+					return;
+					
+					//console.log('el', el);
+					//console.log('replaced', replaced);
+					//console.log('parent', el && el.parentNode);
 					
 					if( replaced && el !== replaced ) {
 						if( !isNode(replaced) ) return console.error('illegal returned node at ', selector, replaced);
@@ -7837,9 +7851,12 @@ var Component = (function() {
 	
 	var Util = require('attrs.util');
 	var $ = require('attrs.dom');
+	var Path = require('path');
+	
+	var isElement = $.util.isElement;
 
 	var DOM_EVENTS = [
-		'click', 'dblclick', 'contextmenu', 'blur', 'focus', 
+		'click', 'dblclick', 'applicationmenu', 'blur', 'focus', 
 		'tap', 'dbltap', 'shorttap', 'longtap',
 		'touchstart', 'touchmove', 'touchend', 'touchstop',
 		'mouseup', 'mousedown', 'mouseover', 'mousemove', 'mouseout', 'mouseout',
@@ -7860,11 +7877,11 @@ var Component = (function() {
 		if( o.debug ) this.debug = true;
 
 		// create el
-		if( !this.el ) this.el = $.create((o.tag || cls.tag || 'div'), o.attrs);
-		else this.el.clear();
-		
+		if( !this.el ) this.el = $.create((o.tag || cls.tag || 'div'));
+		else if( !o.el ) this.el.restore('#create');
+				
 		// setup el
-		var el = this.el.data('component', this).classes(cls.accessor());
+		var el = this.el.attr(o.attrs).data('component', this).classes(cls.accessor());
 		
 		// confirm event scope
 		var events = o.e || o.events;
@@ -7883,33 +7900,10 @@ var Component = (function() {
 			if( typeof(fn) === 'function' ) this.on(k, fn);
 		}
 		
-		/* event listener for mutation events
-		$(el).on('detached', function(e) {
-			//console.log('detached', this, e.from);			
-			var parent = e.from;
-			var pcmp = $(e.from).data('component');
-			
-			var cmp = $(this).data('component');
-			console.log('detached', cmp);
-			
-			if( pcmp && ~pcmp._children.indexOf(cmp) ) {
-				pcmp._children = Util.array.removeByItem(pcmp._children, cmp);
-			}
-			
-			cmp._parent = null;
-		});
-		
-		$(el).on('attached', function(e) {
-			//console.log('attached', this, e.to);
-			var cmp = $(this).data('component');
-			console.log('attached', cmp);
-		});
-		*/
-		
-		
-		// setup context & name
+		// setup application & name
 		if( o.id ) this.id(o.id);
 		if( o.name ) this.name(o.name);
+		if( o.origin ) this.origin(o.origin);
 		if( o.title ) this.title(o.title);
 		if( o.classes || o.class ) this.classes(o.classes || o.class);
 		if( o.origin ) this.origin(o.origin);
@@ -7931,10 +7925,10 @@ var Component = (function() {
 		
 		// bg 와 width height font 에 대해서는 편의적 메소드를 제공하기로...
 		if( o.bg || o.background ) el.bg(o.bg || o.background);
+		if( o.font ) el.font(o.font);
 		if( o.color ) el.color(o.color);
 		if( o.flex ) el.flex(o.flex);
 		if( o['float'] ) this['float'](o['float']);
-		if( o.font ) el.font(o.font);
 		if( o.margin ) el.margin(o.margin);
 		if( o.padding ) el.padding(o.padding);
 		if( o.border ) el.border(o.border);
@@ -7992,18 +7986,34 @@ var Component = (function() {
 			return this;
 		},
 		
-		// context
-		getClass: function() {
+		// application
+		concrete: function() {
 			return this.constructor;
 		},
-		context: function() {
-			return this.constructor.context();
+		application: function() {
+			return this.constructor.application();
+		},
+		origin: function(origin) {
+			if( !arguments.length ) return this._origin || this.application().origin();
+			
+			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);
+			
+			this._origin = Path.join(this.application().origin(), origin);
+			return this; 
 		},
 		base: function() {
-			return this.constructor.context().base();
+			return Path.dir(this.origin());
 		},
 		path: function(src) {
-			return this.constructor.context().path(src);
+			return Path.join(this.base(), src);
+		},
+		
+		// selector
+		finds: function(selector) {
+			return null;			
+		},
+		find: function(selector) {
+			return null;
 		},
 		
 		// attach
@@ -8016,13 +8026,13 @@ var Component = (function() {
 		},
 		acceptable: function() {
 			if( typeof(this._acceptable) === 'boolean' ) return this._acceptable;
-			return this.constructor.acceptable();
+			return this.concrete().acceptable();
 		},
 		attachTarget: function(attachTarget) {
 			if( !this.acceptable() ) return null;
 			if( !arguments.length ) return this._attachTarget || this.dom();
 			
-			if( $.isElement(attachTarget) ) this._attachTarget = attachTarget;
+			if( isElement(attachTarget) ) this._attachTarget = attachTarget;
 			else console.error('illegal attach target, target must be an element', attachTarget);
 			return this;
 		},
@@ -8031,7 +8041,9 @@ var Component = (function() {
 			if( !target ) return console.error('component cannot acceptable', this);
 			
 			if( typeof(child) == 'string' || (!(child instanceof Component) && typeof(child.component) === 'string') ) {
-				child = this.context().build(child);
+				var cmp = this.application().component(child.component);
+				if( !cmp ) return console.error('unknown component [' + child.component + ']');
+				child = new cmp(child);
 			}
 			
 			var el;
@@ -8039,11 +8051,18 @@ var Component = (function() {
 			//console.log('attach', child, (child instanceof Component));
 			
 			if( child instanceof Component ) el = child.dom();
-			else if( child instanceof $.EL ) el = child[0];
-			else return console.error('illegal child', child);
+			else if( child instanceof $ ) el = child[0];
+			else el = child;
 			
-			if( !$.isElement(el) ) return console.error('illegal child type', child);
-			$(target).attach(el, index);
+			if( !isElement(el) ) return console.error('illegal child type', child);
+			
+			if( typeof(index) === 'number' ) {
+				var ref = target.children(index);
+				if( ref.length ) ref.before(el);
+				else $(target).append(el);
+			} else { 
+				$(target).append(el);
+			}
 						
 			if( child instanceof Component ) {
 				var prevp = child._parent;
@@ -8059,7 +8078,7 @@ var Component = (function() {
 				var self = this;
 				var listener = function(e){
 					self._children = Util.array.removeByItem(self._children, $(this));
-					child.un('detached', listener);
+					child.off('detached', listener);
 				};
 				child.on('detached', listener);
 			}
@@ -8072,13 +8091,21 @@ var Component = (function() {
 		attachTo: function(target, index) {
 			if( !target ) return console.error('attach target must be a component or dom element', target);
 			
-			if( $.isElement(target) ) target = $(target);			
-			else if( typeof(target) === 'string' ) target = this.context().find(target) || $(target);
+			if( isElement(target) ) target = $(target);			
+			else if( typeof(target) === 'string' ) target = this.application().find(target) || $(target);
 			
 			if( target instanceof Component ) {
 				target.attach(this, index);
-			} else if( target instanceof $.EL ) {
-				target.attach(this.dom(), index);
+			} else if( target instanceof $ ) {
+				var el = this.dom();
+				
+				if( typeof(index) === 'number' ) {
+					var ref = target.children(index);
+					if( ref.length ) ref.before(el);
+					else target.append(el);
+				} else { 
+					target.append(el);
+				}
 			} else {
 				console.error('illegal target(available only Element or EL or Component)', target);
 			}
@@ -8102,7 +8129,7 @@ var Component = (function() {
 		accessor: function() {
 			var themecls = this._theme || '';
 			if( themecls ) themecls = ' theme-' + themecls;
-			return this.constructor.accessor() + themecls;
+			return this.concrete().accessor() + themecls;
 		},
 		classes: function(classes) {
 			var el = this.el;
@@ -8155,12 +8182,12 @@ var Component = (function() {
 		css: function(css) {
 			var el = this.el;
 			var id = el.id();
-			var stylesheet = this.context().stylesheet();
+			var stylesheet = this.application().stylesheet();
 
 			if( !arguments.length ) return id ? stylesheet.get('#' + id) : null;	
 			
 			if( typeof(css) === 'object' ) {
-				id = id || ('gen-' + (this.constructor.cmpname || 'nemo') + '-' + (seq++));
+				id = id || ('gen-' + (this.concrete().id() || 'nemo') + '-' + (seq++));
 				el.id(id);
 				stylesheet.update('#' + id, css);
 				if( css.debug ) console.log('#' + id, stylesheet.build());
@@ -8279,14 +8306,14 @@ var Component = (function() {
 				var script = href.substring(11);
 				var self = this;
 				(function() {
-					var context = self.context();
+					var application = self.application();
 					var o = eval.call(self, script);
 					if( o ) console.log('href script call has result', o);
 				})();
 			} else if( href.startsWith('this:') ) {
 				var path = href.substring(5);
-				var context = self.context();
-				if( context ) url = context.path(path);
+				var application = self.application();
+				if( application ) url = application.path(path);
 				location.href = path;
 			} else {
 				location.href = href;
@@ -8367,7 +8394,7 @@ var Component = (function() {
 			var o = this.options.toJSON();
 
 			var json = {
-				component: this.constructor.id()
+				component: this.concrete().id()
 			};
 
 			for(var k in o) {
@@ -8378,17 +8405,15 @@ var Component = (function() {
 		},
 		destroy: function() {
 			this.detach();
-			var ns = this.constructor.namespace;
 			var name = this.name() || '(unknown)';
-			var context = this.context();
-			if( context ) context.disconnect(this);
-			this.el.clear();
+			var appid = this.application().id();
+			this.el.empty().classes(false).attr(false);
 			for(var k in this) {
 				if( this.hasOwnProperty(k) ) continue;
 				var v = this[k];
 				this[k] = null;
 				try { delete this[k]; } catch(e) {}
-				if( typeof(v) === 'function' ) this[k] = function() {throw new Error(ns + ' ui control [' + name + '] was destroyed.');};
+				if( typeof(v) === 'function' ) this[k] = function() {throw new Error(appid + ' ui control [' + name + '] was destroyed.');};
 			}
 		},
 		framework: function framework() {
@@ -8397,7 +8422,7 @@ var Component = (function() {
 		debug: function() {
 			var cmp = this;
 			var clazz = this.getClass();
-			var context = this.context();
+			var application = this.application();
 			console.log('= Instanceof ' + clazz.fname() + ' ======================================');
 			
 			console.log('- Framework');
@@ -8409,7 +8434,7 @@ var Component = (function() {
 			console.log('instance.id()', cmp.id());
 			console.log('instance.name()', cmp.name());
 			console.log('instance.title()', cmp.title());
-			console.log('instance.context()', cmp.context());
+			console.log('instance.application()', cmp.application());
 			console.log('instance.parent()', cmp.parent());
 			console.log('instance.children()', cmp.children());
 			console.log('instance.acceptable()', cmp.acceptable());
@@ -8427,17 +8452,17 @@ var Component = (function() {
 			console.log('class.id()', clazz.id());
 			console.log('class.fname()', clazz.fname());
 			console.log('class.accessor()', clazz.accessor());
-			console.log('class.context()', clazz.context());
+			console.log('class.application()', clazz.application());
 			console.log('class.style()', clazz.style());
 			console.log('class.source()', clazz.source());
 			
-			console.log('\n- context');
-			console.log('context', context);
-			console.log('context.id()', context.id());
-			console.log('context.src()', context.src());
-			console.log('context.base()', context.base());
-			console.log('context.accessor()', context.accessor());
-			console.log('context.parent()', context.parent());
+			console.log('\n- application');
+			console.log('application', application);
+			console.log('application.id()', application.id());
+			console.log('application.src()', application.src());
+			console.log('application.base()', application.base());
+			console.log('application.accessor()', application.accessor());
+			console.log('application.parent()', application.parent());
 			
 			console.log('==============================================');
 		}
@@ -8591,457 +8616,347 @@ var Container = (function() {
 })();
 
 
-(function() {
+var Application = (function() {
 	"use strict"
 	
 	var HashController = require('attrs.hash');
 	var Util = require('attrs.util');
 	var $ = require('attrs.dom');
+	var Ajax = require('ajax');
 	var Path = require('path');
-	var CONTEXTS = [];
-	var DefaultContext;
+	var APPLICATIONS = [];
+	
+	var seq = 0;
+	
+	function Application(options) {
+		if( typeof(options) === 'string' ) options = {origin:options};
 		
+		this._cmps = {};
+		this.translator = new TagTranslator(this);
 		
-	// class Context
-	var Context = (function() {
-		var seq = 0;
-
-		function Context(src) {			
-			if( !src ) throw new Error('error:src cannot be null:' + src);
-			
-			src = Path.join(location.href, src);
-						
-			this._id = 'ctx-' + (seq++);
-			this._src = src;
-			this._uri = Path.uri(src);
-			this._accessor = 'aui ' + this._id;
-			this._children = [];
-			this.translator = new TagTranslator(this);
-			
-			this._cmps = {};
-			this._instances = [];
+		this.Component = Application.Component;
+		this.Container = Application.Container;
+		this.Application = Application.Application;
 		
-			this.Component = Context.Component;
-			this.Container = Context.Container;
-			
-			this._dispatcher = new EventDispatcher(this);
-			
-			for(var k in BUNDLES.translators) {
-				this.tag(k, BUNDLES.translators[k]);
-			}
-			
-			for(var k in BUNDLES.components) {
-				this.component(k, BUNDLES.components[k]);
-			}
-			
-			if(src === location.href) {
-				var self = this;
-				
-				this._id = 'ctx-local';
-				this._accessor = 'aui ' + this._id;
-				
-				$.on('DOMContentLoaded', function(e) {					
-					var translation = true;
-					if( Framework.parameters['tagtranslate'].toLowerCase() === 'false' ) {
-						if( debug('ui') ) console.log('tag translation on');
-						translation = false;
-					}
-					self.content(document.body, translation);
-				});
-			} else {
-				this.content(src, true);
-			}
-			
-			CONTEXTS.push(this);
+		var self = this;
+		this.constructor.application = function() {
+			return self;
+		};
+		
+		var accessor = 'aui ctx-' + (seq++);
+		this.constructor.applicationAccessor = function() {
+			return accessor;
+		};
+		this.constructor.accessor = function() {
+			return accessor + ' application';
+		};
+		
+		for(var k in BUNDLES.translators) {
+			this.tag(k, BUNDLES.translators[k]);
 		}
+		
+		for(var k in BUNDLES.components) {
+			this.component(k, BUNDLES.components[k]);
+		}
+		
+		options = options || {};
+		if( !options.origin ) options.origin = location.href;
+		
+		this.$super(options);
+		
+		APPLICATIONS.push(this);
+	}
+	
+	Application.prototype = {
+		origin: function(origin) {
+			if( !arguments.length ) return this._origin || location.href;
+			
+			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);
+			
+			this._origin = Path.join(location.href, origin);
+			return this; 
+		},
+		icons: function(icons) {
+			if( !arguments.length ) return this._icons;
+			if( typeof(icons) === 'string' ) icons = {'default': icons};
+			if( typeof(icons) === 'object' ) this._icons = icons;
+			return this;
+		},
+		splash: function(splash) {
+			if( !arguments.length ) return this._splash;
+			if( typeof(splash) === 'string' ) splash = {'default': splash};
+			if( typeof(splash) === 'object' ) this._splash = splash;
+			return this;
+		},
+		
+		// page mapping by url hash
+		page: function(hash, fn) {
+			var pages = this._pages;
+			if( !pages ) pages = this._pages = {};
+			
+			if( !arguments.length ) return pages;
+			if( arguments.length === 1 && typeof(hash) === 'string' ) return pages[hash];
+			if( typeof(hash) !== 'string' || typeof(fn) !== 'function' ) return console.error('illegal parameter', hash, fn);
+											
+			var arr = pages[hash];
+			if( !arr ) arr = pages[hash] = [];
+			
+			arr.push(fn);
+			
+			this.fire('page.added', {
+				hash: hash,
+				fn: fn
+			});
+			
+			return this;
+		},
+		
+		// theme & components
+		theme: function(name) {
+			if( !this._themes ) this._themes = {};
 
-		Context.prototype = {
-			id: function() {
-				return this._id;
-			},
-			content: function(content, translation) {
-				if( !arguments.length ) return this._content;
-				
-				if( !content ) return console.error('null content', content);
-				
-				var self = this;
-				var resolve = function(content) {
-					self.fire('prepare');						
-					self._content = content;
-					if( $.util.isElement(content) ) self.translate(content);
-					self.fire('ready', {
-						content: content
-					});
-				};
-				
-				if( typeof(content) === 'string' ) {
-					current = this;					
-					Ajax.get(content).done(function(err, data) {
-						current = DefaultContext;
-						if( err ) return console.error('content "' + content + '" load failure', err);
-						
-						resolve(data);
-					});
-				} else if( $.util.isElement(content) ) {
-					setTimeout(function() {
-						resolve(content);
-					}, 1);
-				} else {
-					return console.error('unsupported content type', content);
-				}
-				
-				return this;
-			},
-			accessor: function() {
-				return this._accessor;
-			},
-			src: function() {
-				return this._src;
-			},
-			uri: function() {
-				return this._uri;
-			},
-			path: function(path) {
-				return Path.join(this.base(), path);
-			},
-			base: function() {
-				return Path.dir(this.uri());
-			},
+			var themes = this._themes;
+			var theme = themes[name];
+			if( !theme ) theme = themes[name] = new Theme(this, name);				
 			
-			// event support
-			on: function() {
-				var d = this._dispatcher;
-				d.on.apply(d, arguments);
-				return this;
-			},
-			un: function() {
-				var d = this._dispatcher;
-				d.un.apply(d, arguments);
-				return this;
-			},
-			has: function() {
-				var d = this._dispatcher;
-				d.has.apply(d, arguments);
-				return this;
-			},
-			fire: function() {
-				var d = this._dispatcher;
-				if( !d ) return;
-				return d.fireSync.apply(d, arguments);
-			},
-			ready: function(fn) {
-				this.on('ready', fn);	
-			},
+			return theme;
+		},
+		themes: function() {
+			if( !this._themes ) return null;
 			
-			// page mapping by url hash
-			pages: function(mapping, fn) {
-				if( !this._pages ) this._pages = {};
-				var self = this;
-				this._pages.propagation = function(hash) {
-					(this[hash] || function() {}).call(self, {
-						hash: hash
-					});
-				};
-				
-				if( !arguments.length ) return this._pages;
-				if( arguments.length === 1 && typeof(mapping) === 'string' ) return this._pages[mapping];
-				
-				if( typeof(mapping) === 'string' && typeof(fn) == 'function' ) {
-					var name = mapping;
-					mapping = {};
-					mapping[name] = fn;				
-				}
-				
-				if( typeof(mapping) !== 'object' ) return console.error('page mapping must be an object');
-								
-				this._pages = Util.merge(this._pages, mapping);
-				
-				return this;
-			},
+			var args = [];
+			var themes = this._themes;
+			for(var k in themes) 
+				if( k && themes.hasOwnProperty(k) ) args.push(k);					
 			
-			// theme & components
-			theme: function(name) {
-				if( !this._themes ) this._themes = {};
-
-				var themes = this._themes;
-				var theme = themes[name];
-				if( !theme ) theme = themes[name] = new Theme(this, name);				
-				
-				return theme;
-			},
-			themes: function() {
-				if( !this._themes ) return null;
-				
-				var args = [];
-				var themes = this._themes;
-				for(var k in themes) 
-					if( k && themes.hasOwnProperty(k) ) args.push(k);					
-				
-				return args;
-			},
-			stylesheet: function() {
-				if( !this._stylesheet ) this._stylesheet = new StyleSheetManager('attrs.ui.' + this.id() + '.instances');
-				return this._stylesheet;
-			},
-			componentIds: function() {				
-				var args = [];
-				var cmps = this._cmps;
-				for(var k in cmps) 
-					if( k && cmps.hasOwnProperty(k) ) args.push(k);					
-				
-				return args;
-			},
+			return args;
+		},
+		stylesheet: function() {
+			if( !this._stylesheet ) this._stylesheet = new StyleSheetManager('attrs.ui.' + this.id() + '.instances');
+			return this._stylesheet;
+		},
+		componentIds: function() {				
+			var args = [];
+			var cmps = this._cmps;
+			for(var k in cmps) 
+				if( k && cmps.hasOwnProperty(k) ) args.push(k);					
 			
-			// define ui component
-			component: function(id, cls) {
-				if( typeof(id) !== 'string' || ~id.indexOf('.') ) return console.error('illegal component id:' + id);			
-				if( arguments.length === 1 ) {
-					var cmp = this._cmps[id];					
-					if( cmp ) return cmp;
-					
-					var pcmp = local.component(id);
-					if( pcmp ) cls = pcmp.source();
-					
-					if( !cls ) return console.error('[WARN] cannot found component:' + id);
-				}
+			return args;
+		},
+		
+		// define ui component
+		component: function(id, cls) {
+			if( typeof(id) !== 'string' || ~id.indexOf('.') ) return console.error('illegal component id:' + id);			
+			if( arguments.length === 1 ) {
+				var cmp = this._cmps[id];					
+				if( cmp ) return cmp;
 				
-				if( typeof(cls) === 'string' ) cls = require(cls);
-				if( typeof(cls) !== 'function' ) return console.error('[WARN] invalid component class:' + id, cls);
+				if( this === local ) return console.error('[WARN] not exists component:' + id);
 				
-				var inherit = cls.inherit;
+				var pcmp = local.component(id);
+				if( pcmp ) cls = pcmp.source();
 				
-				if( cls.hasOwnProperty('inherit') && !inherit ) return console.error('invalid inherit, unkwnown \'' + inherit + '\'', cls);
-				
-				if( typeof(inherit) === 'string' ) inherit = this.component(inherit);
-								
-				var self = this;
-				var fname = cls.name || Util.camelcase(id);
-				var superclass = inherit || this.Component;
-				
-				if( !superclass ) return console.error('illegal state, cannot find superclass', superclass, this.Component);
-				
-				var cmp = Class.inherit(cls, superclass );
-				var style = null;	//this.theme().component(id).reset(cls.style);
-				var acceptable = cls.acceptable;
-				acceptable = (acceptable === false) ? false : true;
-				
-				var ids = [id];
-				for(var c = cmp;c = c.superclass();) {
-					if( typeof(c.id) === 'function' ) {
-						if(c.id()) ids.push(c.id());
-					}
-					
-					if( typeof(c.acceptable) === 'function' && !c.acceptable() ) acceptable = false;
-					if( !c.superclass ) break;
-				}
-				
-				var accessor = (this.accessor() + ' ' + ids.reverse().join(' ')).trim();
-				
-				
-				// reserve
-				if( false ) {
-					var parser = new less.Parser({});
-					parser.parse(Ajax.get('login/login.less'), function (err, root) { 
-						if( err ) return console.error(err);
-						console.log(root);
-					   	var css = root.toCSS(); 
-						console.log(css);
-					});
-				}
-				
-				
-				cmp.source = function() {
-					return cls;
-				};
-				cmp.context = function() {
-					return self;
-				};
-				cmp.id = function() {
-					return id;
-				};
-				cmp.style = function() {
-					return style;
-				};
-				cmp.accessor = function() {
-					return accessor;
-				};
-				cmp.acceptable = function() {
-					return acceptable;
-				};
-				cmp.theme = function(themeId) {
-					return self.theme(themeId).component(id);
-				};
-				cmp.fname = function() {
-					return fname;
-				};
-				
-				this._cmps[id] = cmp;				
-				if( fname ) {
-					if( this[fname] ) {
-						console.warn('component fname conflict, so overwrited. before=', this[cmp.fname()], '/after=', cmp);
-					} else {
-						this[fname] = cmp;
-					}
-				} else {
-					console.warn('function name was empty', fname);
-				}
-				
-				if( debug('ui') ) {
-					console.info('[' + this.id() + '] component registerd', '[' + cmp.id() + ',' + fname + ']', Util.outline(cmp));
-				}
-				
-				if( cls.translator ) {
-					this.tag(id, cls.translator);
-				}
-				
-				cmp.translator = function() {
-					return cls.translator;
-				};
-				
-				this.fire('component', {
-					component: cmp
-				});
-
-				return cmp;
-			},
-			
-			// inspects DOM Elements for translates as component
-			tag: function(selector, fn) {
-				if( !arguments.length ) return translator;
-				
-				var translator = this.translator;				
-				if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('invalid parameter(string, function)', arguments);
-
-				var self = this;
-				this.translator.add(selector, function() {
-					var result = fn.apply(self, arguments);
-					if( result instanceof Component ) return result.dom();
-					return result;
-				});
-				return this;
-			},
-			translate: function(el) {
-				this.translator.translate(el);
-				return this;
-			},
-			
-			// load remote component or application through new ui context
-			load: function(src) {
-				if( !src ) return console.error('invalid src', src);				
-				return new Context(src);
-			},
-			
-			// translate from ui json to component
-			build: function(source) {
-				if( $.isElement(source) || typeof(source) === 'string' ) {
-					source = {
-						component: 'html',
-						html: source
-					};
-				} else if( !source || typeof(source) !== 'object' || typeof(source.component) !== 'string' ) {
-					return console.error('source must be \'ui json\'', source);
-				}
-				
-				var cmp = this.component(source.component);
-				if( !cmp ) return console.error('unknown component [' + source.component + ']');
-				var instance = new cmp(source);
-								
-				this.fire('build', {
-					instance: instance
-				});
-				
-				return instance;
-			},
-			
-			// component selector
-			find: function(qry) {
-				return null;
-			},
-			finds: function(qry) {
-				return null;
-			},
-			each: function(fn, scope) {
-				if( typeof(fn) !== 'function' ) throw new Error('illegal arguments. fn must be a function:' + fn);
-				var scope = scope || this;
-				
-				var instances = this.all();
-				for( var i=0; i < instances.length; i++ ) {
-					var cmp = instances[i];
-
-					if( fn.call(scope, cmp) === false ) return false;
-				}
-
-				return true;
-			},
-			destroy: function() {
-				var index = CONTEXTS.indexOf(this);
-				if( ~index ) CONTEXTS.splice(index, 1);
-				
-				var src = this.src();
-				var id = this.id();
-				for(var k in this) {
-					var v = this[k];
-					this[k] = null;
-					try { delete this[k]; } catch(e) {}
-				}
-				if( this.__proto__ ) this.__proto__ = null;
+				if( !cls ) return console.error('[WARN] not exists component:' + id);
 			}
-		};
-	
-		Context.Component = Component;
-		Context.Container = Container;
-		
-		Context.contexts = function contexts() {
-			return CONTEXTS;
-		};
-		
-		var BUNDLES = {
-			components: {},
-			translators: {}
-		};
-		
-		Context.component = function component(id, cls) {
-			if( typeof(id) !== 'string' || typeof(cls) !== 'function' ) return console.error('invalid parameter', id, cls);
 			
-			BUNDLES.components[id] = cls;
-			CONTEXTS.forEach(function(context) {
-				context.component(id, cls);
+			if( typeof(cls) === 'string' ) cls = require(cls);
+			if( typeof(cls) !== 'function' ) return console.error('[WARN] invalid component class:' + id, cls);
+			
+			var inherit = cls.inherit;
+			
+			if( cls.hasOwnProperty('inherit') && !inherit ) return console.error('invalid inherit, unkwnown \'' + inherit + '\'', cls);
+			
+			if( typeof(inherit) === 'string' ) inherit = this.component(inherit);
+							
+			var self = this;
+			var fname = cls.name || Util.camelcase(id);
+			var superclass = inherit || this.Component;
+			
+			if( !superclass ) return console.error('illegal state, cannot find superclass', superclass, this.Component);
+			
+			var cmp = Class.inherit(cls, superclass );
+			var style = null;	//this.theme().component(id).reset(cls.style);
+			var acceptable = cls.acceptable;
+			acceptable = (acceptable === false) ? false : true;
+			
+			var ids = [id];
+			for(var c = cmp;c = c.superclass();) {
+				if( typeof(c.id) === 'function' ) {
+					if(c.id()) ids.push(c.id());
+				}
+				
+				if( typeof(c.acceptable) === 'function' && !c.acceptable() ) acceptable = false;
+				if( !c.superclass ) break;
+			}
+			
+			var accessor = (this.constructor.applicationAccessor() + ' ' + ids.reverse().join(' ')).trim();
+			
+			// reserve
+			if( false ) {
+				var parser = new less.Parser({});
+				parser.parse(Ajax.get('login/login.less'), function (err, root) { 
+					if( err ) return console.error(err);
+					console.log(root);
+				   	var css = root.toCSS(); 
+					console.log(css);
+				});
+			}			
+			
+			cmp.source = function() {
+				return cls;
+			};
+			cmp.application = function() {
+				return self;
+			};
+			cmp.id = function() {
+				return id;
+			};
+			cmp.style = function() {
+				return style;
+			};
+			cmp.accessor = function() {
+				return accessor;
+			};
+			cmp.acceptable = function() {
+				return acceptable;
+			};
+			cmp.theme = function(themeId) {
+				return self.theme(themeId).component(id);
+			};
+			cmp.fname = function() {
+				return fname;
+			};
+			
+			this._cmps[id] = cmp;				
+			if( fname ) {
+				if( this[fname] ) {
+					console.warn('component fname conflict, so overwrited. before=', this[cmp.fname()], '/after=', cmp);
+				} else {
+					this[fname] = cmp;
+				}
+			} else {
+				console.warn('function name was empty', fname);
+			}
+			
+			if( debug('ui') ) {
+				console.info('[' + this.id() + '] component registerd', '[' + cmp.id() + ',' + fname + ']', Util.outline(cmp));
+			}
+			
+			if( cls.translator ) {
+				this.tag(id, cls.translator);
+			}
+			
+			cmp.translator = function() {
+				return cls.translator;
+			};
+			
+			this.fire('component.added', {
+				component: cmp
 			});
-		};
+
+			return cmp;
+		},
 		
-		Context.translator = function(selector, fn) {
-			if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('invalid parameter', selector, fn);
+		// inspects DOM Elements for translates as component
+		tag: function(selector, fn) {
+			if( !arguments.length ) return translator;
 			
-			BUNDLES.translators[selector] = fn;
-			
-			CONTEXTS.forEach(function(context) {
-				context.tag(selector, fn);
+			var translator = this.translator;				
+			if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('invalid parameter(string, function)', arguments);
+
+			var self = this;
+			this.translator.add(selector, function() {
+				var result = fn.apply(self, arguments);
+				if( result instanceof Component ) return result.dom();
+				return result;
 			});
-		};
+			
+			this.fire('tag.added', {
+				selector: selector,
+				fn: fn
+			});
+			
+			return this;
+		},
+		translate: function(el) {
+			this.translator.translate(el);
+			return this;
+		},
 		
-		var current;
-		Context.current = function context() {
-			return current || DefaultContext;
-		};
+		// translate from ui json to component
+		pack: function(source) {
+			if( $.util.isElement(source) ) {
+				source = {
+					component: (type || 'html'),
+					el: source
+				};					
+			} else if( typeof(source) === 'string' ) {
+				var origin = source;
+				source = Ajax.json(source);
+				source.origin = origin;
+			}
+			
+			if( !(source && typeof(source.component) === 'string') ) {
+				return console.error('unsupported source type', source);
+			}
+			
+			var cmp = this.component(source.component);
+			if( !cmp ) return console.error('unknown component [' + source.component + ']');
+			var instance = new cmp(source);
+							
+			this.fire('build', {
+				instance: instance
+			});
+			
+			return instance;
+		},
+	};
+	
+	Application = Class.inherit(Application, Container);
+	
+	
+	Application.Component = Component;
+	Application.Container = Container;
+	Application.Application = Application;	
+	
+	Application.applications = function() {
+		return APPLICATIONS;
+	};
+	
+	// bundles
+	var BUNDLES = {
+		components: {},
+		translators: {}
+	};
+	
+	Application.component = function(id, cls) {
+		if( typeof(id) !== 'string' || typeof(cls) !== 'function' ) return console.error('invalid parameter', id, cls);
 		
-		return Context;
-	})();
+		BUNDLES.components[id] = cls;
+		APPLICATIONS.forEach(function(application) {
+			application.component(id, cls);
+		});
+	};
 	
-	// initializing default context
-	var local = DefaultContext = new Context(location.href);
+	Application.translator = function(selector, fn) {
+		if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('invalid parameter', selector, fn);
+		
+		BUNDLES.translators[selector] = fn;
+		
+		APPLICATIONS.forEach(function(application) {
+			application.tag(selector, fn);
+		});
+	};
 	
-	// regist bundle translators
-	// <page hash="test">
-	// 	<action type="import" target="#content" src="html/page.html"></action>
-	// </page>
-	Context.translator('page', function(el, attrs) {
+	// bind default translators
+	Application.translator('page', function(el, attrs) {
 		var ctx = this;
 	
 		var hash = attrs.hash;
 		if( typeof(hash) !== 'string' ) return console.warn('attributes "hash" required', el);
 	
-		ctx.pages(hash, function(e) {
-			var actions = $(target).children('action');
+		ctx.page(hash, function(e) {
+			var actions = $(this).children('action');
 			
 			console.log('actions', actions);
 			
@@ -9064,29 +8979,59 @@ var Container = (function() {
 	});
 	
 	// <component id="cmpid" src="dir/file.js"></component>
-	Context.translator('component', function(el, attrs) {
-		var ctx = this;
+	Application.translator('component', function(el, attrs) {
+		var app = this;
 		var id = attrs.id;
 		var src = attrs.src;		
-		ctx.component(id, src);
+		app.component(id, src);
 	});
+		
+	return Application;
+})();
+	
+(function() {
+	var $ = require('attrs.dom');
+	
+	// regist default application
+	var app = new Application(location.href);	
+	Application.application = function() {
+		return app;
+	};
+	
+	// auto pack
+	var autopack = Framework.parameters['autopack'];
+	if( !autopack || autopack.toLowerCase() !== 'false' ) {
+		if( debug('ui') ) console.log('autopack on');
+		
+		$.ready(function(e) {
+			app.translate(document.body);
+			//app.items(document.body.children).attachTo(document.body);
+			console.log(Application.application().dom());
+			app.fire('ready');
+		});
+	} else {
+		console.log('autopack off');
+	}
+	
 	
 	// regist hash control	
 	HashController.regist(function(hash, location) {
 		if( debug('hash') ) console.log('hash changed "' + hash + '"');
-		local.pages().propagation(hash);
+		$(document.body).visit(function() {
+			//console.log('visiting for page controlling', this);
+		});
 	});
 	
-	// exports module 'ui'
-	define('ui', function(module) {
-		module.exports = Context;
-	});
-	
-	$.on('ready', function(e) {
-		// invoke current hash
+	$.ready(function(e) {
 		HashController.invoke();
 	});
+	
+	// exports Application as 'ui'
+	define('ui', function(module) {
+		module.exports = Application;
+	});
 })();
+
 
 
 
@@ -9491,16 +9436,20 @@ var Theme = (function() {
 		}
 	};
 	
+	var $ = require('attrs.dom');
 	View.translator = function(el, attrs) {
 		var view = new this.View();
 		var children = el.children;
 		var items = [];
+		
 		for(var i=0; i < children.length; i++) {
-			this.translate(children[i]);
+			var c = children[i];
+			var cmp = $(c).data('component');
+			if( cmp ) items.push(cmp);
+			else items.push(c);
 		}
 		
 		view.add(items);
-		console.log('view', view);
 		return view;
 	};
 	
@@ -9733,7 +9682,7 @@ var Theme = (function() {
 
 	Button.acceptable = true;
 	
-	return Button = UI.component('button', Button);
+	return Button = UI.component('btn', Button);
 })();
 
 
