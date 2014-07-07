@@ -1,10 +1,12 @@
 var files = [
 	'./src/shims/es6.js',
-	'./src/BOF.js',
 	
-	// dep
+	// dependency
 	'./build/attrs.dom.js',
 
+	// begin
+	'./src/BOF.js',
+	
 	// util
 	'./src/util/Util.js',
 	'./src/util/Color.js',

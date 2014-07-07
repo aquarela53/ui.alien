@@ -1,9 +1,6 @@
 (function() {
 	"use strict"
 	
-	var UI = require('ui');
-	var Ajax = require('ajax');
-	
 	function HTML(options) {
 		if( typeof(options) === 'string' ) options = {html:options};
 		this.$super(options);

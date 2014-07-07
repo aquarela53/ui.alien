@@ -1,8 +1,6 @@
 var Theme = (function() {
 	"use strict"
 	
-	var Context = require('ui');
-	
 	// private
 	var writeComponentStyleSheet = function(context, style, cmpname, prefix, stylesheet) {
 		var cmp = context.component(cmpname);
@@ -16,7 +14,7 @@ var Theme = (function() {
 	
 	// class theme
 	function Theme(context, name, src) {
-		if( !(context instanceof Context) ) {
+		if( !(context instanceof Application) ) {
 			console.error('[ERROR] invalid context', context);
 			throw new Error('invalid context:' + context);
 		}

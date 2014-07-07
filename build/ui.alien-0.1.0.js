@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-07 16:16:25
+ * @date: 2014-07-08 3:8:9
 */
 
 // es6 shim
@@ -110,79 +110,6 @@
 		global.Map = global.WeakMap = Map;
 	}
 })();
-
-(function() {
-	// init Framework Object, contains initial parameters & build informations.
-	var Framework = {
-		id: 'ui.alien',
-		version: '0.1.0',
-		name: 'ui.alien',
-		author: {"name":"joje","email":"joje.attrs@gmail.com","url":"https://github.com/joje6"},
-		repository: {"type":"git","url":"git://github.com/attrs/ui.alien.git"},
-		starttime: new Date().getTime(),
-		parameters: {
-			get: function(key) {
-				if( typeof(key) !== 'string' ) return null;
-				return Framework.parameters[key];
-			},
-			set: function(key, value) {
-				if( typeof(key) === 'string' ) Framework.parameters[key] = value;
-				return Framework.parameters;
-			}
-		},
-		print: function() {
-			console.log('* {pkg.name} info', JSON.stringify(Framework.parameters, null, '\t'));
-			console.log('\tversion: ' + __build_info__.version );
-			console.log('\tcore build: ' + __build_info__.buildtime + ' ms');
-			console.log('\telapsed time to here: ' + (new Date().getTime() - __build_info__.finishtime) + ' ms');
-			console.log('\ttotal elapsed time: ' + (new Date().getTime() - __build_info__.starttime) + ' ms');
-		}
-	};
-	
-	// extract global options in meta tag
-	(function() {
-		var argm = document.getElementsByTagName('meta');
-		for (var i=0,length=argm.length; i < length; i++) {
-			var name = argm[i].name.toLowerCase();
-			if( name.startsWith('attrs.ui.') ) {
-				name = name.substring(9);
-				if( name === 'get' || name === 'set' ) continue;
-				var value = argm[i].getAttribute('content').trim();
-				Framework.parameters[name] = value;
-			}
-		}
-	})();
-	
-	// setup debug object
-	var debug = (function(p) {
-		return function(category) {
-			category = category || '';
-			var args = category.split('.');
-			if( args ) {
-				for(var i=args.length; i >= 1; i--) {
-					var c = args.slice(0, i).join('.');
-					//console.log('current', c, p['debug.' + c]);
-					if( p['debug.' + c] === 'false' ) return false;
-					else if( p['debug.' + c] === 'true' ) return true;
-				}
-			}
-			
-			return (p['debug'] !== 'true') ? false : true;
-		}; 
-	})(Framework.parameters);
-	
-	if(debug()) console.debug(Framework.name + '[' + Framework.version + '] started with \n' + JSON.stringify(Framework.parameters, null, '\t'));
-	
-	/* debug test
-	console.log('ui.controls.html', debug('ui.controls.html') );
-	console.log('ui.controls', debug('ui.controls') );
-	console.log('ui.context', debug('ui.context') );
-	console.log('ui.submodule', debug('ui.submodule') );
-	console.log('ui', debug('ui') );
-	console.log('all', debug() );
-	*/
-	
-	// start class definitions
 
 /*!
  * attrs.dom - dom selector (MIT License)
@@ -6170,6 +6097,84 @@ var $ = (function() {
 // End Of File (dom.alien.js), attrs ({https://github.com/attrs})
 
 
+(function() {
+	// init Framework Object, contains initial parameters & build informations.
+	var Framework = {
+		id: 'ui.alien',
+		version: '0.1.0',
+		name: 'ui.alien',
+		author: {"name":"joje","email":"joje.attrs@gmail.com","url":"https://github.com/joje6"},
+		repository: {"type":"git","url":"git://github.com/attrs/ui.alien.git"},
+		starttime: new Date().getTime(),
+		parameters: {
+			get: function(key) {
+				if( typeof(key) !== 'string' ) return null;
+				return Framework.parameters[key];
+			},
+			set: function(key, value) {
+				if( typeof(key) === 'string' ) Framework.parameters[key] = value;
+				return Framework.parameters;
+			}
+		},
+		print: function() {
+			console.log('* {pkg.name} info', JSON.stringify(Framework.parameters, null, '\t'));
+			console.log('\tversion: ' + __build_info__.version );
+			console.log('\tcore build: ' + __build_info__.buildtime + ' ms');
+			console.log('\telapsed time to here: ' + (new Date().getTime() - __build_info__.finishtime) + ' ms');
+			console.log('\ttotal elapsed time: ' + (new Date().getTime() - __build_info__.starttime) + ' ms');
+		}
+	};
+
+	// extract global options in meta tag
+	(function() {
+		var argm = document.getElementsByTagName('meta');
+		for (var i=0,length=argm.length; i < length; i++) {
+			var name = argm[i].name.toLowerCase();
+			if( name.startsWith('attrs.ui.') ) {
+				name = name.substring(9);
+				if( name === 'get' || name === 'set' ) continue;
+				var value = argm[i].getAttribute('content').trim();
+				Framework.parameters[name] = value;
+			}
+		}
+	})();
+
+	// setup debug object
+	var debug = (function(p) {
+		return function(category) {
+			category = category || '';
+			var args = category.split('.');
+			if( args ) {
+				for(var i=args.length; i >= 1; i--) {
+					var c = args.slice(0, i).join('.');
+					//console.log('current', c, p['debug.' + c]);
+					if( p['debug.' + c] === 'false' ) return false;
+					else if( p['debug.' + c] === 'true' ) return true;
+				}
+			}
+		
+			return (p['debug'] !== 'true') ? false : true;
+		}; 
+	})(Framework.parameters);
+
+	if(debug()) console.debug(Framework.name + '[' + Framework.version + '] started with \n' + JSON.stringify(Framework.parameters, null, '\t'));
+
+	// to global use
+	var $ = require('attrs.dom');
+	var Ajax = require('ajax');
+	var Path = require('path');
+	
+	/* debug test
+	console.log('ui.controls.html', debug('ui.controls.html') );
+	console.log('ui.controls', debug('ui.controls') );
+	console.log('ui.context', debug('ui.context') );
+	console.log('ui.submodule', debug('ui.submodule') );
+	console.log('ui', debug('ui') );
+	console.log('all', debug() );
+	*/
+	
+	// start class definitions
+
 var Util = (function() {
 	"use strict"
 
@@ -6219,7 +6224,7 @@ var Util = (function() {
 	function outline(fn) {
 		if( typeof(fn) !== 'function' ) return fn;
 	
-		var o = new (function Outline(){});
+		var o = new (function Static(){});
 		for(var k in fn) {
 			if( !fn.hasOwnProperty(k) ) continue;
 			o[k] = fn[k];
@@ -6267,11 +6272,6 @@ var Util = (function() {
 		outline: outline
 	};
 })();
-
-
-define('attrs.util', function(module) {
-	module.exports = Util;
-});
 
 
 /*
@@ -6883,27 +6883,30 @@ var Class = (function() {
 
 			// define cls class
 			var cls = function cls() {constructor.apply(this, arguments);}			
-			cls.__meta__ = {};
+			//cls.__meta__ = {};
 			
 			// for debug
 			if( debug ) {
 				var name = fname(clz);
 				eval('cls = function ' + (name || 'anonymous') + '() {constructor.apply(this, arguments);}');
-				cls.__meta__ = {};
-				cls.__meta__.name = name;
+				//cls.__meta__ = {};
+				//cls.__meta__.name = name;
 			}
 
 			// inheritance
 			if( sclz ) cls.prototype = new sclz(_);
 			cls.prototype.constructor = cls;
 			
-			cls.__meta__.origin = clz;
-			cls.__meta__.superclass = sclz;
+			//cls.__meta__.origin = clz;
+			//cls.__meta__.superclass = sclz;
 			cls.clone = function() {
 				return Class.inherit(clz, sclz, instantiatable);
 			};
 			cls.superclass = function() {
 				return sclz;
+			};
+			cls.origin = function() {
+				return clz;	
 			};
 
 			// copy prototype
@@ -7150,9 +7153,7 @@ var HashController = (function() {
 })();
 
 
-define('attrs.hash', function(module) {
-	module.exports = HashController;
-});
+
 
 
 var StyleSheetManager = (function() {
@@ -7848,11 +7849,7 @@ var StyleSystem = (function() {
 
 var Component = (function() { 
 	"use strict"
-	
-	var Util = require('attrs.util');
-	var $ = require('attrs.dom');
-	var Path = require('path');
-	
+		
 	var isElement = $.util.isElement;
 
 	var DOM_EVENTS = [
@@ -7880,8 +7877,8 @@ var Component = (function() {
 		if( !this.el ) this.el = $.create((o.tag || cls.tag || 'div'));
 		else if( !o.el ) this.el.restore('#create');
 				
-		// setup el
-		var el = this.el.attr(o.attrs).data('component', this).classes(cls.accessor());
+		// setup el	
+		var el = this.el.attr(o.attrs).data('component', this).classes(this.accessor());
 		
 		// confirm event scope
 		var events = o.e || o.events;
@@ -8142,7 +8139,8 @@ var Component = (function() {
 				}).join(' ');
 			}
 			
-			el.classes(this.accessor()).ac(classes);
+			el.classes(this.accessor());
+			if( classes && typeof(classes) === 'string' ) el.ac(classes);
 			return this;
 		},
 		ac: function(classes) {
@@ -8534,8 +8532,6 @@ var Component = (function() {
 var Container = (function() {
 	"use strict"
 
-	var Util = require('attrs.util');
-
 	// class container
 	function Container(options) {
 		this._items = [];
@@ -8675,16 +8671,11 @@ var Container = (function() {
 var Application = (function() {
 	"use strict"
 	
-	var HashController = require('attrs.hash');
-	var Util = require('attrs.util');
-	var $ = require('attrs.dom');
-	var Ajax = require('ajax');
-	var Path = require('path');
 	var APPLICATIONS = [];
 	
 	var seq = 0;
 	
-	// TODO : Application 객체는 생성될 때 콘크리트도 분리되어서 생성되어야 하지만 지금은 그렇지 못함. 고쳐야 해
+	// class Application
 	function Application(options) {
 		if( typeof(options) === 'string' ) options = {origin:options};
 		
@@ -8695,20 +8686,8 @@ var Application = (function() {
 		this.Container = Application.Container;
 		this.Application = Application.Application;
 		
-		var self = this;
-		this.constructor.application = function() {
-			return self;
-		};
-		
-		var applicationId = this.applicationId = 'app-' + (seq++);
-		var accessor = 'aui app-' + applicationId;
-		this.constructor.applicationAccessor = function() {
-			return accessor;
-		};
-		
-		this.constructor.accessor = function() {
-			return accessor + ' application';
-		};
+		this._applicationId = 'app-' + (seq++);
+		this._accessor = 'aui app-' + this._applicationId;
 		
 		for(var k in BUNDLES.components) {
 			this.component(k, BUNDLES.components[k]);
@@ -8727,6 +8706,19 @@ var Application = (function() {
 	}
 	
 	Application.prototype = {
+		applicationId: function() {
+			return this._applicationId;
+		},
+		applicationAccessor: function() {
+			return this._accessor;
+		},
+		accessor: function() {
+			return this._accessor + ' application';
+		},
+		application: function() {
+			return this;
+		},
+		
 		origin: function(origin) {
 			if( !arguments.length ) return this._origin || location.href;
 			
@@ -8785,15 +8777,7 @@ var Application = (function() {
 		component: function(id, cls) {
 			if( typeof(id) !== 'string' || ~id.indexOf('.') ) return console.error('illegal component id:' + id);			
 			if( arguments.length === 1 ) {
-				var cmp = this._cmps[id];					
-				if( cmp ) return cmp;
-				
-				if( this === local ) return console.error('[WARN] not exists component:' + id);
-				
-				var pcmp = local.component(id);
-				if( pcmp ) cls = pcmp.source();
-				
-				if( !cls ) return console.error('[WARN] not exists component:' + id);
+				return this._cmps[id];
 			}
 			
 			if( typeof(cls) === 'string' ) cls = require(this.path(cls));
@@ -8826,9 +8810,8 @@ var Application = (function() {
 				if( !c.superclass ) break;
 			}
 			
-			var accessor = (this.constructor.applicationAccessor() + ' ' + ids.reverse().join(' ')).trim();
+			var accessor = (this.applicationAccessor() + ' ' + ids.reverse().join(' ')).trim();
 			
-			// reserve
 			if( false ) {
 				var parser = new less.Parser({});
 				parser.parse(Ajax.get('login/login.less'), function (err, root) { 
@@ -8837,11 +8820,8 @@ var Application = (function() {
 				   	var css = root.toCSS(); 
 					console.log(css);
 				});
-			}			
+			}
 			
-			cmp.source = function() {
-				return cls;
-			};
 			cmp.application = function() {
 				return self;
 			};
@@ -8876,12 +8856,10 @@ var Application = (function() {
 			}
 			
 			if( debug('ui') ) {
-				console.info('[' + this.accessor() + '] component registerd', '[' + cmp.id() + ',' + fname + ']', Util.outline(cmp));
+				console.info('[' + this.applicationId() + '] component added', '[' + cmp.id() + ',' + fname + ']', Util.outline(cmp));
 			}
 			
-			if( cls.translator ) {
-				this.tag(id, cls.translator);
-			}
+			if( cls.translator ) this.tag(id, cls.translator);
 			
 			cmp.translator = function() {
 				return cls.translator;
@@ -9020,21 +8998,25 @@ var Application = (function() {
 	Application.translator('component', function(el, attrs) {
 		var app = this;
 		var id = attrs.id;
-		var src = attrs.src;		
+		var src = attrs.src;
 
-		if( debug('translator') ) console.log('translate component', id, src);
+		if( debug('translator') ) console.log('[' + this.applicationId() + '] component tag found [' + id + '] src="' + src + '"');
 		
-		app.component(id, src);
+		try {
+			app.component(id, src);
+		} catch(e) {
+			console.warn('[' + this.applicationId() + '] component load failure. [' + id + '] src="' + src + '"', e);
+		} 
 		return false;
 	});
 		
 	return Application;
 })();
+
+var UI = Application;
 	
 // initial application setting
-(function() {
-	var $ = require('attrs.dom');
-	
+(function() {	
 	// create default application
 	var app = new Application(location.href);	
 	Application.local = function() {
@@ -9044,7 +9026,7 @@ var Application = (function() {
 	// auto pack
 	var autopack = Framework.parameters['autopack'];
 	if( !autopack || autopack.toLowerCase() !== 'false' ) {
-		if( debug('ui') ) console.log('autopack on');
+		if( debug('ui') ) console.info('[ui.alien] autopack on');
 		
 		$.ready(function(e) {
 			app.translate(document.body);
@@ -9081,11 +9063,6 @@ var Application = (function() {
 		if( debug('hash') ) console.log('hash controller invoke');
 		HashController.invoke();
 	});
-	
-	// exports Application as 'ui'
-	define('ui', function(module) {
-		module.exports = Application;
-	});
 })();
 
 
@@ -9093,8 +9070,6 @@ var Application = (function() {
 
 var Theme = (function() {
 	"use strict"
-	
-	var Context = require('ui');
 	
 	// private
 	var writeComponentStyleSheet = function(context, style, cmpname, prefix, stylesheet) {
@@ -9109,7 +9084,7 @@ var Theme = (function() {
 	
 	// class theme
 	function Theme(context, name, src) {
-		if( !(context instanceof Context) ) {
+		if( !(context instanceof Application) ) {
 			console.error('[ERROR] invalid context', context);
 			throw new Error('invalid context:' + context);
 		}
@@ -9424,8 +9399,6 @@ var Theme = (function() {
 
 (function() {
 	"use strict"
-	
-	var UI = require('ui');
 
 	// class view
 	function View(options) {
@@ -9492,7 +9465,6 @@ var Theme = (function() {
 		}
 	};
 	
-	var $ = require('attrs.dom');
 	View.translator = function(el, attrs) {
 		var view = new this.View();
 		var children = el.children;
@@ -9517,9 +9489,6 @@ var Theme = (function() {
 
 (function() {
 	"use strict"
-	
-	var UI = require('ui');
-	var Ajax = require('ajax');
 	
 	function HTML(options) {
 		if( typeof(options) === 'string' ) options = {html:options};
@@ -9602,8 +9571,6 @@ var Theme = (function() {
 
 (function() {
 	"use strict"
-	
-	var UI = require('ui');
 
 	function Button(options) {
 		this.$super(options);
@@ -9748,14 +9715,18 @@ var Theme = (function() {
 	HashController.start();
 
 	// bundle require binding
-	define('debug', function(module) { module.exports = debug; });
 	define('color', function(module) { module.exports = Color; });
-	define('document', function(module) { module.exports = document; });
 	define('class', function(module) { module.exports = Class; });
+	
 	define('style.system', function(module) { module.exports = StyleSystem; });
 	define('style', function(module) { module.exports = Style; });
 	define('theme', function(module) { module.exports = Theme; });
+	
+	define('util', function(module) { module.exports = Util; });	
+	define('hash', function(module) { module.exports = HashController; });	
 	define('framework', function(module) { module.exports = Framework; });
+	define('debug', function(module) { module.exports = debug; });
+	define('ui', function(module) { module.exports = Application; });
 	
 	// mark build time
 	Framework.buildtime = (Framework.finishtime = new Date().getTime()) - Framework.starttime;

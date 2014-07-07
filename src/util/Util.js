@@ -47,7 +47,7 @@ var Util = (function() {
 	function outline(fn) {
 		if( typeof(fn) !== 'function' ) return fn;
 	
-		var o = new (function Outline(){});
+		var o = new (function Static(){});
 		for(var k in fn) {
 			if( !fn.hasOwnProperty(k) ) continue;
 			o[k] = fn[k];
@@ -95,11 +95,6 @@ var Util = (function() {
 		outline: outline
 	};
 })();
-
-
-define('attrs.util', function(module) {
-	module.exports = Util;
-});
 
 
 /*

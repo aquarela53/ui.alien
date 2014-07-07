@@ -1,7 +1,5 @@
 (function() {
 	"use strict"
-	
-	var UI = require('ui');
 
 	// class view
 	function View(options) {
@@ -68,7 +66,6 @@
 		}
 	};
 	
-	var $ = require('attrs.dom');
 	View.translator = function(el, attrs) {
 		var view = new this.View();
 		var children = el.children;

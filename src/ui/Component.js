@@ -1,10 +1,6 @@
 var Component = (function() { 
 	"use strict"
-	
-	var Util = require('attrs.util');
-	var $ = require('attrs.dom');
-	var Path = require('path');
-	
+		
 	var isElement = $.util.isElement;
 
 	var DOM_EVENTS = [
@@ -32,8 +28,8 @@ var Component = (function() {
 		if( !this.el ) this.el = $.create((o.tag || cls.tag || 'div'));
 		else if( !o.el ) this.el.restore('#create');
 				
-		// setup el
-		var el = this.el.attr(o.attrs).data('component', this).classes(cls.accessor());
+		// setup el	
+		var el = this.el.attr(o.attrs).data('component', this).classes(this.accessor());
 		
 		// confirm event scope
 		var events = o.e || o.events;
@@ -294,7 +290,8 @@ var Component = (function() {
 				}).join(' ');
 			}
 			
-			el.classes(this.accessor()).ac(classes);
+			el.classes(this.accessor());
+			if( classes && typeof(classes) === 'string' ) el.ac(classes);
 			return this;
 		},
 		ac: function(classes) {

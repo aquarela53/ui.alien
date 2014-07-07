@@ -1,16 +1,11 @@
 var Application = (function() {
 	"use strict"
 	
-	var HashController = require('attrs.hash');
-	var Util = require('attrs.util');
-	var $ = require('attrs.dom');
-	var Ajax = require('ajax');
-	var Path = require('path');
 	var APPLICATIONS = [];
 	
 	var seq = 0;
 	
-	// TODO : Application 객체는 생성될 때 콘크리트도 분리되어서 생성되어야 하지만 지금은 그렇지 못함. 고쳐야 해
+	// class Application
 	function Application(options) {
 		if( typeof(options) === 'string' ) options = {origin:options};
 		
@@ -21,20 +16,8 @@ var Application = (function() {
 		this.Container = Application.Container;
 		this.Application = Application.Application;
 		
-		var self = this;
-		this.constructor.application = function() {
-			return self;
-		};
-		
-		var applicationId = this.applicationId = 'app-' + (seq++);
-		var accessor = 'aui app-' + applicationId;
-		this.constructor.applicationAccessor = function() {
-			return accessor;
-		};
-		
-		this.constructor.accessor = function() {
-			return accessor + ' application';
-		};
+		this._applicationId = 'app-' + (seq++);
+		this._accessor = 'aui app-' + this._applicationId;
 		
 		for(var k in BUNDLES.components) {
 			this.component(k, BUNDLES.components[k]);
@@ -53,6 +36,19 @@ var Application = (function() {
 	}
 	
 	Application.prototype = {
+		applicationId: function() {
+			return this._applicationId;
+		},
+		applicationAccessor: function() {
+			return this._accessor;
+		},
+		accessor: function() {
+			return this._accessor + ' application';
+		},
+		application: function() {
+			return this;
+		},
+		
 		origin: function(origin) {
 			if( !arguments.length ) return this._origin || location.href;
 			
@@ -111,15 +107,7 @@ var Application = (function() {
 		component: function(id, cls) {
 			if( typeof(id) !== 'string' || ~id.indexOf('.') ) return console.error('illegal component id:' + id);			
 			if( arguments.length === 1 ) {
-				var cmp = this._cmps[id];					
-				if( cmp ) return cmp;
-				
-				if( this === local ) return console.error('[WARN] not exists component:' + id);
-				
-				var pcmp = local.component(id);
-				if( pcmp ) cls = pcmp.source();
-				
-				if( !cls ) return console.error('[WARN] not exists component:' + id);
+				return this._cmps[id];
 			}
 			
 			if( typeof(cls) === 'string' ) cls = require(this.path(cls));
@@ -152,9 +140,8 @@ var Application = (function() {
 				if( !c.superclass ) break;
 			}
 			
-			var accessor = (this.constructor.applicationAccessor() + ' ' + ids.reverse().join(' ')).trim();
+			var accessor = (this.applicationAccessor() + ' ' + ids.reverse().join(' ')).trim();
 			
-			// reserve
 			if( false ) {
 				var parser = new less.Parser({});
 				parser.parse(Ajax.get('login/login.less'), function (err, root) { 
@@ -163,11 +150,8 @@ var Application = (function() {
 				   	var css = root.toCSS(); 
 					console.log(css);
 				});
-			}			
+			}
 			
-			cmp.source = function() {
-				return cls;
-			};
 			cmp.application = function() {
 				return self;
 			};
@@ -202,12 +186,10 @@ var Application = (function() {
 			}
 			
 			if( debug('ui') ) {
-				console.info('[' + this.accessor() + '] component registerd', '[' + cmp.id() + ',' + fname + ']', Util.outline(cmp));
+				console.info('[' + this.applicationId() + '] component added', '[' + cmp.id() + ',' + fname + ']', Util.outline(cmp));
 			}
 			
-			if( cls.translator ) {
-				this.tag(id, cls.translator);
-			}
+			if( cls.translator ) this.tag(id, cls.translator);
 			
 			cmp.translator = function() {
 				return cls.translator;
@@ -346,21 +328,25 @@ var Application = (function() {
 	Application.translator('component', function(el, attrs) {
 		var app = this;
 		var id = attrs.id;
-		var src = attrs.src;		
+		var src = attrs.src;
 
-		if( debug('translator') ) console.log('translate component', id, src);
+		if( debug('translator') ) console.log('[' + this.applicationId() + '] component tag found [' + id + '] src="' + src + '"');
 		
-		app.component(id, src);
+		try {
+			app.component(id, src);
+		} catch(e) {
+			console.warn('[' + this.applicationId() + '] component load failure. [' + id + '] src="' + src + '"', e);
+		} 
 		return false;
 	});
 		
 	return Application;
 })();
+
+var UI = Application;
 	
 // initial application setting
-(function() {
-	var $ = require('attrs.dom');
-	
+(function() {	
 	// create default application
 	var app = new Application(location.href);	
 	Application.local = function() {
@@ -370,7 +356,7 @@ var Application = (function() {
 	// auto pack
 	var autopack = Framework.parameters['autopack'];
 	if( !autopack || autopack.toLowerCase() !== 'false' ) {
-		if( debug('ui') ) console.log('autopack on');
+		if( debug('ui') ) console.info('[ui.alien] autopack on');
 		
 		$.ready(function(e) {
 			app.translate(document.body);
@@ -406,11 +392,6 @@ var Application = (function() {
 	$.on('load', function(e) {
 		if( debug('hash') ) console.log('hash controller invoke');
 		HashController.invoke();
-	});
-	
-	// exports Application as 'ui'
-	define('ui', function(module) {
-		module.exports = Application;
 	});
 })();
 

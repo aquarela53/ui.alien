@@ -25,7 +25,7 @@
 			console.log('\ttotal elapsed time: ' + (new Date().getTime() - __build_info__.starttime) + ' ms');
 		}
 	};
-	
+
 	// extract global options in meta tag
 	(function() {
 		var argm = document.getElementsByTagName('meta');
@@ -39,7 +39,7 @@
 			}
 		}
 	})();
-	
+
 	// setup debug object
 	var debug = (function(p) {
 		return function(category) {
@@ -53,12 +53,17 @@
 					else if( p['debug.' + c] === 'true' ) return true;
 				}
 			}
-			
+		
 			return (p['debug'] !== 'true') ? false : true;
 		}; 
 	})(Framework.parameters);
-	
+
 	if(debug()) console.debug(Framework.name + '[' + Framework.version + '] started with \n' + JSON.stringify(Framework.parameters, null, '\t'));
+
+	// to global use
+	var $ = require('attrs.dom');
+	var Ajax = require('ajax');
+	var Path = require('path');
 	
 	/* debug test
 	console.log('ui.controls.html', debug('ui.controls.html') );

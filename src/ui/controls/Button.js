@@ -1,7 +1,5 @@
 (function() {
 	"use strict"
-	
-	var UI = require('ui');
 
 	function Button(options) {
 		this.$super(options);

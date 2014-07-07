@@ -97,6 +97,4 @@ var HashController = (function() {
 })();
 
 
-define('attrs.hash', function(module) {
-	module.exports = HashController;
-});
+

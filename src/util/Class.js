@@ -65,27 +65,30 @@ var Class = (function() {
 
 			// define cls class
 			var cls = function cls() {constructor.apply(this, arguments);}			
-			cls.__meta__ = {};
+			//cls.__meta__ = {};
 			
 			// for debug
 			if( debug ) {
 				var name = fname(clz);
 				eval('cls = function ' + (name || 'anonymous') + '() {constructor.apply(this, arguments);}');
-				cls.__meta__ = {};
-				cls.__meta__.name = name;
+				//cls.__meta__ = {};
+				//cls.__meta__.name = name;
 			}
 
 			// inheritance
 			if( sclz ) cls.prototype = new sclz(_);
 			cls.prototype.constructor = cls;
 			
-			cls.__meta__.origin = clz;
-			cls.__meta__.superclass = sclz;
+			//cls.__meta__.origin = clz;
+			//cls.__meta__.superclass = sclz;
 			cls.clone = function() {
 				return Class.inherit(clz, sclz, instantiatable);
 			};
 			cls.superclass = function() {
 				return sclz;
+			};
+			cls.origin = function() {
+				return clz;	
 			};
 
 			// copy prototype

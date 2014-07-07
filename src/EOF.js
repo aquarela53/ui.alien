@@ -4,14 +4,18 @@
 	HashController.start();
 
 	// bundle require binding
-	define('debug', function(module) { module.exports = debug; });
 	define('color', function(module) { module.exports = Color; });
-	define('document', function(module) { module.exports = document; });
 	define('class', function(module) { module.exports = Class; });
+	
 	define('style.system', function(module) { module.exports = StyleSystem; });
 	define('style', function(module) { module.exports = Style; });
 	define('theme', function(module) { module.exports = Theme; });
+	
+	define('util', function(module) { module.exports = Util; });	
+	define('hash', function(module) { module.exports = HashController; });	
 	define('framework', function(module) { module.exports = Framework; });
+	define('debug', function(module) { module.exports = debug; });
+	define('ui', function(module) { module.exports = Application; });
 	
 	// mark build time
 	Framework.buildtime = (Framework.finishtime = new Date().getTime()) - Framework.starttime;
