@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-07 2:3:10
+ * @date: 2014-07-07 16:16:25
 */
 
 // es6 shim
@@ -6479,7 +6479,7 @@ var EventDispatcher = (function() {
 	 *			un: Function(),
 	 *			has: Function(),
 	 *			fire: Function(),
-	 *			fireSync: Function(),
+	 *			fireASync: Function(),
 	 *			dispatchEvent: Function()
 	 *			
 	 *		}
@@ -6610,8 +6610,8 @@ var EventDispatcher = (function() {
 			o.has = function() {
 				return self.has.apply(self, arguments);
 			};
-			o.fireSync = function() {
-				return self.fireSync.apply(self, arguments);
+			o.fireASync = function() {
+				return self.fireASync.apply(self, arguments);
 			};
 			o.fire = function() {
 				return self.fire.apply(self, arguments);
@@ -6664,7 +6664,7 @@ var EventDispatcher = (function() {
 					capture: capture
 				};
 				items.push(item);
-				this.fireSync('event.on', item);
+				this.fire('event.on', item);
 			}
 
 			return this;
@@ -6687,7 +6687,7 @@ var EventDispatcher = (function() {
 					if( item && item.type === type && item.handler === fn && item.capture === capture) {
 						items[x] = null;
 						items = items.splice(x, 1);
-						this.fireSync('event.un', item);
+						this.fire('event.un', item);
 					}
 				}
 			}
@@ -6716,16 +6716,16 @@ var EventDispatcher = (function() {
 					} else {
 						console.warn('invalid event listener(bypassed)', handler.toString());
 					}
-
-					if( result === false ) event.preventDefault();						
+					
+					if( result === false ) event.stopPropagation();
 					if( event.cancelBubble ) break;
 				}
 			}
 
 			return this;
 		},
-		fireSync: function(action, values, fn) {
-			//if( action === 'named' ) console.error('fireSync', action, values);
+		fire: function(action, values, fn) {
+			//if( action === 'named' ) console.error('fire', action, values);
 			if( typeof(action) !== 'string' ) return null;
 
 			var event = new EventObject({
@@ -6763,13 +6763,13 @@ var EventDispatcher = (function() {
 
 			return event;
 		},
-		fire: function(action, values, fn) {
+		fireASync: function(action, values, fn) {
 			//if( action === 'named' ) console.error('fire', action, values);
 			if( typeof(action) !== 'string' ) return this;
 
 			var self = this;
 			setTimeout(function() {
-				self.fireSync(action, values, fn);
+				self.fire(action, values, fn);
 			}, 1);
 
 			return this;
@@ -7547,8 +7547,8 @@ var Style = (function() {
 				try { delete this[rule]; } catch(e) {}
 			}
 
-			dispatcher.fireSync('cleared');
-			dispatcher.fireSync('changed');
+			dispatcher.fire('cleared');
+			dispatcher.fire('changed');
 			return this;
 		},
 		reset: function(source) {
@@ -7564,8 +7564,8 @@ var Style = (function() {
 			this.set(source);
 			dispatcher.silent(silent);
 
-			dispatcher.fireSync('reset', {source:source});
-			dispatcher.fireSync('changed');
+			dispatcher.fire('reset', {source:source});
+			dispatcher.fire('changed');
 			return this;
 		},
 		set: function(rule, value, event) {
@@ -7609,7 +7609,7 @@ var Style = (function() {
 					
 							// bind events
 							var fn = function(e) {
-								dispatcher.fireSync('changed', {rule:rule, originalEvent:e.originalEvent || e});
+								dispatcher.fire('changed', {rule:rule, originalEvent:e.originalEvent || e});
 							};
 							style.on('changed', fn).__listener__ = fn;
 						}
@@ -7621,7 +7621,7 @@ var Style = (function() {
 					
 					// bind events
 					var fn = function(e) {
-						dispatcher.fireSync('changed', {rule:rule, originalEvent:e.originalEvent || e});
+						dispatcher.fire('changed', {rule:rule, originalEvent:e.originalEvent || e});
 					};
 					style.on('changed', fn).__listener__ = fn;
 
@@ -7633,9 +7633,9 @@ var Style = (function() {
 			}
 			
 			if( event !== false ) {
-				if( p ) dispatcher.fireSync('replaced', {rule:rule, value:value});
-				else dispatcher.fireSync('added', {rule:rule, value:value});
-				dispatcher.fireSync('changed');
+				if( p ) dispatcher.fire('replaced', {rule:rule, value:value});
+				else dispatcher.fire('added', {rule:rule, value:value});
+				dispatcher.fire('changed');
 			}
 			
 			return this;
@@ -7676,7 +7676,7 @@ var Style = (function() {
 						// bind events
 						if( v instanceof Style ) {
 							var fn = function(e) {
-								dispatcher.fireSync('changed', {rule:rule, originalEvent:e.originalEvent || e});
+								dispatcher.fire('changed', {rule:rule, originalEvent:e.originalEvent || e});
 							};
 							style.on('changed', fn).__listener__ = fn;
 						}
@@ -7693,8 +7693,8 @@ var Style = (function() {
 			}
 			
 			if( event !== false ) {
-				dispatcher.fireSync('merged', {rule:rule, value:value});
-				dispatcher.fireSync('changed');
+				dispatcher.fire('merged', {rule:rule, value:value});
+				dispatcher.fire('changed');
 			}
 
 			return this;
@@ -7719,8 +7719,8 @@ var Style = (function() {
 			this[rule] = null;
 			try { delete this[rule]; } catch(e) {}
 
-			dispatcher.fireSync('removed', {rule:rule});
-			dispatcher.fireSync('changed');
+			dispatcher.fire('removed', {rule:rule});
+			dispatcher.fire('changed');
 
 			return this;
 		},
@@ -8365,7 +8365,7 @@ var Component = (function() {
 			dispatcher.on.apply(dispatcher, arguments);
 			return this;
 		},
-		un: function(action, fn, bubble) {
+		off: function(action, fn, bubble) {
 			if( typeof(action) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', action, fn, bubble);
 	
 			var dispatcher = this._dispatcher;
@@ -8380,16 +8380,72 @@ var Component = (function() {
 			dispatcher.un.apply(dispatcher, arguments);
 			return this;
 		},
-		fireSync: function() {
+		fireASync: function() {
 			var d = this._dispatcher;
 			if( !d ) return;
-			return d.fireSync.apply(d, arguments);
+			return d.fireASync.apply(d, arguments);
 		},
 		fire: function() {
 			var d = this._dispatcher;
 			if( !d ) return;
 			return d.fire.apply(d, arguments);
 		},
+
+		
+		// page mapping by url hash
+		hash: function(hash, fn) {
+			if( arguments.length === 1 && hash === false ) {
+				// 다 지움
+				var hashset = this._hashset;
+				if( !hashset ) return this;
+				
+				for(var k in hashset) {
+					if( !hashset.hasOwnProperty(k) ) continue;
+					
+					var fn = hashset[k];
+					if( fn ) this.off('hash', fn.listener);
+					
+					hashset[k] = null;
+					try { delete hashset[k]; } catch(e) {}
+				}
+				
+				return this;
+			} else if( typeof(hash) === 'string' && fn === false ) {
+				// 해당 hash 만 지움
+				var hashset = this._hashset;
+				if( !hashset ) return this;
+				
+				var fn = hashset[hash];				
+				if( fn ) this.off('hash', fn.listener);
+								
+				hashset[hash] = null;
+				try { delete hashset[hash]; } catch(e) {}
+				
+				return this;
+			} else if( typeof(hash) === 'string' && typeof(fn) === 'function' ) {
+				// hash 이벤트 등록
+				var hashset = this._hashset;
+				if( !hashset ) hashset = this._hashset = {};
+				
+				var listener = (function(hash, fn) {
+					return function(e) {
+						if( hash === '*' || e.hash === hash ) return fn.call(this, e);
+					};
+				})(hash, fn);
+				
+				fn.listener = listener;
+				
+				this.on('hash', listener);
+				
+				return this;
+			} else {
+				return console.error('illegal parameter', hash, fn);
+			}
+			
+			return this;
+		},
+		
+		// misc		
 		toJSON: function() {
 			var o = this.options.toJSON();
 
@@ -8522,7 +8578,7 @@ var Container = (function() {
 					if( !item && item !== 0 ) continue;
 					
 					// evaluation for available to add
-					var e = this.fireSync('add', {
+					var e = this.fire('add', {
 						cancelable: true,
 						item: item,
 						index: ((index === -1) ? this.length() - 1 : index + 1)
@@ -8539,7 +8595,7 @@ var Container = (function() {
 						this._items = this._items.splice(at, 0, item);
 					}
 
-					e = this.fireSync('added', {item:item, index:this.indexOf(item)});
+					e = this.fire('added', {item:item, index:this.indexOf(item)});
 				}
 			}
 
@@ -8553,7 +8609,7 @@ var Container = (function() {
 			this._items = this._items.filter(function(c) {
 				return (c === item) ? false : true;
 			});
-			this.fireSync('removed', {item:item});
+			this.fire('removed', {item:item});
 
 			return this;
 		},
@@ -8563,7 +8619,7 @@ var Container = (function() {
 				this.remove(i);
 			}
 
-			this.fireSync('removedAll');
+			this.fire('removedAll');
 			return this;
 		},
 		items: function(items) {
@@ -8628,6 +8684,7 @@ var Application = (function() {
 	
 	var seq = 0;
 	
+	// TODO : Application 객체는 생성될 때 콘크리트도 분리되어서 생성되어야 하지만 지금은 그렇지 못함. 고쳐야 해
 	function Application(options) {
 		if( typeof(options) === 'string' ) options = {origin:options};
 		
@@ -8643,20 +8700,22 @@ var Application = (function() {
 			return self;
 		};
 		
-		var accessor = 'aui ctx-' + (seq++);
+		var applicationId = this.applicationId = 'app-' + (seq++);
+		var accessor = 'aui app-' + applicationId;
 		this.constructor.applicationAccessor = function() {
 			return accessor;
 		};
+		
 		this.constructor.accessor = function() {
 			return accessor + ' application';
 		};
 		
-		for(var k in BUNDLES.translators) {
-			this.tag(k, BUNDLES.translators[k]);
-		}
-		
 		for(var k in BUNDLES.components) {
 			this.component(k, BUNDLES.components[k]);
+		}
+		
+		for(var k in BUNDLES.translators) {
+			this.tag(k, BUNDLES.translators[k]);
 		}
 		
 		options = options || {};
@@ -8689,35 +8748,13 @@ var Application = (function() {
 			return this;
 		},
 		
-		// page mapping by url hash
-		page: function(hash, fn) {
-			var pages = this._pages;
-			if( !pages ) pages = this._pages = {};
-			
-			if( !arguments.length ) return pages;
-			if( arguments.length === 1 && typeof(hash) === 'string' ) return pages[hash];
-			if( typeof(hash) !== 'string' || typeof(fn) !== 'function' ) return console.error('illegal parameter', hash, fn);
-											
-			var arr = pages[hash];
-			if( !arr ) arr = pages[hash] = [];
-			
-			arr.push(fn);
-			
-			this.fire('page.added', {
-				hash: hash,
-				fn: fn
-			});
-			
-			return this;
-		},
-		
 		// theme & components
 		theme: function(name) {
 			if( !this._themes ) this._themes = {};
 
 			var themes = this._themes;
 			var theme = themes[name];
-			if( !theme ) theme = themes[name] = new Theme(this, name);				
+			if( !theme ) theme = themes[name] = new Theme(this, name);
 			
 			return theme;
 		},
@@ -8727,7 +8764,7 @@ var Application = (function() {
 			var args = [];
 			var themes = this._themes;
 			for(var k in themes) 
-				if( k && themes.hasOwnProperty(k) ) args.push(k);					
+				if( k && themes.hasOwnProperty(k) ) args.push(k);
 			
 			return args;
 		},
@@ -8759,7 +8796,7 @@ var Application = (function() {
 				if( !cls ) return console.error('[WARN] not exists component:' + id);
 			}
 			
-			if( typeof(cls) === 'string' ) cls = require(cls);
+			if( typeof(cls) === 'string' ) cls = require(this.path(cls));
 			if( typeof(cls) !== 'function' ) return console.error('[WARN] invalid component class:' + id, cls);
 			
 			var inherit = cls.inherit;
@@ -8839,7 +8876,7 @@ var Application = (function() {
 			}
 			
 			if( debug('ui') ) {
-				console.info('[' + this.id() + '] component registerd', '[' + cmp.id() + ',' + fname + ']', Util.outline(cmp));
+				console.info('[' + this.accessor() + '] component registerd', '[' + cmp.id() + ',' + fname + ']', Util.outline(cmp));
 			}
 			
 			if( cls.translator ) {
@@ -8955,7 +8992,7 @@ var Application = (function() {
 		var hash = attrs.hash;
 		if( typeof(hash) !== 'string' ) return console.warn('attributes "hash" required', el);
 	
-		ctx.page(hash, function(e) {
+		ctx.hash(hash, function(e) {
 			var actions = $(this).children('action');
 			
 			console.log('actions', actions);
@@ -8976,6 +9013,7 @@ var Application = (function() {
 				}
 			}
 		});
+		return false;
 	});
 	
 	// <component id="cmpid" src="dir/file.js"></component>
@@ -8983,18 +9021,23 @@ var Application = (function() {
 		var app = this;
 		var id = attrs.id;
 		var src = attrs.src;		
+
+		if( debug('translator') ) console.log('translate component', id, src);
+		
 		app.component(id, src);
+		return false;
 	});
 		
 	return Application;
 })();
 	
+// initial application setting
 (function() {
 	var $ = require('attrs.dom');
 	
-	// regist default application
+	// create default application
 	var app = new Application(location.href);	
-	Application.application = function() {
+	Application.local = function() {
 		return app;
 	};
 	
@@ -9006,23 +9049,36 @@ var Application = (function() {
 		$.ready(function(e) {
 			app.translate(document.body);
 			//app.items(document.body.children).attachTo(document.body);
-			console.log(Application.application().dom());
 			app.fire('ready');
 		});
 	} else {
 		console.log('autopack off');
 	}
 	
-	
-	// regist hash control	
+	// regist global hash control	
 	HashController.regist(function(hash, location) {
 		if( debug('hash') ) console.log('hash changed "' + hash + '"');
+		
+		var e = app.fire('hash', {
+			hash: hash
+		});
+		if( e.cancelBubble === true ) return false;
+		
 		$(document.body).visit(function() {
-			//console.log('visiting for page controlling', this);
+			var cmp = $(this).data('component');
+			if( cmp instanceof Component ) {
+				if( debug('hash') ) console.log('visiting component', cmp.accessor());
+				var e = cmp.fire('hash', {
+					hash: hash
+				});
+				if( e.cancelBubble === true ) return false;
+			}
 		});
 	});
 	
-	$.ready(function(e) {
+	// invoke current hash after application ready
+	$.on('load', function(e) {
+		if( debug('hash') ) console.log('hash controller invoke');
 		HashController.invoke();
 	});
 	

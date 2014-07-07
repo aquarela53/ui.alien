@@ -67,7 +67,7 @@ var EventDispatcher = (function() {
 	 *			un: Function(),
 	 *			has: Function(),
 	 *			fire: Function(),
-	 *			fireSync: Function(),
+	 *			fireASync: Function(),
 	 *			dispatchEvent: Function()
 	 *			
 	 *		}
@@ -198,8 +198,8 @@ var EventDispatcher = (function() {
 			o.has = function() {
 				return self.has.apply(self, arguments);
 			};
-			o.fireSync = function() {
-				return self.fireSync.apply(self, arguments);
+			o.fireASync = function() {
+				return self.fireASync.apply(self, arguments);
 			};
 			o.fire = function() {
 				return self.fire.apply(self, arguments);
@@ -252,7 +252,7 @@ var EventDispatcher = (function() {
 					capture: capture
 				};
 				items.push(item);
-				this.fireSync('event.on', item);
+				this.fire('event.on', item);
 			}
 
 			return this;
@@ -275,7 +275,7 @@ var EventDispatcher = (function() {
 					if( item && item.type === type && item.handler === fn && item.capture === capture) {
 						items[x] = null;
 						items = items.splice(x, 1);
-						this.fireSync('event.un', item);
+						this.fire('event.un', item);
 					}
 				}
 			}
@@ -304,16 +304,16 @@ var EventDispatcher = (function() {
 					} else {
 						console.warn('invalid event listener(bypassed)', handler.toString());
 					}
-
-					if( result === false ) event.preventDefault();						
+					
+					if( result === false ) event.stopPropagation();
 					if( event.cancelBubble ) break;
 				}
 			}
 
 			return this;
 		},
-		fireSync: function(action, values, fn) {
-			//if( action === 'named' ) console.error('fireSync', action, values);
+		fire: function(action, values, fn) {
+			//if( action === 'named' ) console.error('fire', action, values);
 			if( typeof(action) !== 'string' ) return null;
 
 			var event = new EventObject({
@@ -351,13 +351,13 @@ var EventDispatcher = (function() {
 
 			return event;
 		},
-		fire: function(action, values, fn) {
+		fireASync: function(action, values, fn) {
 			//if( action === 'named' ) console.error('fire', action, values);
 			if( typeof(action) !== 'string' ) return this;
 
 			var self = this;
 			setTimeout(function() {
-				self.fireSync(action, values, fn);
+				self.fire(action, values, fn);
 			}, 1);
 
 			return this;

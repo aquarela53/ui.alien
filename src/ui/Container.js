@@ -45,7 +45,7 @@ var Container = (function() {
 					if( !item && item !== 0 ) continue;
 					
 					// evaluation for available to add
-					var e = this.fireSync('add', {
+					var e = this.fire('add', {
 						cancelable: true,
 						item: item,
 						index: ((index === -1) ? this.length() - 1 : index + 1)
@@ -62,7 +62,7 @@ var Container = (function() {
 						this._items = this._items.splice(at, 0, item);
 					}
 
-					e = this.fireSync('added', {item:item, index:this.indexOf(item)});
+					e = this.fire('added', {item:item, index:this.indexOf(item)});
 				}
 			}
 
@@ -76,7 +76,7 @@ var Container = (function() {
 			this._items = this._items.filter(function(c) {
 				return (c === item) ? false : true;
 			});
-			this.fireSync('removed', {item:item});
+			this.fire('removed', {item:item});
 
 			return this;
 		},
@@ -86,7 +86,7 @@ var Container = (function() {
 				this.remove(i);
 			}
 
-			this.fireSync('removedAll');
+			this.fire('removedAll');
 			return this;
 		},
 		items: function(items) {

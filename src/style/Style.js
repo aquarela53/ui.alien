@@ -160,8 +160,8 @@ var Style = (function() {
 				try { delete this[rule]; } catch(e) {}
 			}
 
-			dispatcher.fireSync('cleared');
-			dispatcher.fireSync('changed');
+			dispatcher.fire('cleared');
+			dispatcher.fire('changed');
 			return this;
 		},
 		reset: function(source) {
@@ -177,8 +177,8 @@ var Style = (function() {
 			this.set(source);
 			dispatcher.silent(silent);
 
-			dispatcher.fireSync('reset', {source:source});
-			dispatcher.fireSync('changed');
+			dispatcher.fire('reset', {source:source});
+			dispatcher.fire('changed');
 			return this;
 		},
 		set: function(rule, value, event) {
@@ -222,7 +222,7 @@ var Style = (function() {
 					
 							// bind events
 							var fn = function(e) {
-								dispatcher.fireSync('changed', {rule:rule, originalEvent:e.originalEvent || e});
+								dispatcher.fire('changed', {rule:rule, originalEvent:e.originalEvent || e});
 							};
 							style.on('changed', fn).__listener__ = fn;
 						}
@@ -234,7 +234,7 @@ var Style = (function() {
 					
 					// bind events
 					var fn = function(e) {
-						dispatcher.fireSync('changed', {rule:rule, originalEvent:e.originalEvent || e});
+						dispatcher.fire('changed', {rule:rule, originalEvent:e.originalEvent || e});
 					};
 					style.on('changed', fn).__listener__ = fn;
 
@@ -246,9 +246,9 @@ var Style = (function() {
 			}
 			
 			if( event !== false ) {
-				if( p ) dispatcher.fireSync('replaced', {rule:rule, value:value});
-				else dispatcher.fireSync('added', {rule:rule, value:value});
-				dispatcher.fireSync('changed');
+				if( p ) dispatcher.fire('replaced', {rule:rule, value:value});
+				else dispatcher.fire('added', {rule:rule, value:value});
+				dispatcher.fire('changed');
 			}
 			
 			return this;
@@ -289,7 +289,7 @@ var Style = (function() {
 						// bind events
 						if( v instanceof Style ) {
 							var fn = function(e) {
-								dispatcher.fireSync('changed', {rule:rule, originalEvent:e.originalEvent || e});
+								dispatcher.fire('changed', {rule:rule, originalEvent:e.originalEvent || e});
 							};
 							style.on('changed', fn).__listener__ = fn;
 						}
@@ -306,8 +306,8 @@ var Style = (function() {
 			}
 			
 			if( event !== false ) {
-				dispatcher.fireSync('merged', {rule:rule, value:value});
-				dispatcher.fireSync('changed');
+				dispatcher.fire('merged', {rule:rule, value:value});
+				dispatcher.fire('changed');
 			}
 
 			return this;
@@ -332,8 +332,8 @@ var Style = (function() {
 			this[rule] = null;
 			try { delete this[rule]; } catch(e) {}
 
-			dispatcher.fireSync('removed', {rule:rule});
-			dispatcher.fireSync('changed');
+			dispatcher.fire('removed', {rule:rule});
+			dispatcher.fire('changed');
 
 			return this;
 		},

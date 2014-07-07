@@ -517,7 +517,7 @@ var Component = (function() {
 			dispatcher.on.apply(dispatcher, arguments);
 			return this;
 		},
-		un: function(action, fn, bubble) {
+		off: function(action, fn, bubble) {
 			if( typeof(action) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', action, fn, bubble);
 	
 			var dispatcher = this._dispatcher;
@@ -532,16 +532,72 @@ var Component = (function() {
 			dispatcher.un.apply(dispatcher, arguments);
 			return this;
 		},
-		fireSync: function() {
+		fireASync: function() {
 			var d = this._dispatcher;
 			if( !d ) return;
-			return d.fireSync.apply(d, arguments);
+			return d.fireASync.apply(d, arguments);
 		},
 		fire: function() {
 			var d = this._dispatcher;
 			if( !d ) return;
 			return d.fire.apply(d, arguments);
 		},
+
+		
+		// page mapping by url hash
+		hash: function(hash, fn) {
+			if( arguments.length === 1 && hash === false ) {
+				// 다 지움
+				var hashset = this._hashset;
+				if( !hashset ) return this;
+				
+				for(var k in hashset) {
+					if( !hashset.hasOwnProperty(k) ) continue;
+					
+					var fn = hashset[k];
+					if( fn ) this.off('hash', fn.listener);
+					
+					hashset[k] = null;
+					try { delete hashset[k]; } catch(e) {}
+				}
+				
+				return this;
+			} else if( typeof(hash) === 'string' && fn === false ) {
+				// 해당 hash 만 지움
+				var hashset = this._hashset;
+				if( !hashset ) return this;
+				
+				var fn = hashset[hash];				
+				if( fn ) this.off('hash', fn.listener);
+								
+				hashset[hash] = null;
+				try { delete hashset[hash]; } catch(e) {}
+				
+				return this;
+			} else if( typeof(hash) === 'string' && typeof(fn) === 'function' ) {
+				// hash 이벤트 등록
+				var hashset = this._hashset;
+				if( !hashset ) hashset = this._hashset = {};
+				
+				var listener = (function(hash, fn) {
+					return function(e) {
+						if( hash === '*' || e.hash === hash ) return fn.call(this, e);
+					};
+				})(hash, fn);
+				
+				fn.listener = listener;
+				
+				this.on('hash', listener);
+				
+				return this;
+			} else {
+				return console.error('illegal parameter', hash, fn);
+			}
+			
+			return this;
+		},
+		
+		// misc		
 		toJSON: function() {
 			var o = this.options.toJSON();
 

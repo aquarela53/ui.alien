@@ -10,8 +10,9 @@
 		
 		<!-- attrs.ui initial paramters -->
 		<meta name="attrs.ui.autopack" content="true">
-		<meta name="attrs.ui.debug" content="false">
-		<meta name="attrs.ui.debug.mutation" content="false">
+		<meta name="attrs.ui.debug" content="true">
+		<meta name="attrs.ui.debug.translator" content="true">
+		<meta name="attrs.ui.debug.hash" content="false">
 		
 		<title>UI.Alien</title>
 
@@ -21,51 +22,34 @@
 		
 		<script type="text/javascript">
 		//<![CDATA[
-			/*
-			호출순서
-			 content loading
-			 fire load
-			 content inspecting
-			 fire
-			 fire page
-			 fire ready
-			*/
-			
 			(function() {
-				var app = require('ui').application();
-				var $ = require('attrs.dom');
-				var Ajax = require('ajax');
-				var Util = require('attrs.util');
+				var app = require('ui').local();
 				var debug = require('debug');
 				
-				// event monitoring
-				app.on('*', function(e) {
-					//console.log('[' + this.id() + '] event fired', e.type, e);
-				});
-				
-				app.page('guide', function(e) {
-					this.find('#content').load('guide.html');
-					this.find('side-navigation').load('./data/guide.ui.json');
-			
-					return false;
-				});
-				
-				var view = app.pack({
-					component: 'view',
-					horizontal: true,
-					items: [
-						{
-							component: 'html',
-							html: 'html!'
-						}, {
-							component: 'btn',
-							text: '버튼!'
-						}
-					]
-				});
-				
 				app.on('ready', function(e) {
-					console.log('ready');		
+					console.log('ready');
+					
+					var view = app.pack({
+						component: 'view',
+						horizontal: true,
+						items: [
+							{
+								component: 'html',
+								html: 'html!'
+							}, {
+								component: 'timetable',
+								cols: ['room1', 'room2', 'room3'],
+								rows: 'date',
+								mapper: {
+									col: function(data) {
+										var booked = data.booked;
+									},
+									row: function(data) {
+									}
+								}
+							}
+						]
+					});
 					view.attachTo('#content', 1);
 				});
 			})();
@@ -73,7 +57,7 @@
 		</script>
 	</head>
 	<body>
-		<component id="login" src="./login/LoginUI.js" tag="login"></component>
+		<component id="timetable" src="components/timetable/Timetable.js" tag="login"></component>
 		<page hash="test">
 			<action type="import" target="#content" src="html/page2.html"></action>
 		</page>

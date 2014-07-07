@@ -10,6 +10,7 @@ var Application = (function() {
 	
 	var seq = 0;
 	
+	// TODO : Application 객체는 생성될 때 콘크리트도 분리되어서 생성되어야 하지만 지금은 그렇지 못함. 고쳐야 해
 	function Application(options) {
 		if( typeof(options) === 'string' ) options = {origin:options};
 		
@@ -25,20 +26,22 @@ var Application = (function() {
 			return self;
 		};
 		
-		var accessor = 'aui ctx-' + (seq++);
+		var applicationId = this.applicationId = 'app-' + (seq++);
+		var accessor = 'aui app-' + applicationId;
 		this.constructor.applicationAccessor = function() {
 			return accessor;
 		};
+		
 		this.constructor.accessor = function() {
 			return accessor + ' application';
 		};
 		
-		for(var k in BUNDLES.translators) {
-			this.tag(k, BUNDLES.translators[k]);
-		}
-		
 		for(var k in BUNDLES.components) {
 			this.component(k, BUNDLES.components[k]);
+		}
+		
+		for(var k in BUNDLES.translators) {
+			this.tag(k, BUNDLES.translators[k]);
 		}
 		
 		options = options || {};
@@ -71,35 +74,13 @@ var Application = (function() {
 			return this;
 		},
 		
-		// page mapping by url hash
-		page: function(hash, fn) {
-			var pages = this._pages;
-			if( !pages ) pages = this._pages = {};
-			
-			if( !arguments.length ) return pages;
-			if( arguments.length === 1 && typeof(hash) === 'string' ) return pages[hash];
-			if( typeof(hash) !== 'string' || typeof(fn) !== 'function' ) return console.error('illegal parameter', hash, fn);
-											
-			var arr = pages[hash];
-			if( !arr ) arr = pages[hash] = [];
-			
-			arr.push(fn);
-			
-			this.fire('page.added', {
-				hash: hash,
-				fn: fn
-			});
-			
-			return this;
-		},
-		
 		// theme & components
 		theme: function(name) {
 			if( !this._themes ) this._themes = {};
 
 			var themes = this._themes;
 			var theme = themes[name];
-			if( !theme ) theme = themes[name] = new Theme(this, name);				
+			if( !theme ) theme = themes[name] = new Theme(this, name);
 			
 			return theme;
 		},
@@ -109,7 +90,7 @@ var Application = (function() {
 			var args = [];
 			var themes = this._themes;
 			for(var k in themes) 
-				if( k && themes.hasOwnProperty(k) ) args.push(k);					
+				if( k && themes.hasOwnProperty(k) ) args.push(k);
 			
 			return args;
 		},
@@ -141,7 +122,7 @@ var Application = (function() {
 				if( !cls ) return console.error('[WARN] not exists component:' + id);
 			}
 			
-			if( typeof(cls) === 'string' ) cls = require(cls);
+			if( typeof(cls) === 'string' ) cls = require(this.path(cls));
 			if( typeof(cls) !== 'function' ) return console.error('[WARN] invalid component class:' + id, cls);
 			
 			var inherit = cls.inherit;
@@ -221,7 +202,7 @@ var Application = (function() {
 			}
 			
 			if( debug('ui') ) {
-				console.info('[' + this.id() + '] component registerd', '[' + cmp.id() + ',' + fname + ']', Util.outline(cmp));
+				console.info('[' + this.accessor() + '] component registerd', '[' + cmp.id() + ',' + fname + ']', Util.outline(cmp));
 			}
 			
 			if( cls.translator ) {
@@ -337,7 +318,7 @@ var Application = (function() {
 		var hash = attrs.hash;
 		if( typeof(hash) !== 'string' ) return console.warn('attributes "hash" required', el);
 	
-		ctx.page(hash, function(e) {
+		ctx.hash(hash, function(e) {
 			var actions = $(this).children('action');
 			
 			console.log('actions', actions);
@@ -358,6 +339,7 @@ var Application = (function() {
 				}
 			}
 		});
+		return false;
 	});
 	
 	// <component id="cmpid" src="dir/file.js"></component>
@@ -365,18 +347,23 @@ var Application = (function() {
 		var app = this;
 		var id = attrs.id;
 		var src = attrs.src;		
+
+		if( debug('translator') ) console.log('translate component', id, src);
+		
 		app.component(id, src);
+		return false;
 	});
 		
 	return Application;
 })();
 	
+// initial application setting
 (function() {
 	var $ = require('attrs.dom');
 	
-	// regist default application
+	// create default application
 	var app = new Application(location.href);	
-	Application.application = function() {
+	Application.local = function() {
 		return app;
 	};
 	
@@ -388,23 +375,36 @@ var Application = (function() {
 		$.ready(function(e) {
 			app.translate(document.body);
 			//app.items(document.body.children).attachTo(document.body);
-			console.log(Application.application().dom());
 			app.fire('ready');
 		});
 	} else {
 		console.log('autopack off');
 	}
 	
-	
-	// regist hash control	
+	// regist global hash control	
 	HashController.regist(function(hash, location) {
 		if( debug('hash') ) console.log('hash changed "' + hash + '"');
+		
+		var e = app.fire('hash', {
+			hash: hash
+		});
+		if( e.cancelBubble === true ) return false;
+		
 		$(document.body).visit(function() {
-			//console.log('visiting for page controlling', this);
+			var cmp = $(this).data('component');
+			if( cmp instanceof Component ) {
+				if( debug('hash') ) console.log('visiting component', cmp.accessor());
+				var e = cmp.fire('hash', {
+					hash: hash
+				});
+				if( e.cancelBubble === true ) return false;
+			}
 		});
 	});
 	
-	$.ready(function(e) {
+	// invoke current hash after application ready
+	$.on('load', function(e) {
+		if( debug('hash') ) console.log('hash controller invoke');
 		HashController.invoke();
 	});
 	
