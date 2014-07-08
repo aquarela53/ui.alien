@@ -23,14 +23,20 @@ var Component = (function() {
 		var cls = this.constructor;
 
 		if( o.debug ) this.debug = true;
-
-		// create el
-		if( !this.el ) this.el = $.create((o.tag || cls.tag || 'div'));
-		else if( !o.el ) this.el.restore('#create');
-				
-		// setup el	
-		var el = this.el.attr(o.attrs).data('component', this).classes(this.accessor());
 		
+		// if rebuild component
+		var el;
+		if( this.el ) {
+			el = this.el.restore('first').data('component', false);
+		} else {
+			if( isElement(o.el) ) el = $(o.el);
+			else if( !o.el ) el = $.create((o.tag || cls.tag || 'div'));
+			else if( el instanceof $ ) el = o.el;
+			else throw new TypeError('illegal type "options.el":' + o.el); 
+		}
+				
+		this.el = el.save('first').data('component', this).attr(o.attrs).classes(this.accessor());
+				
 		// confirm event scope
 		var events = o.e || o.events;
 		var scope = (events && events.scope) || this;
@@ -285,7 +291,7 @@ var Component = (function() {
 			if( !arguments.length ) {
 				var accessor = this.accessor().split(' ');
 				
-				return el.classes().split(' ').filter(function(item) {
+				return el.classes().filter(function(item) {
 					return !~accessor.indexOf(item);
 				}).join(' ');
 			}
@@ -497,7 +503,7 @@ var Component = (function() {
 			if( typeof(action) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', action, fn, bubble);
 			
 			var dispatcher = this._dispatcher;
-			if( !dispatcher ) return console.error('[ERROR] where is displatcher?');
+			if( !dispatcher ) return console.error('[ERROR] where is event dispatcher?');
 			
 			// if action is dom element event type, binding events to dom element
 			if( ~DOM_EVENTS.indexOf(action) || action.startsWith('dom.') || action === '*' || action === 'dom.*' ) {
@@ -518,7 +524,7 @@ var Component = (function() {
 			if( typeof(action) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', action, fn, bubble);
 	
 			var dispatcher = this._dispatcher;
-			if( !dispatcher ) return console.error('[ERROR] where is displatcher?');
+			if( !dispatcher ) return console.error('[ERROR] where is event dispatcher?');
 
 			if( ~DOM_EVENTS.indexOf(action) || action.startsWith('dom.') || action == '*' || action == 'el.*' ) {
 				var type = action.startsWith('dom.') ? action.substring(4) : action;
@@ -626,9 +632,9 @@ var Component = (function() {
 		},
 		debug: function() {
 			var cmp = this;
-			var clazz = this.getClass();
+			var concrete = this.concrete();
 			var application = this.application();
-			console.log('= Instanceof ' + clazz.fname() + ' ======================================');
+			console.log('= Instanceof ' + concrete.id() + ':' + concrete.fname() + ' ======================================');
 			
 			console.log('- Framework');
 			console.log('Framework', Framework);
@@ -651,23 +657,22 @@ var Component = (function() {
 			console.log('instance.accessor()', cmp.accessor());
 			console.log('instance.classes()', cmp.classes());
 			
-			console.log('\n- class');
-			console.log('class', clazz);
-			console.log('class.acceptable()', clazz.acceptable());
-			console.log('class.id()', clazz.id());
-			console.log('class.fname()', clazz.fname());
-			console.log('class.accessor()', clazz.accessor());
-			console.log('class.application()', clazz.application());
-			console.log('class.style()', clazz.style());
-			console.log('class.source()', clazz.source());
+			console.log('\n- concrete');
+			console.log('concrete', concrete);
+			console.log('concrete.acceptable()', concrete.acceptable());
+			console.log('concrete.id()', concrete.id());
+			console.log('concrete.fname()', concrete.fname());
+			console.log('concrete.accessor()', concrete.accessor());
+			console.log('concrete.application()', concrete.application());
+			console.log('concrete.style()', concrete.style());
+			console.log('concrete.source()', concrete.source());
 			
 			console.log('\n- application');
 			console.log('application', application);
-			console.log('application.id()', application.id());
-			console.log('application.src()', application.src());
+			console.log('application.applicationId()', application.applicationId());
+			console.log('application.origin()', application.origin());
 			console.log('application.base()', application.base());
 			console.log('application.accessor()', application.accessor());
-			console.log('application.parent()', application.parent());
 			
 			console.log('==============================================');
 		}

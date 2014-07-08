@@ -2,15 +2,15 @@ var Application = (function() {
 	"use strict"
 	
 	var APPLICATIONS = [];
+	var isElement = $.util.isElement;
 	
 	var seq = 0;
 	
 	// class Application
-	function Application(options) {
-		if( typeof(options) === 'string' ) options = {origin:options};
-		
+	function Application(options, argv) {
 		this._cmps = {};
-		this.translator = new TagTranslator(this);
+		this._translator = new TagTranslator(this);
+		this._themes = new ThemeManager();
 		
 		this.Component = Application.Component;
 		this.Container = Application.Container;
@@ -27,15 +27,51 @@ var Application = (function() {
 			this.tag(k, BUNDLES.translators[k]);
 		}
 		
+		// validate options
+		if( typeof(options) === 'string' ) {
+			if( Path.uri(options) === Path.uri(location.href) ) throw new Error('cannot load current location url', options);
+			options = {origin:options};
+			
+			var result = require(Path.join(location.href, options.origin));
+			if( typeof(result) === 'function' ) options.setup = result;
+			else if( typeof(result) === 'object' ) options.items = [result];
+			else if( Array.isArray(result) ) options.item = result;
+		} else if( isElement(options) ) {
+			options = {el:options, translation: true};
+		}
+		
 		options = options || {};
 		if( !options.origin ) options.origin = location.href;
+		if( argv ) options.argv = argv;
 		
 		this.$super(options);
 		
 		APPLICATIONS.push(this);
+		
+		this.fire('ready');
 	}
 	
 	Application.prototype = {
+		build: function() {
+			var o = this.options;
+			
+			if( o.translation ) this.translate(this.el);
+			
+			if( o.setup ) {
+				var fn = o.setup;
+				fn.call(fn, this, (o.argv || {}));
+			}
+			
+			this.on('added', function(e) {
+				this.attach(e.item);
+			});
+
+			this.on('removed', function(e) {
+				if( e.item && e.item.detach ) e.item.detach();
+			});
+			
+			this.$super();
+		},
 		applicationId: function() {
 			return this._applicationId;
 		},
@@ -72,23 +108,24 @@ var Application = (function() {
 		
 		// theme & components
 		theme: function(name) {
-			if( !this._themes ) this._themes = {};
+			/*if( !this._themes ) this._themes = {};
 
 			var themes = this._themes;
 			var theme = themes[name];
 			if( !theme ) theme = themes[name] = new Theme(this, name);
 			
-			return theme;
+			return theme;*/
+			//TODO: 지정된 테마를 기본테마로 변경
+			if( !arguments.length ) return this.themes().current();
+			
+			if( !this.themes().current(name) ) {
+				console.warn('[' + this.applicationId() + '] not exists theme name', name);
+			}
+			
+			return this;
 		},
 		themes: function() {
-			if( !this._themes ) return null;
-			
-			var args = [];
-			var themes = this._themes;
-			for(var k in themes) 
-				if( k && themes.hasOwnProperty(k) ) args.push(k);
-			
-			return args;
+			return this._themes;
 		},
 		stylesheet: function() {
 			if( !this._stylesheet ) this._stylesheet = new StyleSheetManager('attrs.ui.' + this.id() + '.instances');
@@ -105,27 +142,27 @@ var Application = (function() {
 		
 		// define ui component
 		component: function(id, cls) {
-			if( typeof(id) !== 'string' || ~id.indexOf('.') ) return console.error('illegal component id:' + id);			
+			if( typeof(id) !== 'string' || ~id.indexOf('.') ) return console.error('[' + this.applicationId() + '] illegal component id:' + id);			
 			if( arguments.length === 1 ) {
 				return this._cmps[id];
 			}
 			
 			if( typeof(cls) === 'string' ) cls = require(this.path(cls));
-			if( typeof(cls) !== 'function' ) return console.error('[WARN] invalid component class:' + id, cls);
+			if( typeof(cls) !== 'function' ) return console.error('[' + this.applicationId() + '] invalid component class:' + id, cls);
 			
-			var inherit = cls.inherit;
-			
-			if( cls.hasOwnProperty('inherit') && !inherit ) return console.error('invalid inherit, unkwnown \'' + inherit + '\'', cls);
-			
-			if( typeof(inherit) === 'string' ) inherit = this.component(inherit);
-							
 			var self = this;
 			var fname = cls.name || Util.camelcase(id);
-			var superclass = inherit || this.Component;
 			
-			if( !superclass ) return console.error('illegal state, cannot find superclass', superclass, this.Component);
+			var inherit = cls.inherit;			
+			if( cls.hasOwnProperty('inherit') && !inherit ) return console.error('[' + this.applicationId() + '] invalid inherit, unkwnown \'' + inherit + '\'', cls);
+			else if( !inherit || inherit === 'component' ) inherit = this.Component;
+			else if( inherit === 'container' ) inherit = this.Container;
+			else if( inherit === 'application' ) inherit = this.Application;
+			else if( typeof(inherit) === 'string' ) inherit = this.component(inherit);
+						
+			if( !inherit ) return console.error('[' + this.applicationId() + '] illegal state, cannot find superclass', inherit);
 			
-			var cmp = Class.inherit(cls, superclass );
+			var cmp = Class.inherit(cls, inherit);
 			var style = null;	//this.theme().component(id).reset(cls.style);
 			var acceptable = cls.acceptable;
 			acceptable = (acceptable === false) ? false : true;
@@ -177,12 +214,12 @@ var Application = (function() {
 			this._cmps[id] = cmp;				
 			if( fname ) {
 				if( this[fname] ) {
-					console.warn('component fname conflict, so overwrited. before=', this[cmp.fname()], '/after=', cmp);
+					console.warn('[' + this.applicationId() + '] component fname conflict, so overwrited. before=', this[cmp.fname()], '/after=', cmp);
 				} else {
 					this[fname] = cmp;
 				}
 			} else {
-				console.warn('function name was empty', fname);
+				console.warn('[' + this.applicationId() + '] function name was empty', fname);
 			}
 			
 			if( debug('ui') ) {
@@ -203,14 +240,11 @@ var Application = (function() {
 		},
 		
 		// inspects DOM Elements for translates as component
-		tag: function(selector, fn) {
-			if( !arguments.length ) return translator;
-			
-			var translator = this.translator;				
-			if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('invalid parameter(string, function)', arguments);
+		tag: function(selector, fn) {	
+			if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('[' + this.applicationId() + '] invalid parameter(string, function)', arguments);
 
 			var self = this;
-			this.translator.add(selector, function() {
+			this._translator.add(selector, function() {
 				var result = fn.apply(self, arguments);
 				if( result instanceof Component ) return result.dom();
 				return result;
@@ -224,7 +258,14 @@ var Application = (function() {
 			return this;
 		},
 		translate: function(el) {
-			this.translator.translate(el);
+			if( isElement(el) ) el = $(el);
+			else if( !(el instanceof $) ) return console.error('[' + this.applicationId() + '] illegal element', el);
+			
+			var translator = this._translator;
+			el.each(function() {
+				translator.translate(this);
+			});
+			
 			return this;
 		},
 		
@@ -242,11 +283,11 @@ var Application = (function() {
 			}
 			
 			if( !(source && typeof(source.component) === 'string') ) {
-				return console.error('unsupported source type', source);
+				return console.error('[' + this.applicationId() + '] unsupported source type', source);
 			}
 			
 			var cmp = this.component(source.component);
-			if( !cmp ) return console.error('unknown component [' + source.component + ']');
+			if( !cmp ) return console.error('[' + this.applicationId() + '] unknown component [' + source.component + ']');
 			var instance = new cmp(source);
 							
 			this.fire('build', {
@@ -258,7 +299,6 @@ var Application = (function() {
 	};
 	
 	Application = Class.inherit(Application, Container);
-	
 	
 	Application.Component = Component;
 	Application.Container = Container;
@@ -275,7 +315,7 @@ var Application = (function() {
 	};
 	
 	Application.component = function(id, cls) {
-		if( typeof(id) !== 'string' || typeof(cls) !== 'function' ) return console.error('invalid parameter', id, cls);
+		if( typeof(id) !== 'string' || typeof(cls) !== 'function' ) return console.error('[' + Framework.id + '] invalid parameter', id, cls);
 		
 		BUNDLES.components[id] = cls;
 		APPLICATIONS.forEach(function(application) {
@@ -284,7 +324,7 @@ var Application = (function() {
 	};
 	
 	Application.translator = function(selector, fn) {
-		if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('invalid parameter', selector, fn);
+		if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('[' + Framework.id + '] invalid parameter', selector, fn);
 		
 		BUNDLES.translators[selector] = fn;
 		
@@ -298,31 +338,42 @@ var Application = (function() {
 		var ctx = this;
 	
 		var hash = attrs.hash;
-		if( typeof(hash) !== 'string' ) return console.warn('attributes "hash" required', el);
+		if( typeof(hash) !== 'string' ) return console.warn('[' + Framework.id + '] attributes "hash" required', el);
 	
 		ctx.hash(hash, function(e) {
 			var actions = $(this).children('action');
 			
-			console.log('actions', actions);
+			console.log('[' + ctx.applicationId() + '] actions', actions);
 			
 			var target = attrs.target;
 			var src = attrs.src;
-			if( typeof(target) !== 'string' ) return console.warn('attributes "target" required', el);
-			if( typeof(src) !== 'string' ) return console.warn('attributes "src" required', el);
+			if( typeof(target) !== 'string' ) return console.warn('[' + ctx.applicationId() + '] attributes "target" required', el);
+			if( typeof(src) !== 'string' ) return console.warn('[' + ctx.applicationId() + '] attributes "src" required', el);
 		
-			var app = this.load(src);
+			var app = ctx.load(src);
 		
 			if( app ) {
 				var cmp = el.data('component');
 				if( cmp ) {
-					console.log('target cmp', cmp);
+					console.log('[' + ctx.applicationId() + '] target cmp', cmp);
 				} else {
-					console.log('target el', el);
+					console.log('[' + ctx.applicationId() + '] target el', el);
 				}
 			}
 		});
 		return false;
 	});
+	
+	
+	// if autopack is on, fire ready after build default application.
+	var dispatcher = new EventDispatcher().scope(Application);
+	Application.ready = function(fn) {
+		dispatcher.on('ready', fn);
+	};
+	
+	Application.fire = function(type, value) {
+		dispatcher.fire(type, value);
+	};
 	
 	// <component id="cmpid" src="dir/file.js"></component>
 	Application.translator('component', function(el, attrs) {
@@ -347,39 +398,30 @@ var UI = Application;
 	
 // initial application setting
 (function() {	
-	// create default application
-	var app = new Application(location.href);	
-	Application.local = function() {
-		return app;
-	};
-	
 	// auto pack
 	var autopack = Framework.parameters['autopack'];
 	if( !autopack || autopack.toLowerCase() !== 'false' ) {
-		if( debug('ui') ) console.info('[ui.alien] autopack on');
+		if( debug('ui') ) console.info('[' + Framework.id + '] autopack on');
 		
 		$.ready(function(e) {
-			app.translate(document.body);
-			//app.items(document.body.children).attachTo(document.body);
-			app.fire('ready');
+			var app = new Application(document.body);
+			
+			Application.fire('ready', {
+				application: app
+			});
 		});
 	} else {
-		console.log('autopack off');
+		if( debug() ) console.info('[' + Framework.id + '] autopack off');
 	}
 	
 	// regist global hash control	
 	HashController.regist(function(hash, location) {
-		if( debug('hash') ) console.log('hash changed "' + hash + '"');
-		
-		var e = app.fire('hash', {
-			hash: hash
-		});
-		if( e.cancelBubble === true ) return false;
+		if( debug('hash') ) console.log('[' + Framework.id + '] hash changed "' + hash + '"');
 		
 		$(document.body).visit(function() {
 			var cmp = $(this).data('component');
 			if( cmp instanceof Component ) {
-				if( debug('hash') ) console.log('visiting component', cmp.accessor());
+				if( debug('hash') ) console.log('[' + Framework.id + '] visiting component', cmp.accessor());
 				var e = cmp.fire('hash', {
 					hash: hash
 				});

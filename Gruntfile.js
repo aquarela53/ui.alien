@@ -1,8 +1,9 @@
 var files = [
 	'./src/shims/es6.js',
 	
-	// dependency
-	'./build/attrs.dom.js',
+	// dependencies
+	'./src/dependencies/attrs.dom.js',	
+	'./src/dependencies/less.js',
 
 	// begin
 	'./src/BOF.js',
@@ -26,7 +27,8 @@ var files = [
 	'./src/ui/Container.js',
 	'./src/ui/Application.js',
 	'./src/ui/Theme.js',
-	'./src/ui/BaseStyle.js',
+	'./src/ui/ThemeManager.js',
+	'./src/ui/themes/alien.js',
 	'./src/ui/views/View.js',
 	'./src/ui/controls/HTML.js',
 	'./src/ui/controls/Button.js',

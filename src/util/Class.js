@@ -87,7 +87,7 @@ var Class = (function() {
 			cls.superclass = function() {
 				return sclz;
 			};
-			cls.origin = function() {
+			cls.source = function() {
 				return clz;	
 			};
 
