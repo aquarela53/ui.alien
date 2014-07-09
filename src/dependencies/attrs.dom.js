@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-09 16:35:36
+ * @date: 2014-07-09 18:2:18
 */
 
 /*!
@@ -5215,6 +5215,7 @@ var $ = (function() {
 			var before = this;
 			if( target ) {
 				els.each(function() {
+					//console.error('before', this, before, target);
 					target.insertBefore(this, before);
 				});
 			}

@@ -168,8 +168,6 @@ var Application = (function() {
 			var self = this;
 			var fname = cls.fname || Util.camelcase(id);
 			
-			console.log('fname', fname);
-			
 			var inherit = cls.inherit;			
 			if( cls.hasOwnProperty('inherit') && !inherit ) return console.error('[' + this.applicationId() + '] invalid inherit, unkwnown \'' + inherit + '\'', cls);
 			else if( !inherit || inherit === 'component' ) inherit = this.Component;
@@ -284,17 +282,6 @@ var Application = (function() {
 			
 			var self = this;
 			
-			// preprocessing application tags
-			var resolveApplication = function() {
-				var el = $(this);
-				var options = el.attr();
-				options.items = Array.prototype.slice.call(this.children);
-				var application = new Application(options);
-				el.before(application.dom()).detach();
-			};
-			if( el.is('application') ) return el.each(resolveApplication).void();
-			else el.find('application').each(resolveApplication);
-			
 			// preprocessing component & on & theme tags
 			var resolveComponent = function() {
 				var el = $(this);
@@ -314,6 +301,18 @@ var Application = (function() {
 			if( el.is('component') ) return el.each(resolveComponent).void();
 			else el.find('component').each(resolveComponent);
 			
+			// preprocessing application tags
+			var resolveApplication = function() {
+				var el = $(this);
+				var options = el.attr();
+				console.log(this.children);
+				options.items = Array.prototype.slice.call(this.children);
+				var application = new Application(options);
+				el.before(application.dom()).detach();
+			};
+			if( el.is('application') ) return el.each(resolveApplication).void();
+			else el.find('application').each(resolveApplication);
+			
 			// preprocessing onhash tags
 			var resolveOnHash = function() {
 				var el = $(this);
@@ -327,21 +326,30 @@ var Application = (function() {
 			var resolveInclude = function() {
 				var el = $(this);
 				var src = el.attr('src');
+				var sync = (el.attr('sync') === 'true') ? true : false;
 				
-				var result = Ajax.get(self.path(src));
-				el.before(result).detach();
+				Ajax.ajax(self.path(src)).sync(sync).done(function(err, result) {
+					if( err ) return console.error('cannot include src', src);
+					var items = $(result);
+					el.before(items).detach();
+					items.each(function() {
+						var translated = self.translate(this);
+						console.log('include translated', translated);
+					});
+				});
 			};			
-			if( el.is('include') ) return el.each(resolveInclude).void();
+			if( el.is('include') ) el.each(resolveInclude).void();
 			else el.find('include').each(resolveInclude);
 			
 			//if( debug('translator') ) console.info('[' + self.applicationId() + '] translation start', el[0]);
 			var translator = this._translator;
-			var match = $.util.match;
+			//var match = $.util.match;
 			var tag = this.tag();
 			
 			var tmp = $.create('div').append(el).all().reverse().each(function() {
 				for(var tagname in tag) {
 					if( this.tagName.toLowerCase() === tagname || this.getAttribute('as') === tagname ) {
+						var as = this.getAttribute('as') ? true : false;
 						this.removeAttribute('as');
 						var el = this;
 						var fn = tag[tagname];
@@ -351,12 +359,18 @@ var Application = (function() {
 							var name = attributes[i].name;
 							var value = attributes[i].value;
 							attrs[name] = value;
-						}
+						}						
 						
-						var cmp = fn.apply(self, [el, attrs]);
-						if( cmp instanceof Component ) $(this).before(cmp.dom()).detach();
-						else if( (cmp instanceof $) || isElement(cmp) ) $(this).before(cmp).detach();
-						else $(this).detach();
+						if( as ) {
+							attrs['el'] = el;
+							var cmp = fn.apply(self, [el, attrs]);
+							if( !cmp ) $(el).detach();
+						} else {
+							var cmp = fn.apply(self, [el, attrs]);
+							if( cmp instanceof Component ) $(el).before(cmp.dom()).detach();
+							else if( (cmp instanceof $) || isElement(cmp) ) $(el).before(cmp).detach();
+							else $(el).detach();
+						}
 					}
 				}			
 			}).end(1);
