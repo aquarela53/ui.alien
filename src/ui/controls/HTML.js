@@ -75,6 +75,8 @@
 			'font-size': 13
 		}
 	};
+	
+	HTML.fname = 'HTML';
 		
 	return HTML = UI.component('html', HTML);
 })();

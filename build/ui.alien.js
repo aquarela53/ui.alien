@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-09 17:6:2
+ * @date: 2014-07-09 17:17:53
 */
 
 // es6 shim
@@ -16789,7 +16789,9 @@ var Application = (function() {
 			if( typeof(cls) !== 'function' ) return console.error('[' + this.applicationId() + '] invalid component class:' + id, cls);
 			
 			var self = this;
-			var fname = cls.name || Util.camelcase(id);
+			var fname = cls.fname || Util.camelcase(id);
+			
+			console.log('fname', fname);
 			
 			var inherit = cls.inherit;			
 			if( cls.hasOwnProperty('inherit') && !inherit ) return console.error('[' + this.applicationId() + '] invalid inherit, unkwnown \'' + inherit + '\'', cls);
@@ -17661,6 +17663,8 @@ var ThemeManager = (function() {
 			'font-size': 13
 		}
 	};
+	
+	HTML.fname = 'HTML';
 		
 	return HTML = UI.component('html', HTML);
 })();
@@ -17799,7 +17803,8 @@ var ThemeManager = (function() {
 		attrs.text = el.innerText;
 		return new this.Button(attrs);
 	};
-
+	
+	Button.fname = 'Button';
 	Button.acceptable = true;
 	
 	return Button = UI.component('btn', Button);

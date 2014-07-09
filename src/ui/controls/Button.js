@@ -131,7 +131,8 @@
 		attrs.text = el.innerText;
 		return new this.Button(attrs);
 	};
-
+	
+	Button.fname = 'Button';
 	Button.acceptable = true;
 	
 	return Button = UI.component('btn', Button);
