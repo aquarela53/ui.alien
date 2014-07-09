@@ -12,7 +12,7 @@ var Container = (function() {
 			var self = this;
 			var o = this.options;
 			var fn = function() {
-				self.items(o.items || o.item || o.src);
+				self.add(o.items);
 				self.mark();
 			};
 
@@ -60,7 +60,7 @@ var Container = (function() {
 						this._items = this._items.splice(at, 0, item);
 					}
 
-					e = this.fire('added', {item:item, index:this.indexOf(item)});
+					e = this.fire('added', {added:item, index:this.indexOf(item)});
 				}
 			}
 
@@ -68,13 +68,14 @@ var Container = (function() {
 		},
 		remove: function(index) {
 			var item = this.get(index);
+			var index = this.indexOf(item);
 
 			if( !item ) return;
 			
 			this._items = this._items.filter(function(c) {
 				return (c === item) ? false : true;
 			});
-			this.fire('removed', {item:item});
+			this.fire('removed', {removed:item, index:index});
 
 			return this;
 		},
@@ -84,7 +85,7 @@ var Container = (function() {
 				this.remove(i);
 			}
 
-			this.fire('removedAll');
+			this.fire('cleared');
 			return this;
 		},
 		items: function(items) {
@@ -92,6 +93,7 @@ var Container = (function() {
 			if( typeof(items) === 'number' ) return this.get(items);
 
 			this.clear();
+			
 			if( items || items === 0 ) this.add(items);
 			return this;
 		},

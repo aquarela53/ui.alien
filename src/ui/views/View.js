@@ -18,22 +18,32 @@
 			this.cmpmap = new Map();
 
 			this.on('added', function(e) {
-				var cmp = e.item;
-				if( cmp === '-' ) cmp = new UI.Separator({flex:1});
+				var added = e.added;
+				if( added === '-' ) added = new UI.Separator({flex:1});
 				
-				cmp = this.attach(cmp);
-				if( cmp ) this.componentByItem(e.item, cmp);
+				var packed;
+				if( o.translation !== false ) {
+					packed = this.application().pack(added);
+				}
+				
+				if( packed ) this.attach(packed);
+				
+				this.packed(added, packed);
 			});
 
 			this.on('removed', function(e) {
-				var cmp = this.componentByItem(e.item);
-				if( cmp ) cmp.detach();
+				var removed = e.removed;
+				removed = this.byItem(removed);
+				
+				if( removed instanceof $ ) removed.detach();
+				else if( removed instanceof Component ) removed.detach();
+				else if( isElement(removed) ) this.attachTarget() && this.attachTarget().removeChild(removed);
 			});
 			
 			// call super's build
 			this.$super();
 		},
-		componentByItem: function(item, cmp) {
+		packed: function(item, cmp) {
 			if( arguments.length == 1 ) return this.cmpmap.get(item);
 			if( item && cmp ) return this.cmpmap.set(item, cmp);
 			return null;

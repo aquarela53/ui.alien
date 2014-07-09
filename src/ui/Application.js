@@ -37,7 +37,7 @@ var Application = (function() {
 			else if( typeof(result) === 'object' ) options.items = [result];
 			else if( Array.isArray(result) ) options.item = result;
 		} else if( isElement(options) ) {
-			options = {el:options, translation: true};
+			options = {el:options};
 		}
 		
 		options = options || {};
@@ -56,37 +56,48 @@ var Application = (function() {
 			var self = this;
 			var o = this.options;
 			
+			this.cmpmap = new Map();
+			
 			this.on('added', function(e) {
-				var item = e.item;
+				var added = e.added;
 				
-				if( isElement(item) ) item = this.translate(item);				
-				if( isElement(item) ) this.attach(item);
+				var packed;
+				if( o.translation !== false ) {
+					packed = this.pack(added);
+				}
+				
+				if( packed ) this.attach(packed);
+				
+				this.packed(added, packed);
 			});
 
 			this.on('removed', function(e) {
-				if( e.item && e.item.detach ) e.item.detach();
+				var packed = this.packed(e.removed);
+				
+				// TODO : 그냥 detach 하면 안됨. 어떤 시점에 다른 곳에 이미 attach 되었을 수도 있으니.
+				if( packed instanceof $ ) packed.detach();
+				else if( packed instanceof Component ) packed.detach();
+				else if( isElement(packed) ) this.attachTarget() && this.attachTarget().removeChild(packed);
 			});
 			
-			if( o.translation ) {
-				var children = $(this.dom()).children();
-				
-				children.each(function() {
-					var converted = self.translate(this);
-					if( converted ) {
-						var cmp = $(converted).data('component');
-						if( cmp ) self.add(cmp);
-						else self.add(converted);
-					}
-				});
-			}
+			// add original element
+			$(this.dom()).children().each(function() {
+				self.add(this);
+			});
+			
+			this.$super();
 			
 			if( o.setup ) {
 				var fn = o.setup;
 				fn.call(fn, this, (o.argv || {}));
 			}
-			
-			this.$super();
 		},
+		packed: function(item, cmp) {
+			if( arguments.length == 1 ) return this.cmpmap.get(item);
+			if( item && cmp ) return this.cmpmap.set(item, cmp);
+			return null;
+		},
+		
 		applicationId: function() {
 			return this._applicationId;
 		},
@@ -121,6 +132,166 @@ var Application = (function() {
 			return this;
 		},
 		
+		// inspects DOM Elements for translates as component
+		tag: function(selector, fn) {
+			if( !arguments.length ) return this._tags || {};
+			else if( arguments.length === 1 ) return this._tags && this._tags[selector];
+			
+			if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('[' + this.applicationId() + '] invalid parameter(string, function)', arguments);
+			
+			this._tags = this._tags || {};
+			this._tags[selector] = fn;
+			
+			this.fire('tag.added', {
+				selector: selector,
+				fn: fn
+			});
+			
+			return this;
+		},
+		translate: function(el) {
+			if( !isElement(el) ) return console.error('[' + this.applicationId() + '] el must be an element');
+			
+			el = $(el);
+			
+			var self = this;
+			
+			// preprocessing component & on & theme tags
+			var fn_component = function() {
+				var el = $(this);
+				var id = el.id();
+				var src = el.attr('src');
+
+				if( debug('translator') ) console.info('[' + self.applicationId() + '] component tag found [' + id + '] src="' + src + '"');
+
+				try {
+					self.component(id, src);
+				} catch(e) {
+					console.warn('[' + self.applicationId() + '] component load failure. [' + id + '] src="' + src + '"', e);
+				} finally {
+					el.detach();
+				}
+			};			
+			if( el.is('component') ) return el.each(fn_component).void();
+			else el.find('component').each(fn_component);
+			
+			// preprocessing onhash tags
+			var fn_onhash = function() {
+				var el = $(this);
+				// TODO : 미구현
+				el.detach();
+			};			
+			if( el.is('onhash') ) return el.each(fn_onhash).void();
+			else el.find('onhash').each(fn_onhash);
+			
+			// preprocessing application tags
+			var fn_application = function() {
+				var el = $(this);
+				var options = el.attr();
+				options.items = Array.prototype.slice.call(this.children);
+				var application = new Application(options);
+				el.before(application.dom()).detach();
+			};
+			if( el.is('application') ) return el.each(fn_application).void();
+			else el.find('application').each(fn_application);
+			
+			//if( debug('translator') ) console.info('[' + self.applicationId() + '] translation start', el[0]);
+			var translator = this._translator;
+			//var match = $.util.match;
+			var tag = this.tag();
+			
+			var tmp = $.create('div').append(el).all().reverse().each(function() {
+				for(var tagname in tag) {
+					if( this.tagName.toLowerCase() === tagname || this.getAttribute('as') === tagname ) {
+						var as = this.getAttribute('as') ? true : false;
+						this.removeAttribute('as');
+						var el = this;
+						var fn = tag[tagname];
+						var attributes = el.attributes;
+						var attrs = {};
+						for(var i=0; i < attributes.length; i++) {
+							var name = attributes[i].name;
+							var value = attributes[i].value;
+							attrs[name] = value;
+						}						
+						
+						if( as ) {
+							attrs['el'] = el;
+							var cmp = fn.apply(self, [el, attrs]);
+							if( !cmp ) $(el).detach();
+						} else {
+							var cmp = fn.apply(self, [el, attrs]);
+							if( cmp instanceof Component ) $(el).before(cmp.dom()).detach();
+							else if( (cmp instanceof $) || isElement(cmp) ) $(el).before(cmp).detach();
+							else $(el).detach();
+						}
+					}
+				}			
+			}).end(1);
+			
+			// preprocessing onhash tags
+			var fn_include = function() {
+				var el = $(this);
+				var src = el.attr('src');
+				var sync = (el.attr('sync') === 'true') ? true : false;
+				
+				Ajax.ajax(self.path(src)).sync(sync).done(function(err, result) {
+					if( err ) return console.error('cannot include src', src);
+					var items = $(result);
+					//el.before(items).detach();
+					items.each(function() {
+						var translated = self.translate(this);
+						if( translated ) el.before(translated);
+						//console.log('include translated', translated);
+					});
+					el.detach();
+				});
+			};			
+			if( el.is('include') ) el.each(fn_include).void();
+			else el.find('include').each(fn_include);
+			
+			return tmp.children()[0];
+		},
+		
+		
+		// translate from ui json to component
+		pack: function(source) {
+			if( source instanceof Component ) return source;
+			
+			var packed;
+			
+			if( typeof(source) === 'string' ) {
+				var origin = source;
+				source = Ajax.json(source);
+				source.origin = origin;
+			}
+			
+			if( isElement(source) ) {
+				packed = this.translate(source);
+			} else if( source instanceof $ ) {
+				var arr = [];
+				var self = this;
+				source.each(function() {
+					var translated = this.translate(this);
+					if( translated ) arr.push(translated);
+				});
+				packed = $(arr).owner(source);
+			} else if( source && typeof(source.component) === 'string' ) {
+				var cmp = this.component(source.component);
+				if( !cmp ) return console.error('[' + this.applicationId() + '] unknown component [' + source.component + ']');
+				packed = new cmp(source);
+			} else {
+				return console.error('[' + this.applicationId() + '] unsupported source type', source);
+			}
+			
+			this.fire('packed', {
+				packed: packed
+			});
+			
+			return packed;
+		},
+		
+
 		// theme & components
 		theme: function(name) {
 			/*if( !this._themes ) this._themes = {};
@@ -256,155 +427,7 @@ var Application = (function() {
 			});
 
 			return cmp;
-		},
-		
-		// inspects DOM Elements for translates as component
-		tag: function(selector, fn) {
-			if( !arguments.length ) return this._tags || {};
-			else if( arguments.length === 1 ) return this._tags && this._tags[selector];
-			
-			if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('[' + this.applicationId() + '] invalid parameter(string, function)', arguments);
-			
-			this._tags = this._tags || {};
-			this._tags[selector] = fn;
-			
-			this.fire('tag.added', {
-				selector: selector,
-				fn: fn
-			});
-			
-			return this;
-		},
-		translate: function(el) {
-			if( !isElement(el) ) return console.error('[' + this.applicationId() + '] el must be an element');
-			
-			el = $(el);
-			
-			var self = this;
-			
-			// preprocessing component & on & theme tags
-			var resolveComponent = function() {
-				var el = $(this);
-				var id = el.id();
-				var src = el.attr('src');
-
-				if( debug('translator') ) console.info('[' + self.applicationId() + '] component tag found [' + id + '] src="' + src + '"');
-
-				try {
-					self.component(id, src);
-				} catch(e) {
-					console.warn('[' + self.applicationId() + '] component load failure. [' + id + '] src="' + src + '"', e);
-				} finally {
-					el.detach();
-				}
-			};			
-			if( el.is('component') ) return el.each(resolveComponent).void();
-			else el.find('component').each(resolveComponent);
-			
-			// preprocessing application tags
-			var resolveApplication = function() {
-				var el = $(this);
-				var options = el.attr();
-				console.log(this.children);
-				options.items = Array.prototype.slice.call(this.children);
-				var application = new Application(options);
-				el.before(application.dom()).detach();
-			};
-			if( el.is('application') ) return el.each(resolveApplication).void();
-			else el.find('application').each(resolveApplication);
-			
-			// preprocessing onhash tags
-			var resolveOnHash = function() {
-				var el = $(this);
-				// TODO : 미구현
-				el.detach();
-			};			
-			if( el.is('onhash') ) return el.each(resolveOnHash).void();
-			else el.find('onhash').each(resolveOnHash);
-			
-			// preprocessing onhash tags
-			var resolveInclude = function() {
-				var el = $(this);
-				var src = el.attr('src');
-				var sync = (el.attr('sync') === 'true') ? true : false;
-				
-				Ajax.ajax(self.path(src)).sync(sync).done(function(err, result) {
-					if( err ) return console.error('cannot include src', src);
-					var items = $(result);
-					el.before(items).detach();
-					items.each(function() {
-						var translated = self.translate(this);
-						console.log('include translated', translated);
-					});
-				});
-			};			
-			if( el.is('include') ) el.each(resolveInclude).void();
-			else el.find('include').each(resolveInclude);
-			
-			//if( debug('translator') ) console.info('[' + self.applicationId() + '] translation start', el[0]);
-			var translator = this._translator;
-			//var match = $.util.match;
-			var tag = this.tag();
-			
-			var tmp = $.create('div').append(el).all().reverse().each(function() {
-				for(var tagname in tag) {
-					if( this.tagName.toLowerCase() === tagname || this.getAttribute('as') === tagname ) {
-						var as = this.getAttribute('as') ? true : false;
-						this.removeAttribute('as');
-						var el = this;
-						var fn = tag[tagname];
-						var attributes = el.attributes;
-						var attrs = {};
-						for(var i=0; i < attributes.length; i++) {
-							var name = attributes[i].name;
-							var value = attributes[i].value;
-							attrs[name] = value;
-						}						
-						
-						if( as ) {
-							attrs['el'] = el;
-							var cmp = fn.apply(self, [el, attrs]);
-							if( !cmp ) $(el).detach();
-						} else {
-							var cmp = fn.apply(self, [el, attrs]);
-							if( cmp instanceof Component ) $(el).before(cmp.dom()).detach();
-							else if( (cmp instanceof $) || isElement(cmp) ) $(el).before(cmp).detach();
-							else $(el).detach();
-						}
-					}
-				}			
-			}).end(1);
-			
-			return tmp.children()[0];
-		},
-		
-		// translate from ui json to component
-		pack: function(source) {
-			if( $.util.isElement(source) ) {
-				source = {
-					component: (type || 'html'),
-					el: source
-				};					
-			} else if( typeof(source) === 'string' ) {
-				var origin = source;
-				source = Ajax.json(source);
-				source.origin = origin;
-			}
-			
-			if( !(source && typeof(source.component) === 'string') ) {
-				return console.error('[' + this.applicationId() + '] unsupported source type', source);
-			}
-			
-			var cmp = this.component(source.component);
-			if( !cmp ) return console.error('[' + this.applicationId() + '] unknown component [' + source.component + ']');
-			var instance = new cmp(source);
-							
-			this.fire('build', {
-				instance: instance
-			});
-			
-			return instance;
-		},
+		}
 	};
 	
 	Application = Class.inherit(Application, Container);

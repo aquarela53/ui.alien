@@ -13,7 +13,7 @@ var Component = (function() {
 		'swipeleft', 'swiperight',
 		'staged', 'unstaged',
 		'transition.start', 'transition.stop', 'transition.end',
-		'attach', 'attached', 'detach', 'detached'
+		'appended', 'attached', 'dropped', 'detached'
 	];
 	
 	var seq = 100;
@@ -175,8 +175,10 @@ var Component = (function() {
 			return this._parent;
 		},
 		children: function() {
-			if( !this._children ) this._children = [];
-			return this._children.slice();
+			var attachTarget = this.attachTarget();
+			if( !attachTarget ) return [];
+			
+			return attachTarget.children;
 		},
 		acceptable: function() {
 			if( typeof(this._acceptable) === 'boolean' ) return this._acceptable;
@@ -214,33 +216,11 @@ var Component = (function() {
 				var ref = target.children(index);
 				if( ref.length ) ref.before(el);
 				else $(target).append(el);
-			} else { 
+			} else {
 				$(target).append(el);
 			}
 						
-			if( child instanceof Component ) {
-				var prevp = child._parent;
-				if( prevp && prevp._children ) {
-					prevp._children = Util.array.removeByItem(prevp._children, child);
-				}
-				
-				child._parent = this;
-			} else {
-				var $child = $(child);
-				
-				// element 가 detach 되면 자동으로 child 에서 삭제되도록.
-				var self = this;
-				var listener = function(e){
-					if( e.from === self.dom() ) {
-						self._children = Util.array.removeByItem(self._children, this);
-						$child.off('detached', listener);
-					}
-				};
-				$child.on('detached', listener);
-			}
-
-			if( !this._children ) this._children = [];
-			this._children.push(child);
+			if( child instanceof Component ) child._parent = this;
 			
 			return this;
 		},
@@ -270,10 +250,6 @@ var Component = (function() {
 		},
 		detach: function() {
 			this.el.detach();
-			var prevp = this._parent;
-			if( prevp && prevp._children ) {
-				prevp._children = Util.array.removeByItem(prevp._children, this);
-			}
 			this._parent = null;
 			return this;
 		},
@@ -501,40 +477,52 @@ var Component = (function() {
 		},
 
 		// event handle
-		on: function(action, fn, bubble) {
-			if( typeof(action) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', action, fn, bubble);
+		on: function(actions, fn, bubble) {
+			if( typeof(actions) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', actions, fn, bubble);
 			
 			var dispatcher = this._dispatcher;
 			if( !dispatcher ) return console.error('[ERROR] where is event dispatcher?');
 			
-			// if action is dom element event type, binding events to dom element
-			if( ~DOM_EVENTS.indexOf(action) || action.startsWith('dom.') || action === '*' || action === 'dom.*' ) {
-				var type = action.startsWith('dom.') ? action.substring(4) : action;
-				var self = this;
-				var proxy = function(e) {
-					return fn.call(self, e);
-				};
-				fn.proxy = proxy;
-				this.el.on(type, proxy, bubble);
-				if( action !== '*' ) return this;
-			}
+			actions = actions.split(' ');
+			for(var i=0; i < actions.length; i++) {
+				var action = actions[i];
+				
+				// if action is dom element event type, binding events to dom element
+				if( ~DOM_EVENTS.indexOf(action) || action.startsWith('dom.') || action === '*' || action === 'dom.*' ) {
+					var type = action.startsWith('dom.') ? action.substring(4) : action;
+					var self = this;
+					var proxy = function(e) {
+						return fn.call(self, e);
+					};
+					fn.proxy = proxy;
+					this.el.on(type, proxy, bubble);
+					if( action !== '*' ) return this;
+				}
 	
-			dispatcher.on.apply(dispatcher, arguments);
+				dispatcher.on.apply(dispatcher, arguments);
+			}
+			
 			return this;
 		},
-		off: function(action, fn, bubble) {
-			if( typeof(action) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', action, fn, bubble);
+		off: function(actions, fn, bubble) {
+			if( typeof(actions) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', actions, fn, bubble);
 	
 			var dispatcher = this._dispatcher;
 			if( !dispatcher ) return console.error('[ERROR] where is event dispatcher?');
 
-			if( ~DOM_EVENTS.indexOf(action) || action.startsWith('dom.') || action == '*' || action == 'el.*' ) {
-				var type = action.startsWith('dom.') ? action.substring(4) : action;
-				this.el.un(type, fn.proxy || fn, bubble);
-				if( action !== '*' ) return this;
-			}
+			actions = actions.split(' ');
+			for(var i=0; i < actions.length; i++) {
+				var action = actions[i];
+				
+				if( ~DOM_EVENTS.indexOf(action) || action.startsWith('dom.') || action == '*' || action == 'el.*' ) {
+					var type = action.startsWith('dom.') ? action.substring(4) : action;
+					this.el.un(type, fn.proxy || fn, bubble);
+					if( action !== '*' ) return this;
+				}
 
-			dispatcher.un.apply(dispatcher, arguments);
+				dispatcher.un.apply(dispatcher, arguments);
+			}
+			
 			return this;
 		},
 		fireASync: function() {
