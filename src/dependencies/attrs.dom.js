@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-08 22:6:59
+ * @date: 2014-07-09 16:35:36
 */
 
 /*!
@@ -1587,7 +1587,7 @@ var EventDispatcher = (function() {
 	var seq = 100;
 
 	var EventObjectSeq = 1;
-	var EventObject = function AlienEvent(o) {
+	var EventObject = function CustomEvent(o) {
 		this.options(o);
 	};
 
@@ -4398,7 +4398,7 @@ var $ = (function() {
 	};
 	
 	prototype.reverse = function() {
-		this.reverse();
+		Array.prototype.reverse.call(this);
 		return this;
 	};
 	
@@ -4446,6 +4446,10 @@ var $ = (function() {
 			var v = resolve.call(this, value);
 			data.call(this, key, v);
 		});
+	};
+	
+	prototype.void = function() {
+		return;	
 	};
 	
 	prototype.arg = function(value) {

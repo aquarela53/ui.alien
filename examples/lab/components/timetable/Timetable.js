@@ -48,6 +48,7 @@ Timetable.prototype = {
 		} else if( !cols ) {
 			return console.error('illegal parameter', cls, flag);
 		} else if( arguments.length === 1 ) {
+			if( typeof(cols) === 'string' ) cols = cols.split(',');
 			if( !Array.isArray(cols) ) cols = [cols];
 			this._cols = cols;
 			
@@ -96,5 +97,10 @@ Timetable.prototype = {
 
 Timetable.inherit = UI.Component;
 Timetable.style = 'css/style.less';
+
+Timetable.translator = function(el, attrs) {
+	var cls = this.component('timetable');
+	return new cls(attrs);
+};
 
 module.exports = Timetable;

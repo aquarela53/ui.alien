@@ -226,21 +226,23 @@ var Component = (function() {
 				
 				child._parent = this;
 			} else {
-				child = $(child);
+				var $child = $(child);
 				
 				// element 가 detach 되면 자동으로 child 에서 삭제되도록.
 				var self = this;
 				var listener = function(e){
-					self._children = Util.array.removeByItem(self._children, $(this));
-					child.off('detached', listener);
+					if( e.from === self.dom() ) {
+						self._children = Util.array.removeByItem(self._children, this);
+						$child.off('detached', listener);
+					}
 				};
-				child.on('detached', listener);
+				$child.on('detached', listener);
 			}
 
 			if( !this._children ) this._children = [];
 			this._children.push(child);
 			
-			return child;
+			return this;
 		},
 		attachTo: function(target, index) {
 			if( !target ) return console.error('attach target must be a component or dom element', target);

@@ -18,11 +18,11 @@
 			}
 		},
 		print: function() {
-			console.log('* {pkg.name} info', JSON.stringify(Framework.parameters, null, '\t'));
-			console.log('\tversion: ' + __build_info__.version );
-			console.log('\tcore build: ' + __build_info__.buildtime + ' ms');
-			console.log('\telapsed time to here: ' + (new Date().getTime() - __build_info__.finishtime) + ' ms');
-			console.log('\ttotal elapsed time: ' + (new Date().getTime() - __build_info__.starttime) + ' ms');
+			console.info('* {pkg.name} info');
+			console.info('\tversion: ' + Framework.version );
+			console.info('\tcore build: ' + Framework.buildtime + ' ms');
+			console.info('\telapsed time to here: ' + (new Date().getTime() - Framework.finishtime) + ' ms');
+			console.info('\ttotal elapsed time: ' + (new Date().getTime() - Framework.starttime) + ' ms');
 		}
 	};
 

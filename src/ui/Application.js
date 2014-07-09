@@ -53,22 +53,37 @@ var Application = (function() {
 	
 	Application.prototype = {
 		build: function() {
+			var self = this;
 			var o = this.options;
 			
-			if( o.translation ) this.translate(this.el);
-			
-			if( o.setup ) {
-				var fn = o.setup;
-				fn.call(fn, this, (o.argv || {}));
-			}
-			
 			this.on('added', function(e) {
-				this.attach(e.item);
+				var item = e.item;
+				
+				if( isElement(item) ) item = this.translate(item);				
+				if( isElement(item) ) this.attach(item);
 			});
 
 			this.on('removed', function(e) {
 				if( e.item && e.item.detach ) e.item.detach();
 			});
+			
+			if( o.translation ) {
+				var children = $(this.dom()).children();
+				
+				children.each(function() {
+					var converted = self.translate(this);
+					if( converted ) {
+						var cmp = $(converted).data('component');
+						if( cmp ) self.add(cmp);
+						else self.add(converted);
+					}
+				});
+			}
+			
+			if( o.setup ) {
+				var fn = o.setup;
+				fn.call(fn, this, (o.argv || {}));
+			}
 			
 			this.$super();
 		},
@@ -226,10 +241,14 @@ var Application = (function() {
 				console.info('[' + this.applicationId() + '] component added', '[' + cmp.id() + ',' + fname + ']', Util.outline(cmp));
 			}
 			
-			if( cls.translator ) this.tag(id, cls.translator);
+			var translator = cls.translator || function(el) {
+				console.warn('[' + this.applicationId() + '] component [' + id + '] does not support custom tag');
+			};
+			
+			this.tag(id, translator);
 			
 			cmp.translator = function() {
-				return cls.translator;
+				return translator;
 			};
 			
 			this.fire('component.added', {
@@ -240,15 +259,14 @@ var Application = (function() {
 		},
 		
 		// inspects DOM Elements for translates as component
-		tag: function(selector, fn) {	
+		tag: function(selector, fn) {
+			if( !arguments.length ) return this._tags || {};
+			else if( arguments.length === 1 ) return this._tags && this._tags[selector];
+			
 			if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('[' + this.applicationId() + '] invalid parameter(string, function)', arguments);
-
-			var self = this;
-			this._translator.add(selector, function() {
-				var result = fn.apply(self, arguments);
-				if( result instanceof Component ) return result.dom();
-				return result;
-			});
+			
+			this._tags = this._tags || {};
+			this._tags[selector] = fn;
 			
 			this.fire('tag.added', {
 				selector: selector,
@@ -258,15 +276,90 @@ var Application = (function() {
 			return this;
 		},
 		translate: function(el) {
-			if( isElement(el) ) el = $(el);
-			else if( !(el instanceof $) ) return console.error('[' + this.applicationId() + '] illegal element', el);
+			if( !isElement(el) ) return console.error('[' + this.applicationId() + '] el must be an element');
 			
+			el = $(el);
+			
+			var self = this;
+			
+			// preprocessing application tags
+			var resolveApplication = function() {
+				var el = $(this);
+				var options = el.attr();
+				options.items = Array.prototype.slice.call(this.children);
+				var application = new Application(options);
+				el.before(application.dom()).detach();
+			};
+			if( el.is('application') ) return el.each(resolveApplication).void();
+			else el.find('application').each(resolveApplication);
+			
+			// preprocessing component & on & theme tags
+			var resolveComponent = function() {
+				var el = $(this);
+				var id = el.id();
+				var src = el.attr('src');
+
+				if( debug('translator') ) console.info('[' + self.applicationId() + '] component tag found [' + id + '] src="' + src + '"');
+
+				try {
+					self.component(id, src);
+				} catch(e) {
+					console.warn('[' + self.applicationId() + '] component load failure. [' + id + '] src="' + src + '"', e);
+				} finally {
+					el.detach();
+				}
+			};			
+			if( el.is('component') ) return el.each(resolveComponent).void();
+			else el.find('component').each(resolveComponent);
+			
+			// preprocessing onhash tags
+			var resolveOnHash = function() {
+				var el = $(this);
+				// TODO : 미구현
+				el.detach();
+			};			
+			if( el.is('onhash') ) return el.each(resolveOnHash).void();
+			else el.find('onhash').each(resolveOnHash);
+			
+			// preprocessing onhash tags
+			var resolveInclude = function() {
+				var el = $(this);
+				var src = el.attr('src');
+				
+				var result = Ajax.get(self.path(src));
+				el.before(result).detach();
+			};			
+			if( el.is('include') ) return el.each(resolveInclude).void();
+			else el.find('include').each(resolveInclude);
+			
+			//if( debug('translator') ) console.info('[' + self.applicationId() + '] translation start', el[0]);
 			var translator = this._translator;
-			el.each(function() {
-				translator.translate(this);
-			});
+			var match = $.util.match;
+			var tag = this.tag();
 			
-			return this;
+			var tmp = $.create('div').append(el).all().reverse().each(function() {
+				for(var tagname in tag) {
+					if( this.tagName.toLowerCase() === tagname || this.getAttribute('as') === tagname ) {
+						this.removeAttribute('as');
+						var el = this;
+						var fn = tag[tagname];
+						var attributes = el.attributes;
+						var attrs = {};
+						for(var i=0; i < attributes.length; i++) {
+							var name = attributes[i].name;
+							var value = attributes[i].value;
+							attrs[name] = value;
+						}
+						
+						var cmp = fn.apply(self, [el, attrs]);
+						if( cmp instanceof Component ) $(this).before(cmp.dom()).detach();
+						else if( (cmp instanceof $) || isElement(cmp) ) $(this).before(cmp).detach();
+						else $(this).detach();
+					}
+				}			
+			}).end(1);
+			
+			return tmp.children()[0];
 		},
 		
 		// translate from ui json to component
@@ -302,7 +395,11 @@ var Application = (function() {
 	
 	Application.Component = Component;
 	Application.Container = Container;
-	Application.Application = Application;	
+	Application.Application = Application;
+	
+	Application.acceptable = function() {
+		return true;
+	};
 	
 	Application.applications = function() {
 		return APPLICATIONS;
@@ -323,6 +420,8 @@ var Application = (function() {
 		});
 	};
 	
+	
+	// TODO: ...
 	Application.translator = function(selector, fn) {
 		if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('[' + Framework.id + '] invalid parameter', selector, fn);
 		
@@ -374,22 +473,6 @@ var Application = (function() {
 	Application.fire = function(type, value) {
 		dispatcher.fire(type, value);
 	};
-	
-	// <component id="cmpid" src="dir/file.js"></component>
-	Application.translator('component', function(el, attrs) {
-		var app = this;
-		var id = attrs.id;
-		var src = attrs.src;
-
-		if( debug('translator') ) console.log('[' + this.applicationId() + '] component tag found [' + id + '] src="' + src + '"');
-		
-		try {
-			app.component(id, src);
-		} catch(e) {
-			console.warn('[' + this.applicationId() + '] component load failure. [' + id + '] src="' + src + '"', e);
-		} 
-		return false;
-	});
 		
 	return Application;
 })();

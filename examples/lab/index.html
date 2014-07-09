@@ -11,42 +11,22 @@
 		<!-- attrs.ui initial paramters -->
 		<meta name="attrs.ui.autopack" content="true">
 		<meta name="attrs.ui.debug" content="false">
-		<meta name="attrs.ui.debug.translator" content="false">
+		<meta name="attrs.ui.debug.translator" content="true">
 		<meta name="attrs.ui.debug.hash" content="false">
 		
 		<title>UI.Alien</title>
 
+		<link rel="stylesheet/less" type="text/css" href="css/style.less" />
 		<script type="text/javascript" src="../../build/ui.alien.js"></script>
 		
-		<script type="text/javascript" src="test.js"></script>
+		
 	</head>
 	<body>
 		<component id="timetable" src="components/timetable/Timetable.js" tag="login"></component>
-		<page hash="test">
+		<onhash hash="test">
 			<action type="import" target="#content" src="html/page2.html"></action>
-		</page>
+		</onhash>
 		
-		<!-- test -->
-		<view id="view">
-			<div class="pre">a</div>
-			<view name="content">
-				<h1>제목</h1>
-				<div>
-					내용
-					<view horizontal="true">
-						<btn align="left">버튼</btn>
-						<btn align="center">버튼</btn>
-						<btn align="right">버튼</btn>
-					</view>
-				</div>
-			</view>
-			<bar>
-				<btn align="left">버튼</btn>
-				<btn align="center">버튼</btn>
-				<btn align="right">버튼</btn>
-			</bar>
-		</view>
-				
 		<div id="header">
 			<a id="logo" href="#">&nbsp;</a>
 			
@@ -66,21 +46,53 @@
 		<div id="center">
 			<div id="side">
 				<list name="side-navigation" data="./data/ia.json" style="inner-border-color:#333;outer-border:none;">
-					<template>
+					<option name="template" content="element">
 						<li class="row">
 							<div class="icon">{icon}</div>
 							<div class="title">{title}</div>
 						</li>
-					</template>
+					</option>
 				</list>
 			</div>
 			<div id="content">
 				<h1>Title</h1>
-				<div id="slot">
-					// application 태그 하위에 있는 것들은 translation 대상에서 제외되어야 한다.
-					<application id="app" src="application/index.js" style="border:1px solid orange;"></application>
-				</div>
+				<timetable cols="room1,room2,room3" rows="date">
+					<option name="mapper" content="object">
+						{
+							col: function(data) {
+								var booked = data.booked;
+							},
+							row: function(data) {
+							}
+						}
+					</option>					
+				</timetable>
+				<include src="html/page1.html"></include>
+				<include src="html/page2.html"></include>
 			</div>
+		</div>
+		<div id="subcontent">
+			<application id="app" src="application/index.js" style="border:1px solid orange;">
+				<view id="view">
+					<div class="pre">a</div>
+					<view name="content">
+						<h1>제목</h1>
+						<div>
+							내용
+							<view horizontal="true">
+								<btn align="left">버튼</btn>
+								<btn align="center">버튼</btn>
+								<btn align="right">버튼</btn>
+							</view>
+						</div>
+					</view>
+					<bar>
+						<btn align="left">버튼</btn>
+						<btn align="center">버튼</btn>
+						<btn align="right">버튼</btn>
+					</bar>
+				</view>
+			</application>
 		</div>
 		<div id="footer">
 			<div id="footer-wrapper">

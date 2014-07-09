@@ -1,12 +1,13 @@
 (function() {
 	var UI = require('ui');
+	var Framework = require('framework');
 	
 	UI.ready(function(e) {
 		console.log('UI.ready!');
 		
 		var app = e.application;
 		
-		var view = app.pack({
+		/*var view = app.pack({
 			component: 'view',
 			horizontal: true,
 			items: [
@@ -26,11 +27,12 @@
 					}
 				}
 			]
-		});
-		
-		view.attachTo('#content', 1);
+		});		
+		view.attachTo('#content', 1);*/
 		
 		var app2 = new UI.Application('application/index.js');
 		app2.method();
+		
+		Framework.print();
 	});
 })();

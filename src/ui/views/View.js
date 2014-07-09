@@ -20,7 +20,7 @@
 			this.on('added', function(e) {
 				var cmp = e.item;
 				if( cmp === '-' ) cmp = new UI.Separator({flex:1});
-								
+				
 				cmp = this.attach(cmp);
 				if( cmp ) this.componentByItem(e.item, cmp);
 			});
