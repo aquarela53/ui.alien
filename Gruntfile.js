@@ -24,6 +24,8 @@ var files = [
 	
 	// ui
 	'./src/ui/Component.js',
+	'./src/ui/Selectable.js',
+	'./src/ui/SingleSelectable.js',
 	'./src/ui/Container.js',
 	'./src/ui/Application.js',
 	'./src/ui/Theme.js',

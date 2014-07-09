@@ -11,6 +11,11 @@ var Container = (function() {
 		build: function() {
 			var self = this;
 			var o = this.options;
+			
+			// setup selectable
+			if( o.selectable ) this.selectable(o.selectable);
+			
+			// setup options.items
 			var fn = function() {
 				self.add(o.items);
 				self.mark();
@@ -132,6 +137,61 @@ var Container = (function() {
 		},
 		indexOf: function(item) {
 			return this._items.indexOf(item);
+		},
+		
+		// selectable interface
+		selectable: function(selectable) {
+			if( !arguments.length ) {
+				selectable = this._selectable;
+				if( !selectable ) return 0;
+				else return selectable.selectable.call(this);
+			}
+			
+			if( selectable === false || selectable === 0 ) this._selectable = null;
+			else if( selectable === 1 ) this._selectable = SingleSelectable;
+			else if( selectable > 0 ) this._selectable = Selectable;
+			
+			return this;
+		},
+		select: function(index) {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.select.apply(this, arguments);
+		},
+		deselect: function(index) {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.deselect.apply(this, arguments);
+		},
+		selected: function(index) {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.selected.apply(this, arguments);
+		},
+		selectedIndex: function(item) {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.selectedIndex.apply(this, arguments);
+		},
+		prev: function() {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.prev.apply(this, arguments);
+		},
+		next: function() {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.next.apply(this, arguments);
+		},
+		first: function() {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.first.apply(this, arguments);
+		},
+		last: function() {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.last.apply(this, arguments);
 		}
 	};
 

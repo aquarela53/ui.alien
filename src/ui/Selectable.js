@@ -1,12 +1,11 @@
-UI.SingleSelectableContainer = (function() {
+var Selectable = (function() {
 	"use strict"
 
-	function SingleSelectableContainer(options) {
-		this.$super(options);
-		this.selectable(options.selectable);
+	function Selectable() {
+		this._selected = [];
 	}
 	
-	SingleSelectableContainer.prototype = {
+	Selectable.prototype = {
 		select: function(index) {
 			if( !this.selectable() ) return false;
 			var item = this.get(index);
@@ -14,15 +13,12 @@ UI.SingleSelectableContainer = (function() {
 
 			if( !item ) return false;
 
-			if( this.selected() === item ) return false;
-			if( this.selected() ) this.deselect(this.selected());
-
 			var e = this.fireSync('select', {cancelable: true, item:item, index:index});
 			if( e.eventPrevented ) return false;
 
 			if( this.selected(item) ) return false;
 
-			this._selected = item;
+			this._selected.push(item);
 
 			this.fireSync('selected', {
 				item: e.item,
@@ -47,7 +43,7 @@ UI.SingleSelectableContainer = (function() {
 			
 			if( !this.selected(item) ) return false;
 
-			this._selected = null;
+			this._selected.remove(item);
 
 			this.fireSync('deselected', {
 				item: e.item,
@@ -56,35 +52,15 @@ UI.SingleSelectableContainer = (function() {
 
 			return true;
 		},
-		selected: function(index) {
+		selected: function(item) {
 			if( !arguments.length ) return this._selected;
 
 			var item = this.get(index);
-			index = this.indexOf(item);
+			var index = this.indexOf(item);
 
-			return (this._selected === item);
-		},
-		selectedIndex: function(item) {
-			if( !this._selected ) return -1;
-			return this.indexOf(this._selected);
-		},
-		prev: function() {
-			var i = this.selectedIndex();
-			if( i > 0 ) return this.select(i--);
-			return false;
-		},
-		next: function() {
-			var i = this.selectedIndex();
-			if( i >= 0 && i < (this.length() - 1) ) return this.select(i++);
-			return false;
-		},
-		first: function() {
-			return this.select(0);
-		},
-		last: function() {
-			return this.select(this.length());
+			return ~this._selected.indexOf(item);
 		}
 	};
-
-	return SingleSelectableContainer = UI.inherit(SingleSelectableContainer, UI.Attachable, false);
+	
+	return Selectable;
 })();

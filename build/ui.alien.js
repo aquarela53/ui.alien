@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-09 23:55:11
+ * @date: 2014-07-10 0:21:41
 */
 
 // es6 shim
@@ -16471,6 +16471,164 @@ var Component = (function() {
 
 
 
+var Selectable = (function() {
+	"use strict"
+
+	function Selectable() {
+		this._selected = [];
+	}
+	
+	Selectable.prototype = {
+		select: function(index) {
+			if( !this.selectable() ) return false;
+			var item = this.get(index);
+			index = this.indexOf(item);
+
+			if( !item ) return false;
+
+			var e = this.fireSync('select', {cancelable: true, item:item, index:index});
+			if( e.eventPrevented ) return false;
+
+			if( this.selected(item) ) return false;
+
+			this._selected.push(item);
+
+			this.fireSync('selected', {
+				item: e.item,
+				index: e.index
+			});
+
+			return true;
+		},
+		selectable: function(selectable) {
+			if( !arguments.length ) return (this._selectable === false) ? false : true;
+			if( selectable === false ) this._selectable = false;
+			return this;
+		},
+		deselect: function(index) {
+			var item = this.get(index);
+			index = this.indexOf(item);
+
+			if( !item ) return false;
+			
+			var e = this.fireSync('deselect', {cancelable: true, item:item, index:index});
+			if( e.eventPrevented ) return false;
+			
+			if( !this.selected(item) ) return false;
+
+			this._selected.remove(item);
+
+			this.fireSync('deselected', {
+				item: e.item,
+				index: e.index
+			});
+
+			return true;
+		},
+		selected: function(item) {
+			if( !arguments.length ) return this._selected;
+
+			var item = this.get(index);
+			var index = this.indexOf(item);
+
+			return ~this._selected.indexOf(item);
+		}
+	};
+	
+	return Selectable;
+})();
+
+
+var SingleSelectable = (function() {
+	"use strict";
+
+	function SingleSelectable() {
+	}
+	
+	SingleSelectable.prototype = {
+		select: function(index) {
+			if( !this.selectable() ) return false;
+			var item = this.get(index);
+			index = this.indexOf(item);
+
+			if( !item ) return false;
+
+			if( this.selected() === item ) return false;
+			if( this.selected() ) this.deselect(this.selected());
+
+			var e = this.fireSync('select', {cancelable: true, item:item, index:index});
+			if( e.eventPrevented ) return false;
+
+			if( this.selected(item) ) return false;
+
+			this._selected = item;
+
+			this.fireSync('selected', {
+				item: e.item,
+				index: e.index
+			});
+
+			return true;
+		},
+		selectable: function(selectable) {
+			if( !arguments.length ) return (this._selectable === false) ? false : true;
+			if( selectable === false ) this._selectable = false;
+			return this;
+		},
+		deselect: function(index) {
+			var item = this.get(index);
+			index = this.indexOf(item);
+
+			if( !item ) return false;
+			
+			var e = this.fireSync('deselect', {cancelable: true, item:item, index:index});
+			if( e.eventPrevented ) return false;
+			
+			if( !this.selected(item) ) return false;
+
+			this._selected = null;
+
+			this.fireSync('deselected', {
+				item: e.item,
+				index: e.index
+			});
+
+			return true;
+		},
+		selected: function(index) {
+			if( !arguments.length ) return this._selected;
+
+			var item = this.get(index);
+			index = this.indexOf(item);
+
+			return (this._selected === item);
+		},
+		selectedIndex: function(item) {
+			if( !this._selected ) return -1;
+			return this.indexOf(this._selected);
+		},
+		prev: function() {
+			var i = this.selectedIndex();
+			if( i > 0 ) return this.select(i--);
+			return false;
+		},
+		next: function() {
+			var i = this.selectedIndex();
+			if( i >= 0 && i < (this.length() - 1) ) return this.select(i++);
+			return false;
+		},
+		first: function() {
+			return this.select(0);
+		},
+		last: function() {
+			return this.select(this.length());
+		}
+	};
+
+	return SingleSelectable;
+})();
+
+
 var Container = (function() {
 	"use strict"
 
@@ -16484,6 +16642,11 @@ var Container = (function() {
 		build: function() {
 			var self = this;
 			var o = this.options;
+			
+			// setup selectable
+			if( o.selectable ) this.selectable(o.selectable);
+			
+			// setup options.items
 			var fn = function() {
 				self.add(o.items);
 				self.mark();
@@ -16605,6 +16768,61 @@ var Container = (function() {
 		},
 		indexOf: function(item) {
 			return this._items.indexOf(item);
+		},
+		
+		// selectable interface
+		selectable: function(selectable) {
+			if( !arguments.length ) {
+				selectable = this._selectable;
+				if( !selectable ) return 0;
+				else return selectable.selectable.call(this);
+			}
+			
+			if( selectable === false || selectable === 0 ) this._selectable = null;
+			else if( selectable === 1 ) this._selectable = SingleSelectable;
+			else if( selectable > 0 ) this._selectable = Selectable;
+			
+			return this;
+		},
+		select: function(index) {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.select.apply(this, arguments);
+		},
+		deselect: function(index) {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.deselect.apply(this, arguments);
+		},
+		selected: function(index) {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.selected.apply(this, arguments);
+		},
+		selectedIndex: function(item) {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.selectedIndex.apply(this, arguments);
+		},
+		prev: function() {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.prev.apply(this, arguments);
+		},
+		next: function() {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.next.apply(this, arguments);
+		},
+		first: function() {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.first.apply(this, arguments);
+		},
+		last: function() {
+			var selectable = this._selectable;
+			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
+			return selectable.last.apply(this, arguments);
 		}
 	};
 
