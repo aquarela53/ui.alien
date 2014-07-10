@@ -1,7 +1,5 @@
 var Component = (function() { 
 	"use strict"
-		
-	var isElement = $.util.isElement;
 
 	var DOM_EVENTS = [
 		'click', 'dblclick', 'applicationmenu', 'blur', 'focus', 
@@ -17,6 +15,15 @@ var Component = (function() {
 	];
 	
 	var seq = 100;
+	
+	// wrapping script text as function for when event listener is script string
+	function wrappingevalscript(script) {
+		var app = this.application();
+		var cmp = this;
+		return function(e) {
+			return eval(script);
+		};
+	}
 	
 	// privates
 	function makeup(o) {
@@ -51,7 +58,13 @@ var Component = (function() {
 
 		for(var k in events) {
 			var fn = events[k];
+			
+			if( typeof(fn) === 'string' ) {
+				fn = wrappingevalscript.call(this, fn);
+			}
+			
 			if( typeof(fn) === 'function' ) this.on(k, fn);
+			else console.warn('[' + this.accessor() + '] illegal type of event listener:', fn);
 		}
 		
 		// setup application & name
@@ -92,6 +105,11 @@ var Component = (function() {
 		if( o.height || o.height === 0 ) el.height(o.height);
 		if( o.minHeight || o.minHeight === 0 ) el.minHeight(o.minHeight);
 		if( o.maxHeight || o.maxHeight === 0 ) el.maxHeight(o.maxHeight);
+		
+		if( o['min-width'] || o['min-width'] === 0 ) el.minWidth(o['min-width']);
+		if( o['max-width'] || o['max-width'] === 0 ) el.maxWidth(o['max-width']);
+		if( o['min-height'] || o['min-height'] === 0 ) el.minHeight(o['min-height']);
+		if( o['max-height'] || o['max-height'] === 0 ) el.maxHeight(o['max-height']);
 
 		if( o.fit ) el.ac('fit');
 
@@ -210,7 +228,7 @@ var Component = (function() {
 			else if( child instanceof $ ) el = child[0];
 			else el = child;
 			
-			if( !isElement(el) ) return console.error('illegal child type', child);
+			if( !isNode(el) ) return console.error('illegal child type', child);
 			
 			if( typeof(index) === 'number' ) {
 				var ref = target.children(index);
@@ -481,7 +499,11 @@ var Component = (function() {
 			if( typeof(actions) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', actions, fn, bubble);
 			
 			var dispatcher = this._dispatcher;
-			if( !dispatcher ) return console.error('[ERROR] where is event dispatcher?');
+			if( !dispatcher ) {
+				this.options.e = this.options.e || {};
+				this.options.e[actions] = fn;
+				return this;
+			}
 			
 			actions = actions.split(' ');
 			for(var i=0; i < actions.length; i++) {

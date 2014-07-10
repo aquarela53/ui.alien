@@ -3,10 +3,10 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-10 0:21:41
+ * @date: 2014-07-11 0:41:6
 */
 
-// es6 shim
+var less = {logLevel: 1};// es6 shim
 (function() {
 	if( !String.prototype.startsWith ) {
 		String.prototype.startsWith = function(s) {
@@ -116,7 +116,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-09 21:53:32
+ * @date: 2014-07-11 0:27:12
 */
 
 /*!
@@ -124,7 +124,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-02 22:16:11
+ * @date: 2014-07-11 0:26:55
 */
 
 (function() {
@@ -180,6 +180,7 @@ var Path = (function() {
 		
 	Path.join = function(base, path) {
 		if( !base ) return path;
+		if( path.trim() === '.' ) return base;
 		if( base instanceof Path ) base = base.src;
 		if( path instanceof Path ) path = path.src;
 
@@ -14064,7 +14065,7 @@ if (typeof define === "function" && define.amd) {
 			}
 		},
 		print: function() {
-			console.info('* {pkg.name} info');
+			console.info('* [' + Framework.id + '] info');
 			console.info('\tversion: ' + Framework.version );
 			console.info('\tcore build: ' + Framework.buildtime + ' ms');
 			console.info('\telapsed time to here: ' + (new Date().getTime() - Framework.finishtime) + ' ms');
@@ -14110,6 +14111,12 @@ if (typeof define === "function" && define.amd) {
 	var $ = require('attrs.dom');
 	var Ajax = require('ajax');
 	var Path = require('path');
+	var isElement = $.util.isElement;
+	var isNode = $.util.isNode;
+	
+	define('dom', function(module) {
+		module.exports = $;
+	});
 	
 	/* debug test
 	console.log('ui.controls.html', debug('ui.controls.html') );
@@ -14180,7 +14187,7 @@ var Util = (function() {
 		return o;
 	}
 	
-	function camelcase(value, delimeter, firstlower){
+	function camelcase(value, firstlower, delimeter){
 		if( !delimeter ) delimeter = '-';
 		var result = value.replace(/(\-[a-z])/g, function($1){return $1.toUpperCase().replace(delimeter,'');});
 		if( !result ) return result;
@@ -15796,8 +15803,6 @@ var StyleSystem = (function() {
 
 var Component = (function() { 
 	"use strict"
-		
-	var isElement = $.util.isElement;
 
 	var DOM_EVENTS = [
 		'click', 'dblclick', 'applicationmenu', 'blur', 'focus', 
@@ -15813,6 +15818,15 @@ var Component = (function() {
 	];
 	
 	var seq = 100;
+	
+	// wrapping script text as function for when event listener is script string
+	function wrappingevalscript(script) {
+		var app = this.application();
+		var cmp = this;
+		return function(e) {
+			return eval(script);
+		};
+	}
 	
 	// privates
 	function makeup(o) {
@@ -15847,7 +15861,13 @@ var Component = (function() {
 
 		for(var k in events) {
 			var fn = events[k];
+			
+			if( typeof(fn) === 'string' ) {
+				fn = wrappingevalscript.call(this, fn);
+			}
+			
 			if( typeof(fn) === 'function' ) this.on(k, fn);
+			else console.warn('[' + this.accessor() + '] illegal type of event listener:', fn);
 		}
 		
 		// setup application & name
@@ -15888,6 +15908,11 @@ var Component = (function() {
 		if( o.height || o.height === 0 ) el.height(o.height);
 		if( o.minHeight || o.minHeight === 0 ) el.minHeight(o.minHeight);
 		if( o.maxHeight || o.maxHeight === 0 ) el.maxHeight(o.maxHeight);
+		
+		if( o['min-width'] || o['min-width'] === 0 ) el.minWidth(o['min-width']);
+		if( o['max-width'] || o['max-width'] === 0 ) el.maxWidth(o['max-width']);
+		if( o['min-height'] || o['min-height'] === 0 ) el.minHeight(o['min-height']);
+		if( o['max-height'] || o['max-height'] === 0 ) el.maxHeight(o['max-height']);
 
 		if( o.fit ) el.ac('fit');
 
@@ -16006,7 +16031,7 @@ var Component = (function() {
 			else if( child instanceof $ ) el = child[0];
 			else el = child;
 			
-			if( !isElement(el) ) return console.error('illegal child type', child);
+			if( !isNode(el) ) return console.error('illegal child type', child);
 			
 			if( typeof(index) === 'number' ) {
 				var ref = target.children(index);
@@ -16277,7 +16302,11 @@ var Component = (function() {
 			if( typeof(actions) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', actions, fn, bubble);
 			
 			var dispatcher = this._dispatcher;
-			if( !dispatcher ) return console.error('[ERROR] where is event dispatcher?');
+			if( !dispatcher ) {
+				this.options.e = this.options.e || {};
+				this.options.e[actions] = fn;
+				return this;
+			}
 			
 			actions = actions.split(' ');
 			for(var i=0; i < actions.length; i++) {
@@ -16830,16 +16859,41 @@ var Container = (function() {
 })();
 
 
+// convert element's attributes to options
+function convert2options(el) {
+	var attributes = el.attributes;
+	var attrs = {};
+	for(var i=0; i < attributes.length; i++) {
+		var name = attributes[i].name;
+		var value = attributes[i].value;
+		
+		if( name === 'as' ) continue;
+		
+		if( name.toLowerCase().startsWith('on') ) {
+			var ename = name.substring(2);
+			if( ename ) {
+				if( !attrs.e ) attrs.e = {};
+				attrs.e[ename] = value;
+				el.removeAttribute(name);
+			}
+		} else if( ~name.indexOf('-') ) {
+			attrs[Util.camelcase(name, true)] = value;
+		}
+		
+		attrs[name] = value;
+	}
+	return attrs;
+}
+
+
 var Application = (function() {
 	"use strict"
 	
 	var APPLICATIONS = [];
-	var isElement = $.util.isElement;
-	
-	var seq = 0;
+	var seq = 1;
 	
 	// class Application
-	function Application(options, argv) {
+	function Application(options) {
 		this._cmps = {};
 		this._translator = new TagTranslator(this);
 		this._themes = new ThemeManager();
@@ -16848,8 +16902,10 @@ var Application = (function() {
 		this.Container = Application.Container;
 		this.Application = Application.Application;
 		
-		this._applicationId = 'app-' + (seq++);
-		this._accessor = 'aui app-' + this._applicationId;
+		this._applicationId = 'app-' + ((seq === 1) ? 'x' : seq);
+		this._accessor = 'aui ' + this._applicationId;
+		
+		seq++;
 		
 		for(var k in BUNDLES.components) {
 			this.component(k, BUNDLES.components[k]);
@@ -16859,28 +16915,34 @@ var Application = (function() {
 			this.tag(k, BUNDLES.translators[k]);
 		}
 		
+		this.options = options = options || {};
+		options.src = (typeof(options) === 'string') ? options : options.src;
+		options.el = isElement(options) ? options : options.el;
+		options.origin = options.origin || options.src || location.href;
+		
+		this.origin(options.origin);
+		
 		// validate options
-		if( typeof(options) === 'string' ) {
-			if( Path.uri(options) === Path.uri(location.href) ) throw new Error('cannot load current location url', options);
-			options = {origin:options};
+		if( typeof(options.src) === 'string' ) {
+			if( Path.uri(options.src) === Path.uri(location.href) ) throw new Error('cannot load current location url', options.src);
 			
-			var result = require(Path.join(location.href, options.origin));
-			if( typeof(result) === 'function' ) options.setup = result;
+			var result = require(Path.join(location.href, options.src));
+			if( typeof(result) === 'function' ) options.initializer = result;
 			else if( typeof(result) === 'object' ) options.items = [result];
-			else if( Array.isArray(result) ) options.item = result;
-		} else if( isElement(options) ) {
-			options = {el:options};
+			else if( Array.isArray(result) ) options.items = result;
+			
+			// invoke initializer
+			if( options.initializer ) {
+				var fn = options.initializer;
+				fn.call(fn, this);
+			}
 		}
 		
-		options = options || {};
-		if( !options.origin ) options.origin = location.href;
-		if( argv ) options.argv = argv;
-		
-		this.$super(options);
+		this.$super(this.options);
 		
 		APPLICATIONS.push(this);
 		
-		this.fire('ready');
+		this.fire('ready', {application:this});
 	}
 	
 	Application.prototype = {
@@ -16888,8 +16950,7 @@ var Application = (function() {
 			var self = this;
 			var o = this.options;
 			
-			this.cmpmap = new Map();
-			
+			this.cmpmap = new Map();			
 			this.on('added', function(e) {
 				var added = e.added;
 				
@@ -16913,16 +16974,15 @@ var Application = (function() {
 			});
 			
 			// add original element
-			$(this.dom()).children().each(function() {
+			$(this.dom()).contents().each(function() {
 				self.add(this);
 			});
 			
 			this.$super();
-			
-			if( o.setup ) {
-				var fn = o.setup;
-				fn.call(fn, this, (o.argv || {}));
-			}
+		},
+		ready: function(fn) {
+			this.on('ready', fn);
+			return this;
 		},
 		packed: function(item, cmp) {
 			if( arguments.length == 1 ) return this.cmpmap.get(item);
@@ -16944,11 +17004,11 @@ var Application = (function() {
 		},
 		
 		origin: function(origin) {
-			if( !arguments.length ) return this._origin || location.href;
+			if( !arguments.length ) return this._origin;
 			
 			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);
 			
-			this._origin = Path.join(location.href, origin);
+			this._origin = Path.uri(Path.join(Path.uri(location.href), origin));
 			return this; 
 		},
 		icons: function(icons) {
@@ -17018,14 +17078,18 @@ var Application = (function() {
 			
 			// preprocessing application tags
 			var fn_application = function() {
-				var el = $(this);
-				var options = el.attr();
-				options.items = Array.prototype.slice.call(this.children);
+				var options = convert2options(this);
+				options.items = Array.prototype.slice.call(this.childNodes);
 				var application = new Application(options);
-				el.before(application.dom()).detach();
+				$(this).before(application.dom()).detach();
 			};
-			if( el.is('application') ) return el.each(fn_application).void();
-			else el.find('application').each(fn_application);
+			if( el.is('application') || el.attr('as') === 'application' ) return el.each(fn_application).void();
+			else el.find('application, *[as="application"]').each(fn_application);
+			
+			// remove defines tag
+			if( el.is('defines') ) return el.detach().void();
+			else el.find('defines').detach();
+			
 			
 			//if( debug('translator') ) console.info('[' + self.applicationId() + '] translation start', el[0]);
 			var translator = this._translator;
@@ -17035,24 +17099,24 @@ var Application = (function() {
 			var tmp = $.create('div').append(el).all().reverse().each(function() {
 				for(var tagname in tag) {
 					if( this.tagName.toLowerCase() === tagname || this.getAttribute('as') === tagname ) {
-						var as = this.getAttribute('as') ? true : false;
-						this.removeAttribute('as');
+						var as = this.getAttribute('as');
 						var el = this;
 						var fn = tag[tagname];
-						var attributes = el.attributes;
-						var attrs = {};
-						for(var i=0; i < attributes.length; i++) {
-							var name = attributes[i].name;
-							var value = attributes[i].value;
-							attrs[name] = value;
-						}						
+						var options = convert2options(el);
 						
 						if( as ) {
-							attrs['el'] = el;
-							var cmp = fn.apply(self, [el, attrs]);
-							if( !cmp ) $(el).detach();
+							options['el'] = el;
+							var cmp = self.component(as);
+							if( !cmp ) {
+								console.error('[' + self.applicationId() + '] component not found', as);
+								continue;
+							}
+							
+							new cmp(options);
+							
+							this.removeAttribute('as');
 						} else {
-							var cmp = fn.apply(self, [el, attrs]);
+							var cmp = fn.apply(self, [el, options]);
 							if( cmp instanceof Component ) $(el).before(cmp.dom()).detach();
 							else if( (cmp instanceof $) || isElement(cmp) ) $(el).before(cmp).detach();
 							else $(el).detach();
@@ -17100,6 +17164,8 @@ var Application = (function() {
 			
 			if( isElement(source) ) {
 				packed = this.translate(source);
+			} else if( isNode(source) ) {
+				packed = source;
 			} else if( source instanceof $ ) {
 				var arr = [];
 				var self = this;
@@ -17313,7 +17379,7 @@ var Application = (function() {
 		ctx.hash(hash, function(e) {
 			var actions = $(this).children('action');
 			
-			console.log('[' + ctx.applicationId() + '] actions', actions);
+			if(debug('hash')) console.info('[' + ctx.applicationId() + '] actions', actions);
 			
 			var target = attrs.target;
 			var src = attrs.src;
@@ -17333,8 +17399,7 @@ var Application = (function() {
 		});
 		return false;
 	});
-	
-	
+		
 	// if autopack is on, fire ready after build default application.
 	var dispatcher = new EventDispatcher().scope(Application);
 	Application.ready = function(fn) {
@@ -17350,7 +17415,7 @@ var Application = (function() {
 
 var UI = Application;
 	
-// initial application setting
+// autopack
 (function() {	
 	// auto pack
 	var autopack = Framework.parameters['autopack'];
@@ -17358,17 +17423,28 @@ var UI = Application;
 		if( debug('ui') ) console.info('[' + Framework.id + '] autopack on');
 		
 		$.ready(function(e) {
-			var app = new Application(document.body);
+			var appels = $('application, *[as="application"]');
+			
+			var applications = [];
+			appels.each(function() {
+				var options = convert2options(this);
+				options.items = Array.prototype.slice.call(this.childNodes);
+				var application = new Application(options);
+				$(this).before(application.dom()).detach();		
+				applications.push(application);
+			});
 			
 			Application.fire('ready', {
-				application: app
+				applications: applications
 			});
 		});
 	} else {
 		if( debug() ) console.info('[' + Framework.id + '] autopack off');
 	}
-	
-	// regist global hash control	
+})();
+
+// regist global hash control
+(function() {
 	HashController.regist(function(hash, location) {
 		if( debug('hash') ) console.log('[' + Framework.id + '] hash changed "' + hash + '"');
 		
@@ -17820,9 +17896,9 @@ var ThemeManager = (function() {
 		}
 	};
 	
-	View.translator = function(el, attrs) {
-		var view = new this.View();
-		var children = el.children;
+	View.translator = function(el, options) {
+		var view = new this.View(options);
+		var children = el.childNodes;
 		var items = [];
 		
 		for(var i=0; i < children.length; i++) {

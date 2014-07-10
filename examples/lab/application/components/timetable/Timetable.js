@@ -97,9 +97,10 @@ Timetable.prototype = {
 
 Timetable.inherit = UI.Component;
 Timetable.style = 'css/style.less';
+Timetable.fname = 'Timetable';
 
 Timetable.translator = function(el, attrs) {
-	var cls = this.component('timetable');
+	var cls = this['Timetable'];
 	return new cls(attrs);
 };
 

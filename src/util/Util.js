@@ -56,7 +56,7 @@ var Util = (function() {
 		return o;
 	}
 	
-	function camelcase(value, delimeter, firstlower){
+	function camelcase(value, firstlower, delimeter){
 		if( !delimeter ) delimeter = '-';
 		var result = value.replace(/(\-[a-z])/g, function($1){return $1.toUpperCase().replace(delimeter,'');});
 		if( !result ) return result;

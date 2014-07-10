@@ -1,50 +1,108 @@
-@base: #fff;
-@highlight: #f8f8f8;
-@border: #ddd;
+@base:                    #fff;
+@highlight:               #f8f8f8;
+@border:                  #ddd;
+@gray-darker:             lighten(#000, 13.5%); // #222
+@gray-dark:               lighten(#000, 20%);   // #333
+@gray:                    lighten(#000, 33.5%); // #555
+@gray-light:              lighten(#000, 46.7%); // #777
+@gray-lighter:            lighten(#000, 93.5%); // #eee
+@brand-primary:           #428bca;
+@brand-success:           #5cb85c;
+@brand-info:              #5bc0de;
+@brand-warning:           #f0ad4e;
+@brand-danger:            #d9534f;
+@font-family-sans-serif:  "Helvetica Neue", Helvetica, Arial, sans-serif;
+@font-family-serif:       Georgia, "Times New Roman", Times, serif;
+@font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace;
+@font-family-base:        @font-family-sans-serif;
+
+@font-size-base:          14px;
+@font-size-large:         ceil((@font-size-base * 1.25)); // ~18px
+@font-size-small:         ceil((@font-size-base * 0.85)); // ~12px
+
+@font-size-h1:            floor((@font-size-base * 2.6)); // ~36px
+@font-size-h2:            floor((@font-size-base * 2.15)); // ~30px
+@font-size-h3:            ceil((@font-size-base * 1.7)); // ~24px
+@font-size-h4:            ceil((@font-size-base * 1.25)); // ~18px
+@font-size-h5:            @font-size-base;
+@font-size-h6:            ceil((@font-size-base * 0.85)); // ~12px
+
+@line-height-base:        1.428571429; // 20/14
+@line-height-computed:    floor((@font-size-base * @line-height-base)); // ~20px
+
+@headings-font-family:    inherit;
+@headings-font-weight:    500;
+@headings-line-height:    1.1;
+@headings-color:          inherit;
 
 @font-face {
     font-family: octicons;
     src: url(octicons.woff);
 }
 
-* {
+html{
+	height: 100%;
+}
+body {
+	min-height: 100%;
+}
+
+.aui {
+	font: 13px Helvetica, arial, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
 	box-sizing: border-box;
 	padding: 0;
 	margin: 0;
-}
-
-body {
-	font: 13px Helvetica, arial, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
-	padding: 10px;
-}
-
-a {
-	color: #4183c4;
-	text-decoration: none;
-}
-
-input, textarea {	
-	min-height: 34px;
-	padding: 7px 8px;
-	color: #333;
-	background-color: #fff;
-	background-repeat: no-repeat;
-	background-position: right center;
-	border: 1px solid #ccc;
-	border-radius: 3px;
-	box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
-	vertical-align: middle;
-}
-
-.aui.octicon, .aui .octicon {
-	font: normal normal 16px octicons;
-	line-height: 1;
-	display: inline-block;
-	text-decoration: none;
-	font-smoothing: antialiased;
 	
-	&.chevron-right:before {
-		content: '\f078';
+	a {
+		color: #4183c4;
+		text-decoration: none;
+	}
+
+	input, textarea {	
+		min-height: 34px;
+		padding: 7px 8px;
+		color: #333;
+		background-color: #fff;
+		background-repeat: no-repeat;
+		background-position: right center;
+		border: 1px solid #ccc;
+		border-radius: 3px;
+		box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
+		vertical-align: middle;
+	}
+	
+	&.icons, .icons {
+		font: normal normal 16px octicons;
+		line-height: 1;
+		display: inline-block;
+		text-decoration: none;
+		font-smoothing: antialiased;
+	
+		&.icon-1:before {
+			content: '\f078';
+		}
+	}
+	
+	.bg-gray-darker {
+		background-color: @gray-darker;
+		color: #eee;
+	}
+	
+	.bg-gray-dark {
+		background-color: @gray-dark;
+		color: #eee;
+	}
+	
+	.bg-gray {
+		background-color: @gray;
+	}
+	
+	.bg-gray-light {
+		background-color: @gray-light;
+	}
+	
+	.bg-gray-lighter {
+		background-color: @gray-lighter;
 	}
 }
 
@@ -96,8 +154,67 @@ input, textarea {
 	}
 }
 
+
+// View
+.aui.view {
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	align-content: stretch;
+
+	&.horizontal {
+		flex-direction: row;
+	}
+	
+	&.fullscreen {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+	}
+	
+	& > .fit {
+		flex: 1;
+	}
+	
+	& > * {
+	}
+}
+
+.aui.view_ {
+	position: relative;
+	
+	&.horizontal {
+		float: left;
+	}
+	
+	*:before, *:after, &:before, &:after {
+		clear: both;
+	}
+}
+
+// Button
+.aui.btn {
+	display: inline-block;
+}
+
+// SideNavigation
+.aui.side-navigation {
+	position: relative;
+	
+	ul {
+		overflow: hidden;	
+		li {
+			list-style: none;
+		}
+	}
+}
+
+
+// Timetable
 .aui.timetable {
 	line-height: 20px;
+	position: relative;
 
 	table.main {
 		width: 100%;

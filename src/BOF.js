@@ -18,7 +18,7 @@
 			}
 		},
 		print: function() {
-			console.info('* {pkg.name} info');
+			console.info('* [' + Framework.id + '] info');
 			console.info('\tversion: ' + Framework.version );
 			console.info('\tcore build: ' + Framework.buildtime + ' ms');
 			console.info('\telapsed time to here: ' + (new Date().getTime() - Framework.finishtime) + ' ms');
@@ -64,6 +64,12 @@
 	var $ = require('attrs.dom');
 	var Ajax = require('ajax');
 	var Path = require('path');
+	var isElement = $.util.isElement;
+	var isNode = $.util.isNode;
+	
+	define('dom', function(module) {
+		module.exports = $;
+	});
 	
 	/* debug test
 	console.log('ui.controls.html', debug('ui.controls.html') );

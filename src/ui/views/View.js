@@ -76,9 +76,9 @@
 		}
 	};
 	
-	View.translator = function(el, attrs) {
-		var view = new this.View();
-		var children = el.children;
+	View.translator = function(el, options) {
+		var view = new this.View(options);
+		var children = el.childNodes;
 		var items = [];
 		
 		for(var i=0; i < children.length; i++) {

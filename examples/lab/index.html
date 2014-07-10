@@ -4,9 +4,6 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-		<meta name="keywords" content="attrs.ui">
-		<meta name="author" content="joje.attrs@gmail.com">
-		<meta name="description" content="attrs.ui examples - Lab">
 		
 		<!-- attrs.ui initial paramters -->
 		<meta name="attrs.ui.autopack" content="true">
@@ -14,104 +11,69 @@
 		<meta name="attrs.ui.debug.translator" content="true">
 		<meta name="attrs.ui.debug.hash" content="false">
 		
-		<title>UI.Alien</title>
+		<title>그리픽스 예약시스템</title>
 
-		<link rel="stylesheet/less" type="text/css" href="css/style.less" />
+		<link rel="stylesheet/less" type="text/css" href="css/style.less" />		
 		<script type="text/javascript" src="../../build/ui.alien.js"></script>
-		<script type="text/javascript" src="test.js"></script>
 	</head>
-	<body>
-		<component id="timetable" src="components/timetable/Timetable.js" tag="login"></component>
-		<onhash hash="test">
-			<action type="import" target="#content" src="html/page2.html"></action>
-		</onhash>
+	
+	<body as="application" src="application/index.js">
+		<defines>
+			<component id="side-navigation" src="components/side-navigation/SideNavigation.js"></component>
+			<component id="timetable" src="components/timetable/Timetable.js"></component>
+		</defines>
 		
-		<div id="header">
-			<a id="logo" href="#">&nbsp;</a>
+		<view class="fullscreen">
+			<view class="horizontal bg-gray-light">
+				<div class="logo large" onclick="console.log(this, cmp, app, e);" as="html">로고</div>
 			
-			<div class="gnb">
-				<btn name="about" type="text" class="embos round(3px)" href="#about">ABOUT</btn>
-				<btn name="guides" type="text" class="embos round(3px)" href="#guides">GUIDES</btn>
-				<btn name="api" type="text" class="embos round(3px)" href="#api">API</btn>
-				<btn name="examples" type="text" class="embos round(3px)" href="#examples">EXAMPLES</btn>
-				<btn name="download" type="text" class="embos round(3px)" href="#download">DOWNLOAD</btn>
-				<btn name="community" type="text" class="embos round(3px)" href="#community">COMMUNITY</btn>
-			</div>
-			
-	        <div id="repository">
-				<btn type="icon+text" icon="icons.fork" style="icon-size:20px;text-size:12px;" href="https://github.com/attrs/attrs.ui.js" target="_blank">GitHub</a>
-	        </div>
-		</div>
-		<div id="center">
-			<div id="side">
-				<list name="side-navigation" data="./data/ia.json" style="inner-border-color:#333;outer-border:none;">
-					<option name="template" content="element">
-						<li class="row">
-							<div class="icon">{icon}</div>
-							<div class="title">{title}</div>
-						</li>
-					</option>
-				</list>
-			</div>
-			<div id="content">
-				<h1>Title</h1>
-				<timetable cols="room1,room2,room3" rows="date">
-					<option name="mapper" content="object">
-						{
-							col: function(data) {
-								var booked = data.booked;
-							},
-							row: function(data) {
-							}
-						}
-					</option>
-				</timetable>
-				<include src="html/page1.html"></include>
-			</div>
-		</div>
-		<div id="subcontent">
-			<application id="app" src="application/index.js" style="border:1px solid orange;">
-				<view id="view">
-					<div class="pre">a</div>
-					<view name="content">
-						<h1>제목</h1>
-						<div>
-							내용
-							<view horizontal="true">
-								<btn align="left">버튼</btn>
-								<btn align="center">버튼</btn>
-								<btn align="right">버튼</btn>
-							</view>
-						</div>
-					</view>
-					<bar>
-						<btn align="left">버튼</btn>
-						<btn align="center">버튼</btn>
-						<btn align="right">버튼</btn>
-					</bar>
+				<view class="horizontal fit" min-height="10px">
+					<btn name="guides" type="text" href="#guides">예약관리</btn>
+					<btn name="examples" type="text" href="#examples">서비스관리</btn>
+					<btn name="api" type="text" href="#api">통계</btn>
 				</view>
-			</application>
-		</div>
-		<div id="footer">
-			<div id="footer-wrapper">
-				<div class="info">
-					Copyright 2014 <a href="https://github.com/attrs" target="_blank">Team Attrs.</a><br>
-					<a href="/team">Core Team</a> | <a href="/sponsors">Project Sponsors</a>
-				</div>
-				<div class="links">
-					<a class="twitter" href="http://twitter.com/emberjs">
-						<i class="icon-twitter"></i><span>Twitter</span>
-					</a>
-					<a class="github" href="https://github.com/emberjs/ember.js">
-						<i class="icon-github"></i><span>GitHub</span>
-					</a>
-					<a class="googleplus" href="https://plus.google.com/communities/106387049790387471205">
-						<i class="icon-gplus"></i><span>Google+</span>
-					</a>
-				</div>
-			</div>
-	    </div>
-		<include src="html/page1.html"></include>
+			</view>
+			<view class="horizontal fit">
+				<view id="side" class="bg-gray-lighter"> 
+					<side-navigation name="snb" class="fit" data="./data/ia.json" style="width:200px;inner-border-color:#333;outer-border:none;">
+						<option name="template" content="element">
+							<li class="row">
+								<div class="icon">{icon}</div>
+								<div class="title">{title}</div>
+							</li>
+						</option>
+					</side-navigation>
+				</view>
+				<view id="contents" class="fit" style="padding:15px;">
+					<h1>Title</h1>
+					<view id="page">
+						<timetable cols="room1,room2,room3" rows="date">
+							<option name="mapper" content="object">
+								{
+									col: function(data) {
+										var booked = data.booked;
+									},
+									row: function(data) {
+									}
+								}
+							</option>
+						</timetable>
+					</view>
+				</view>
+			</view>
+			<view id="footer" class="bg-gray-dark">
+				<view>
+					<div class="info">
+						Copyright 2014 <a href="https://grifix.io" target="_blank">Grifix, Inc</a>
+					</div>
+					<div class="links">
+						<a class="twitter" href="http://twitter.com/emberjs">
+							<i class="icon-twitter"></i><span>Twitter</span>
+						</a>
+					</div>
+				</view>
+			</view>
+		</view>
 	</body>
 </html>
 
