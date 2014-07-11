@@ -381,7 +381,7 @@ var Application = (function() {
 			if( typeof(cls) !== 'function' ) return console.error('[' + this.applicationId() + '] invalid component class:' + id, cls);
 			
 			var self = this;
-			var fname = cls.fname || Util.camelcase(id);
+			var fname = cls.fname = cls.fname || Util.camelcase(id);
 			
 			var inherit = cls.inherit;			
 			if( cls.hasOwnProperty('inherit') && !inherit ) return console.error('[' + this.applicationId() + '] invalid inherit, unkwnown \'' + inherit + '\'', cls);

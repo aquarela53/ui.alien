@@ -30,9 +30,9 @@ module.exports = function(application) {
 		// find test
 		console.log('- find & finds by selector');
 		console.log('find', application.find('.fit[name="snb"]'));
-		console.log('finds', application.finds('.fit[name="snb"]'));
+		console.log('finds', application.finds('[name="guides"]'));
 		console.log('byName', application.byName('snb'));
-		console.log('byId', application.byId('contents').finds());
+		console.log('byId', application.byId('contents'));
 		console.log('');
 		
 		console.log('- find & finds all');

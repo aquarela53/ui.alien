@@ -3,7 +3,6 @@ var files = [
 	
 	// dependencies
 	'./src/dependencies/attrs.dom.js',
-	'./src/dependencies/less.js',
 
 	// begin
 	'./src/BOF.js',
@@ -98,8 +97,7 @@ module.exports = function(grunt) {
 					' * @author: <%= pkg.author.name %> (<%= pkg.author.url %>)\n' + 
 					' * @version: <%= pkg.version %>\n' + 
 					' * @date: <%= grunt.template.today("yyyy-mm-dd H:M:s") %>\n' + 
-					'*/\n\n' + 
-					'var less = {logLevel: 1};',
+					'*/\n\n',
 				process: function(src, filepath) {
 					return src
 						.replace('{pkg.bundleId}', pkg.bundleId || '')

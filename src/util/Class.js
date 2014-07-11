@@ -69,7 +69,7 @@ var Class = (function() {
 			
 			// for debug
 			if( debug ) {
-				var name = fname(clz);
+				var name = clz.fname || fname(clz);
 				eval('cls = function ' + (name || 'anonymous') + '() {constructor.apply(this, arguments);}');
 				//cls.__meta__ = {};
 				//cls.__meta__.name = name;
