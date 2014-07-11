@@ -32,7 +32,7 @@ var files = [
 	'./src/ui/ThemeManager.js',
 	'./src/ui/themes/alien.js',
 	'./src/ui/views/View.js',
-	'./src/ui/controls/HTML.js',
+	'./src/ui/controls/Markup.js',
 	'./src/ui/controls/Button.js',
 	
 	/*

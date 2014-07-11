@@ -42,7 +42,7 @@ var Application = (function() {
 		this.Application = Application.Application;
 		
 		this._applicationId = 'app-' + ((seq === 1) ? 'x' : seq);
-		this._accessor = 'aui ' + this._applicationId;
+		this._accessor = '.aui.' + this._applicationId;
 		
 		seq++;
 		
@@ -94,10 +94,7 @@ var Application = (function() {
 				var added = e.added;
 				
 				var packed;
-				if( o.translation !== false ) {
-					packed = this.pack(added);
-				}
-				
+				if( o.translation !== false ) packed = this.pack(added);				
 				if( packed ) this.attach(packed);
 				
 				this.packed(added, packed);
@@ -106,10 +103,9 @@ var Application = (function() {
 			this.on('removed', function(e) {
 				var packed = this.packed(e.removed);
 				
-				// TODO : 그냥 detach 하면 안됨. 어떤 시점에 다른 곳에 이미 attach 되었을 수도 있으니.
 				if( packed instanceof $ ) packed.detach();
 				else if( packed instanceof Component ) packed.detach();
-				else if( isElement(packed) ) this.attachTarget() && this.attachTarget().removeChild(packed);
+				else if( isElement(packed) ) packed.parentNode && packed.parentNode.removeChild(packed);
 			});
 			
 			// add original element
@@ -128,6 +124,20 @@ var Application = (function() {
 			if( item && cmp ) return this.cmpmap.set(item, cmp);
 			return null;
 		},
+		selector: function(selector) {
+			// request : div#id.a.b.c[name="name"]
+			// accessor : .app-x.application
+			// result = div#id.app-x.application.a.b.c[name="name"]
+			
+			selector = selector || '*';
+			var appaccessor = this.applicationAccessor();
+			if( selector === '*' ) return appaccessor;
+			else if( !~selector.indexOf('.') ) return selector + appaccessor;
+				
+			var h = selector.substring(0, selector.indexOf('.'));
+			var t = selector.substring(selector.indexOf('.'));
+			return h + appaccessor + t;
+		},
 		
 		applicationId: function() {
 			return this._applicationId;
@@ -136,7 +146,7 @@ var Application = (function() {
 			return this._accessor;
 		},
 		accessor: function() {
-			return this._accessor + ' application';
+			return this._accessor + '.application';
 		},
 		application: function() {
 			return this;
@@ -229,43 +239,39 @@ var Application = (function() {
 			if( el.is('defines') ) return el.detach().void();
 			else el.find('defines').detach();
 			
-			
-			//if( debug('translator') ) console.info('[' + self.applicationId() + '] translation start', el[0]);
-			var translator = this._translator;
-			//var match = $.util.match;
-			var selectors = this.tag();
-			
+			// component parsing...
 			var tmp = $.create('div').append(el).all().reverse().each(function() {
-				for(var selector in selectors) {
-					if( $(this).is(selector) || this.getAttribute('as') === selector ) {
-					//if( this.tagName.toLowerCase() === selector || this.getAttribute('as') === selector ) {
-						var as = this.getAttribute('as');
-						var el = this;
-						var fn = selectors[selector];
-						var options = convert2options(el);
-						
-						if( as ) {
-							options['el'] = el;
-							var cmp = self.component(as);
-							if( !cmp ) {
-								console.error('[' + self.applicationId() + '] component not found', as);
-								continue;
-							}
-							
-							new cmp(options);
-							
-							this.removeAttribute('as');
-						} else {
-							var cmp = fn.apply(self, [el, options]);
-							if( cmp instanceof Component ) $(el).before(cmp.dom()).detach();
-							else if( (cmp instanceof $) || isElement(cmp) ) $(el).before(cmp).detach();
-							else $(el).detach();
-						}
+				var as = this.getAttribute('as');
+				var tag = this.tagName.toLowerCase();
+				var options = convert2options(this);
+				var cmp;
+				if( as ) {
+					cmp = self.component(as);
+					options.el = this;
+					if( !cmp ) return console.warn('cannot found component corresponding to the tag [' + as + ']');
+				} else {
+					cmp = self.component(tag);
+				}
+				
+				var fn = cmp && cmp.translator();
+				if( fn ) {
+					var result = fn.apply(self, [this, options]);
+					
+					if( as ) {
+						this.removeAttribute('as');
+					} else {				
+						if( result instanceof Component ) $(this).before(result.dom()).detach();
+						else if( (result instanceof $) || isElement(result) ) $(this).before(result).detach();
+						else $(this).detach();
 					}
-				}			
+				}
 			}).end(1);
 			
-			// preprocessing onhash tags
+			// additional tag translation
+			var tags = this.tag();
+			
+			
+			// preprocessing include tags
 			var fn_include = function() {
 				var el = $(this);
 				var src = el.attr('src');
@@ -365,12 +371,12 @@ var Application = (function() {
 		},
 		
 		// define ui component
-		component: function(id, cls) {
-			if( typeof(id) !== 'string' || ~id.indexOf('.') ) return console.error('[' + this.applicationId() + '] illegal component id:' + id);			
+		component: function(id, cls) {				
 			if( arguments.length === 1 ) {
 				return this._cmps[id];
 			}
 			
+			if( typeof(id) !== 'string' || ~id.indexOf('.') ) return console.error('[' + this.applicationId() + '] illegal component id:' + id);		
 			if( typeof(cls) === 'string' ) cls = require(this.path(cls));
 			if( typeof(cls) !== 'function' ) return console.error('[' + this.applicationId() + '] invalid component class:' + id, cls);
 			
@@ -401,7 +407,7 @@ var Application = (function() {
 				if( !c.superclass ) break;
 			}
 			
-			var accessor = (this.applicationAccessor() + ' ' + ids.reverse().join(' ')).trim();
+			var accessor = (this.applicationAccessor() + '.' + ids.reverse().join('.')).trim();
 			
 			if( false ) {
 				var parser = new less.Parser({});
@@ -497,8 +503,6 @@ var Application = (function() {
 		});
 	};
 	
-	
-	// TODO: ...
 	Application.translator = function(selector, fn) {
 		if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('[' + Framework.id + '] invalid parameter', selector, fn);
 		

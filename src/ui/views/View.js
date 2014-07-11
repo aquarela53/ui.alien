@@ -17,7 +17,7 @@
 
 			this.cmpmap = new Map();
 
-			this.on('added', function(e) {
+			this.on('added', function(e) {		
 				var added = e.added;
 				if( added === '-' ) added = new UI.Separator({flex:1});
 				
@@ -83,7 +83,7 @@
 		
 		for(var i=0; i < children.length; i++) {
 			var c = children[i];
-			var cmp = $(c).data('component');
+			var cmp = c.__aui__;
 			if( cmp ) items.push(cmp);
 			else items.push(c);
 		}

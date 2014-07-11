@@ -11,7 +11,7 @@
 		<meta name="attrs.ui.debug.translator" content="true">
 		<meta name="attrs.ui.debug.hash" content="false">
 		
-		<title>그리픽스 예약시스템</title>
+		<title>예약관리자</title>
 
 		<link rel="stylesheet/less" type="text/css" href="css/style.less" />		
 		<script type="text/javascript" src="../../build/ui.alien.js"></script>
@@ -25,7 +25,7 @@
 		
 		<view class="fullscreen">
 			<view class="horizontal bg-gray-light">
-				<div class="logo large" onclick="console.log(this, cmp, app, e);" as="html">로고</div>
+				<div class="logo large" onclick="console.log(this, cmp, app, e);" as="markup">로고</div>
 			
 				<view class="horizontal fit" min-height="10px">
 					<btn name="guides" type="text" href="#guides">예약관리</btn>
@@ -45,8 +45,8 @@
 					</side-navigation>
 				</view>
 				<view id="contents" class="fit" style="padding:15px;">
-					<h1>Title</h1>
-					<view id="page">
+					<h1 as="markup" onclick="app.test(this);">Title</h1>
+					<view id="page" onclick="app.test(this);">
 						<timetable cols="room1,room2,room3" rows="date">
 							<option name="mapper" content="object">
 								{

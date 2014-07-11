@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-11 14:3:19
+ * @date: 2014-07-11 20:7:51
 */
 
 var less = {logLevel: 1};// es6 shim
@@ -116,7 +116,7 @@ var less = {logLevel: 1};// es6 shim
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-11 0:27:12
+ * @date: 2014-07-11 19:19:28
 */
 
 /*!
@@ -5115,45 +5115,50 @@ var $ = (function() {
 		return $(items).owner(this);
 	};
 	
-	fn.visit = function(fn, direction, containSelf, ctx) {
-		if( typeof(fn) !== 'function' ) return console.error('fn must be a function');
+	fn.visitup = function(visitor, containSelf) {
+		if( typeof(visitor) !== 'function' ) return console.error('visitor must be a function');
 		
-		if( direction && !~['up', 'down'].indexOf(direction) ) return console.error('invalid direction', direction);
-		containSelf = (containSelf === false) ? false : true;
-		ctx = ctx || this;
+		containSelf = (containSelf === true) ? true : false;
 		
 		return this.each(function() {			
-			if( containSelf && fn.call(this, ctx) === false ) return false;
+			if( containSelf && visitor.call(this) === false ) return false;
 	
-			var propagation;
-			if( direction === 'up' ) {
-				propagation = function(el) {
-					var p = el.parentNode;
-					if( p ) {
-						if( fn.call(p, ctx) !== false ) {
-							propagation(p);
-						} else {
-							return false;
-						}
+			var propagation = function(el) {
+				var p = el.parentNode;
+				if( p ) {
+					if( visitor.call(p) !== false ) {
+						propagation(p);
+					} else {
+						return false;
 					}
-				};
-			} else {
-				propagation = function(el) {
-					var argc = el.children;
-					if( argc ) {
-						for(var i=0; i < argc.length;i++) {
-							var cel = argc[i];
-							if( fn.call(cel, ctx) !== false ) {
-								propagation(cel);
-							} else {
-								return false;
-							}
-						}
-					}
-				};
-			}
+				}
+			};
 
-			propagation(this);
+			return propagation(this);
+		});
+	};
+	
+	fn.visit = function(visitor, containSelf, allcontents) {
+		if( typeof(visitor) !== 'function' ) return console.error('visitor must be a function');
+		
+		containSelf = (containSelf === true) ? true : false;
+		allcontents = (allcontents === true) ? true : false;
+		
+		return this.each(function() {			
+			if( containSelf && visitor.call(this) === false ) return false;
+	
+			var propagation = function(el) {
+				var argc = $((allcontents) ? el.childNodes : el.children);
+				argc.each(function() {
+					if( visitor.call(this) !== false ) {
+						propagation(this);
+					} else {
+						return false;
+					}
+				});
+			};
+
+			return propagation(this);
 		});
 	};
 	
@@ -15801,6 +15806,18 @@ var StyleSystem = (function() {
 })();
 
 
+// wrapping script text as function for when event listener is script string
+function wrappingevalscript(script) {
+	var app = this.application();
+	var cmp = this;
+	return function(e) {
+		return eval(script);
+		//var fn;
+		//eval('fn = function(cmp, app) {\n' + script + '\n};');
+		//return fn.apply(cmp, [cmp, app]);
+	};
+}
+
 var Component = (function() { 
 	"use strict"
 
@@ -15819,14 +15836,7 @@ var Component = (function() {
 	
 	var seq = 100;
 	
-	// wrapping script text as function for when event listener is script string
-	function wrappingevalscript(script) {
-		var app = this.application();
-		var cmp = this;
-		return function(e) {
-			return eval(script);
-		};
-	}
+	var array_return = $.util.array_return;
 	
 	// privates
 	function makeup(o) {
@@ -15844,9 +15854,11 @@ var Component = (function() {
 			else if( el instanceof $ ) el = o.el;
 			else throw new TypeError('illegal type "options.el":' + o.el); 
 		}
-				
-		this.el = el.save('first').data('component', this).attr(o.attrs).classes(this.accessor());
-				
+		
+		el = this.el = el.save('first').data('component', this).attr(o.attrs);
+		
+		el[0].__aui__ = this;
+					
 		// confirm event scope
 		var events = o.e || o.events;
 		var scope = (events && events.scope) || this;
@@ -15875,7 +15887,7 @@ var Component = (function() {
 		if( o.name ) this.name(o.name);
 		if( o.origin ) this.origin(o.origin);
 		if( o.title ) this.title(o.title);
-		if( o.classes || o.class ) this.classes(o.classes || o.class);
+		this.classes(o.classes || o.class || '');
 		if( o.origin ) this.origin(o.origin);
 
 		// setup status
@@ -15974,32 +15986,76 @@ var Component = (function() {
 			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);
 			
 			this._origin = Path.join(this.application().origin(), origin);
+			this._base = Path.dir(this._origin);
 			return this; 
 		},
-		base: function() {
-			return Path.dir(this.origin());
+		base: function(base) {
+			if( !arguments.length ) return this._base || Path.dir(this.origin());
+			if( base && typeof(base) === 'string' ) this._base = base;
+			else return console.error('invalid base', base);
+			return this;
 		},
 		path: function(src) {
 			return Path.join(this.base(), src);
 		},
 		
-		// selector
-		finds: function(selector) {
-			return null;			
-		},
-		find: function(selector) {
-			return null;
-		},
-		
 		// attach
 		parent: function() {
-			return this._parent;
+			var parent = this.el[0].parentNode;
+			if( parent && parent.__aui__ ) return parent.__aui__;
+			return parent;
 		},
-		children: function() {
+		contents: function() {
 			var attachTarget = this.attachTarget();
 			if( !attachTarget ) return [];
-			
-			return attachTarget.children;
+			return Array.prototype.slice.call(attachTarget.childNodes);
+		},
+		children: function() {
+			var contents = $(this.contents());
+			var result = [];
+			contents.each(function() {
+				if( this.__aui__ ) result.push(this.__aui__);
+			});
+			return result;
+		},	
+		find: function(selector) {
+			var result;
+			selector = this.application().selector(selector);
+			this.el.find(selector).each(function() {
+				if( this.__aui__ ) {
+					result = this.__aui__;
+					return false;
+				}
+			});
+			return result;
+		},
+		finds: function(selector) {			
+			selector = this.application().selector(selector);
+			var result = [];
+			this.el.find(selector).each(function() {
+				if( this.__aui__ ) result.push(this.__aui__);
+			});
+			return array_return(result);
+		},
+		byId: function(cmpid) {
+			return this.find('#' + cmpid);
+		},
+		byName: function(name) {
+			return this.finds('[name="' + name + '"]');
+		},
+		visitup: function(fn, containSelf) {
+			if( typeof(fn) !== 'function' ) return console.error('visitor must be a function');
+			this.el.visitup(function() {
+				if( this.__aui__ ) return fn.call(this.__aui__);
+			},containSelf);
+			return this;
+		},
+		visit: function(fn, containSelf) {
+			if( typeof(fn) !== 'function' ) return console.error('visitor must be a function');
+			this.el.visit(function() {
+				if( this.__aui__ ) return fn.call(this.__aui__);
+			},containSelf);
+			return this;
 		},
 		acceptable: function() {
 			if( typeof(this._acceptable) === 'boolean' ) return this._acceptable;
@@ -16009,8 +16065,14 @@ var Component = (function() {
 			if( !this.acceptable() ) return null;
 			if( !arguments.length ) return this._attachTarget || this.dom();
 			
+			if( attachTarget === this.dom() ) return this;
+			
+			if( this._attachTarget ) this._attachTarget.__aui__ = null;
+			
 			if( isElement(attachTarget) ) this._attachTarget = attachTarget;
-			else console.error('illegal attach target, target must be an element', attachTarget);
+			else return console.error('illegal attach target, target must be an element', attachTarget);
+			
+			attachTarget.__aui__ = this;
 			return this;
 		},
 		attach: function(child, index) {
@@ -16040,8 +16102,6 @@ var Component = (function() {
 			} else {
 				$(target).append(el);
 			}
-						
-			if( child instanceof Component ) child._parent = this;
 			
 			return this;
 		},
@@ -16071,7 +16131,6 @@ var Component = (function() {
 		},
 		detach: function() {
 			this.el.detach();
-			this._parent = null;
 			return this;
 		},
 
@@ -16080,22 +16139,24 @@ var Component = (function() {
 			return this.el[0];
 		},
 		accessor: function() {
-			var themecls = this._theme || '';
-			if( themecls ) themecls = ' theme-' + themecls;
-			return this.concrete().accessor() + themecls;
+			return this.el.accessor();
 		},
 		classes: function(classes) {
+			var cls = this.constructor;
+			var accessor;
+			if( cls === Application || cls.prototype instanceof Application ) accessor = this.applicationAccessor(); 
+			else accessor = cls.accessor();
+			
 			var el = this.el;
 			
 			if( !arguments.length ) {
-				var accessor = this.accessor().split(' ');
-				
+				var args = accessor.split('.');
 				return el.classes().filter(function(item) {
-					return !~accessor.indexOf(item);
+					return !~args.indexOf(item);
 				}).join(' ');
 			}
 			
-			el.classes(this.accessor());
+			el.classes(accessor.split('.').join(' '));
 			if( classes && typeof(classes) === 'string' ) el.ac(classes);
 			return this;
 		},
@@ -16491,6 +16552,14 @@ var Component = (function() {
 			
 			console.log('==============================================');
 		}
+	};
+	
+	Component.translator = function(cmpid) {
+		return function(el, options) {
+			var concrete = this.component(cmpid);
+			if( !concrete ) return console.warn('cannot find component [' + id + ']');
+			return new concrete(options);
+		};
 	};
 	
 	return Component = Class.inherit(Component);
@@ -16903,7 +16972,7 @@ var Application = (function() {
 		this.Application = Application.Application;
 		
 		this._applicationId = 'app-' + ((seq === 1) ? 'x' : seq);
-		this._accessor = 'aui ' + this._applicationId;
+		this._accessor = '.aui.' + this._applicationId;
 		
 		seq++;
 		
@@ -16955,10 +17024,7 @@ var Application = (function() {
 				var added = e.added;
 				
 				var packed;
-				if( o.translation !== false ) {
-					packed = this.pack(added);
-				}
-				
+				if( o.translation !== false ) packed = this.pack(added);				
 				if( packed ) this.attach(packed);
 				
 				this.packed(added, packed);
@@ -16967,10 +17033,9 @@ var Application = (function() {
 			this.on('removed', function(e) {
 				var packed = this.packed(e.removed);
 				
-				// TODO : 그냥 detach 하면 안됨. 어떤 시점에 다른 곳에 이미 attach 되었을 수도 있으니.
 				if( packed instanceof $ ) packed.detach();
 				else if( packed instanceof Component ) packed.detach();
-				else if( isElement(packed) ) this.attachTarget() && this.attachTarget().removeChild(packed);
+				else if( isElement(packed) ) packed.parentNode && packed.parentNode.removeChild(packed);
 			});
 			
 			// add original element
@@ -16989,6 +17054,20 @@ var Application = (function() {
 			if( item && cmp ) return this.cmpmap.set(item, cmp);
 			return null;
 		},
+		selector: function(selector) {
+			// request : div#id.a.b.c[name="name"]
+			// accessor : .app-x.application
+			// result = div#id.app-x.application.a.b.c[name="name"]
+			
+			selector = selector || '*';
+			var appaccessor = this.applicationAccessor();
+			if( selector === '*' ) return appaccessor;
+			else if( !~selector.indexOf('.') ) return selector + appaccessor;
+				
+			var h = selector.substring(0, selector.indexOf('.'));
+			var t = selector.substring(selector.indexOf('.'));
+			return h + appaccessor + t;
+		},
 		
 		applicationId: function() {
 			return this._applicationId;
@@ -16997,7 +17076,7 @@ var Application = (function() {
 			return this._accessor;
 		},
 		accessor: function() {
-			return this._accessor + ' application';
+			return this._accessor + '.application';
 		},
 		application: function() {
 			return this;
@@ -17090,43 +17169,39 @@ var Application = (function() {
 			if( el.is('defines') ) return el.detach().void();
 			else el.find('defines').detach();
 			
-			
-			//if( debug('translator') ) console.info('[' + self.applicationId() + '] translation start', el[0]);
-			var translator = this._translator;
-			//var match = $.util.match;
-			var selectors = this.tag();
-			
+			// component parsing...
 			var tmp = $.create('div').append(el).all().reverse().each(function() {
-				for(var selector in selectors) {
-					if( $(this).is(selector) || this.getAttribute('as') === selector ) {
-					//if( this.tagName.toLowerCase() === selector || this.getAttribute('as') === selector ) {
-						var as = this.getAttribute('as');
-						var el = this;
-						var fn = selectors[selector];
-						var options = convert2options(el);
-						
-						if( as ) {
-							options['el'] = el;
-							var cmp = self.component(as);
-							if( !cmp ) {
-								console.error('[' + self.applicationId() + '] component not found', as);
-								continue;
-							}
-							
-							new cmp(options);
-							
-							this.removeAttribute('as');
-						} else {
-							var cmp = fn.apply(self, [el, options]);
-							if( cmp instanceof Component ) $(el).before(cmp.dom()).detach();
-							else if( (cmp instanceof $) || isElement(cmp) ) $(el).before(cmp).detach();
-							else $(el).detach();
-						}
+				var as = this.getAttribute('as');
+				var tag = this.tagName.toLowerCase();
+				var options = convert2options(this);
+				var cmp;
+				if( as ) {
+					cmp = self.component(as);
+					options.el = this;
+					if( !cmp ) return console.warn('cannot found component corresponding to the tag [' + as + ']');
+				} else {
+					cmp = self.component(tag);
+				}
+				
+				var fn = cmp && cmp.translator();
+				if( fn ) {
+					var result = fn.apply(self, [this, options]);
+					
+					if( as ) {
+						this.removeAttribute('as');
+					} else {				
+						if( result instanceof Component ) $(this).before(result.dom()).detach();
+						else if( (result instanceof $) || isElement(result) ) $(this).before(result).detach();
+						else $(this).detach();
 					}
-				}			
+				}
 			}).end(1);
 			
-			// preprocessing onhash tags
+			// additional tag translation
+			var tags = this.tag();
+			
+			
+			// preprocessing include tags
 			var fn_include = function() {
 				var el = $(this);
 				var src = el.attr('src');
@@ -17226,12 +17301,12 @@ var Application = (function() {
 		},
 		
 		// define ui component
-		component: function(id, cls) {
-			if( typeof(id) !== 'string' || ~id.indexOf('.') ) return console.error('[' + this.applicationId() + '] illegal component id:' + id);			
+		component: function(id, cls) {				
 			if( arguments.length === 1 ) {
 				return this._cmps[id];
 			}
 			
+			if( typeof(id) !== 'string' || ~id.indexOf('.') ) return console.error('[' + this.applicationId() + '] illegal component id:' + id);		
 			if( typeof(cls) === 'string' ) cls = require(this.path(cls));
 			if( typeof(cls) !== 'function' ) return console.error('[' + this.applicationId() + '] invalid component class:' + id, cls);
 			
@@ -17262,7 +17337,7 @@ var Application = (function() {
 				if( !c.superclass ) break;
 			}
 			
-			var accessor = (this.applicationAccessor() + ' ' + ids.reverse().join(' ')).trim();
+			var accessor = (this.applicationAccessor() + '.' + ids.reverse().join('.')).trim();
 			
 			if( false ) {
 				var parser = new less.Parser({});
@@ -17358,8 +17433,6 @@ var Application = (function() {
 		});
 	};
 	
-	
-	// TODO: ...
 	Application.translator = function(selector, fn) {
 		if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('[' + Framework.id + '] invalid parameter', selector, fn);
 		
@@ -17838,7 +17911,7 @@ var ThemeManager = (function() {
 
 			this.cmpmap = new Map();
 
-			this.on('added', function(e) {
+			this.on('added', function(e) {		
 				var added = e.added;
 				if( added === '-' ) added = new UI.Separator({flex:1});
 				
@@ -17904,7 +17977,7 @@ var ThemeManager = (function() {
 		
 		for(var i=0; i < children.length; i++) {
 			var c = children[i];
-			var cmp = $(c).data('component');
+			var cmp = c.__aui__;
 			if( cmp ) items.push(cmp);
 			else items.push(c);
 		}
@@ -17922,12 +17995,12 @@ var ThemeManager = (function() {
 (function() {
 	"use strict"
 	
-	function HTML(options) {
+	function Markup(options) {
 		if( typeof(options) === 'string' ) options = {html:options};
 		this.$super(options);
 	}
 
-	HTML.prototype = {
+	Markup.prototype = {
 		build: function() {
 			var o = this.options;
 			
@@ -17971,7 +18044,7 @@ var ThemeManager = (function() {
 		}
 	};
 	
-	HTML.style = {
+	Markup.style = {
 		'background-color': 'transparent',
 		'user-select': 'all',
 
@@ -17997,9 +18070,10 @@ var ThemeManager = (function() {
 		}
 	};
 	
-	HTML.fname = 'HTML';
+	Markup.fname = 'Markup';
+	Markup.translator = Component.translator('markup');
 		
-	return HTML = UI.component('html', HTML);
+	return Markup = UI.component('markup', Markup);
 })();
 
 

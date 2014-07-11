@@ -1,3 +1,15 @@
+// wrapping script text as function for when event listener is script string
+function wrappingevalscript(script) {
+	var app = this.application();
+	var cmp = this;
+	return function(e) {
+		return eval(script);
+		//var fn;
+		//eval('fn = function(cmp, app) {\n' + script + '\n};');
+		//return fn.apply(cmp, [cmp, app]);
+	};
+}
+
 var Component = (function() { 
 	"use strict"
 
@@ -16,14 +28,7 @@ var Component = (function() {
 	
 	var seq = 100;
 	
-	// wrapping script text as function for when event listener is script string
-	function wrappingevalscript(script) {
-		var app = this.application();
-		var cmp = this;
-		return function(e) {
-			return eval(script);
-		};
-	}
+	var array_return = $.util.array_return;
 	
 	// privates
 	function makeup(o) {
@@ -41,9 +46,11 @@ var Component = (function() {
 			else if( el instanceof $ ) el = o.el;
 			else throw new TypeError('illegal type "options.el":' + o.el); 
 		}
-				
-		this.el = el.save('first').data('component', this).attr(o.attrs).classes(this.accessor());
-				
+		
+		el = this.el = el.save('first').data('component', this).attr(o.attrs);
+		
+		el[0].__aui__ = this;
+					
 		// confirm event scope
 		var events = o.e || o.events;
 		var scope = (events && events.scope) || this;
@@ -72,7 +79,7 @@ var Component = (function() {
 		if( o.name ) this.name(o.name);
 		if( o.origin ) this.origin(o.origin);
 		if( o.title ) this.title(o.title);
-		if( o.classes || o.class ) this.classes(o.classes || o.class);
+		this.classes(o.classes || o.class || '');
 		if( o.origin ) this.origin(o.origin);
 
 		// setup status
@@ -171,32 +178,76 @@ var Component = (function() {
 			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);
 			
 			this._origin = Path.join(this.application().origin(), origin);
+			this._base = Path.dir(this._origin);
 			return this; 
 		},
-		base: function() {
-			return Path.dir(this.origin());
+		base: function(base) {
+			if( !arguments.length ) return this._base || Path.dir(this.origin());
+			if( base && typeof(base) === 'string' ) this._base = base;
+			else return console.error('invalid base', base);
+			return this;
 		},
 		path: function(src) {
 			return Path.join(this.base(), src);
 		},
 		
-		// selector
-		finds: function(selector) {
-			return null;			
-		},
-		find: function(selector) {
-			return null;
-		},
-		
 		// attach
 		parent: function() {
-			return this._parent;
+			var parent = this.el[0].parentNode;
+			if( parent && parent.__aui__ ) return parent.__aui__;
+			return parent;
 		},
-		children: function() {
+		contents: function() {
 			var attachTarget = this.attachTarget();
 			if( !attachTarget ) return [];
-			
-			return attachTarget.children;
+			return Array.prototype.slice.call(attachTarget.childNodes);
+		},
+		children: function() {
+			var contents = $(this.contents());
+			var result = [];
+			contents.each(function() {
+				if( this.__aui__ ) result.push(this.__aui__);
+			});
+			return result;
+		},	
+		find: function(selector) {
+			var result;
+			selector = this.application().selector(selector);
+			this.el.find(selector).each(function() {
+				if( this.__aui__ ) {
+					result = this.__aui__;
+					return false;
+				}
+			});
+			return result;
+		},
+		finds: function(selector) {			
+			selector = this.application().selector(selector);
+			var result = [];
+			this.el.find(selector).each(function() {
+				if( this.__aui__ ) result.push(this.__aui__);
+			});
+			return array_return(result);
+		},
+		byId: function(cmpid) {
+			return this.find('#' + cmpid);
+		},
+		byName: function(name) {
+			return this.finds('[name="' + name + '"]');
+		},
+		visitup: function(fn, containSelf) {
+			if( typeof(fn) !== 'function' ) return console.error('visitor must be a function');
+			this.el.visitup(function() {
+				if( this.__aui__ ) return fn.call(this.__aui__);
+			},containSelf);
+			return this;
+		},
+		visit: function(fn, containSelf) {
+			if( typeof(fn) !== 'function' ) return console.error('visitor must be a function');
+			this.el.visit(function() {
+				if( this.__aui__ ) return fn.call(this.__aui__);
+			},containSelf);
+			return this;
 		},
 		acceptable: function() {
 			if( typeof(this._acceptable) === 'boolean' ) return this._acceptable;
@@ -206,8 +257,14 @@ var Component = (function() {
 			if( !this.acceptable() ) return null;
 			if( !arguments.length ) return this._attachTarget || this.dom();
 			
+			if( attachTarget === this.dom() ) return this;
+			
+			if( this._attachTarget ) this._attachTarget.__aui__ = null;
+			
 			if( isElement(attachTarget) ) this._attachTarget = attachTarget;
-			else console.error('illegal attach target, target must be an element', attachTarget);
+			else return console.error('illegal attach target, target must be an element', attachTarget);
+			
+			attachTarget.__aui__ = this;
 			return this;
 		},
 		attach: function(child, index) {
@@ -237,8 +294,6 @@ var Component = (function() {
 			} else {
 				$(target).append(el);
 			}
-						
-			if( child instanceof Component ) child._parent = this;
 			
 			return this;
 		},
@@ -268,7 +323,6 @@ var Component = (function() {
 		},
 		detach: function() {
 			this.el.detach();
-			this._parent = null;
 			return this;
 		},
 
@@ -277,22 +331,24 @@ var Component = (function() {
 			return this.el[0];
 		},
 		accessor: function() {
-			var themecls = this._theme || '';
-			if( themecls ) themecls = ' theme-' + themecls;
-			return this.concrete().accessor() + themecls;
+			return this.el.accessor();
 		},
 		classes: function(classes) {
+			var cls = this.constructor;
+			var accessor;
+			if( cls === Application || cls.prototype instanceof Application ) accessor = this.applicationAccessor(); 
+			else accessor = cls.accessor();
+			
 			var el = this.el;
 			
 			if( !arguments.length ) {
-				var accessor = this.accessor().split(' ');
-				
+				var args = accessor.split('.');
 				return el.classes().filter(function(item) {
-					return !~accessor.indexOf(item);
+					return !~args.indexOf(item);
 				}).join(' ');
 			}
 			
-			el.classes(this.accessor());
+			el.classes(accessor.split('.').join(' '));
 			if( classes && typeof(classes) === 'string' ) el.ac(classes);
 			return this;
 		},
@@ -688,6 +744,14 @@ var Component = (function() {
 			
 			console.log('==============================================');
 		}
+	};
+	
+	Component.translator = function(cmpid) {
+		return function(el, options) {
+			var concrete = this.component(cmpid);
+			if( !concrete ) return console.warn('cannot find component [' + id + ']');
+			return new concrete(options);
+		};
 	};
 	
 	return Component = Class.inherit(Component);

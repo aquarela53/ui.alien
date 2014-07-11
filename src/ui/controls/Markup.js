@@ -1,12 +1,12 @@
 (function() {
 	"use strict"
 	
-	function HTML(options) {
+	function Markup(options) {
 		if( typeof(options) === 'string' ) options = {html:options};
 		this.$super(options);
 	}
 
-	HTML.prototype = {
+	Markup.prototype = {
 		build: function() {
 			var o = this.options;
 			
@@ -50,7 +50,7 @@
 		}
 	};
 	
-	HTML.style = {
+	Markup.style = {
 		'background-color': 'transparent',
 		'user-select': 'all',
 
@@ -76,7 +76,8 @@
 		}
 	};
 	
-	HTML.fname = 'HTML';
+	Markup.fname = 'Markup';
+	Markup.translator = Component.translator('markup');
 		
-	return HTML = UI.component('html', HTML);
+	return Markup = UI.component('markup', Markup);
 })();
