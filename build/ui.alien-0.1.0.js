@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-11 0:41:6
+ * @date: 2014-07-11 14:3:19
 */
 
 var less = {logLevel: 1};// es6 shim
@@ -17094,14 +17094,15 @@ var Application = (function() {
 			//if( debug('translator') ) console.info('[' + self.applicationId() + '] translation start', el[0]);
 			var translator = this._translator;
 			//var match = $.util.match;
-			var tag = this.tag();
+			var selectors = this.tag();
 			
 			var tmp = $.create('div').append(el).all().reverse().each(function() {
-				for(var tagname in tag) {
-					if( this.tagName.toLowerCase() === tagname || this.getAttribute('as') === tagname ) {
+				for(var selector in selectors) {
+					if( $(this).is(selector) || this.getAttribute('as') === selector ) {
+					//if( this.tagName.toLowerCase() === selector || this.getAttribute('as') === selector ) {
 						var as = this.getAttribute('as');
 						var el = this;
-						var fn = tag[tagname];
+						var fn = selectors[selector];
 						var options = convert2options(el);
 						
 						if( as ) {

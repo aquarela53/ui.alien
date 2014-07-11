@@ -233,14 +233,15 @@ var Application = (function() {
 			//if( debug('translator') ) console.info('[' + self.applicationId() + '] translation start', el[0]);
 			var translator = this._translator;
 			//var match = $.util.match;
-			var tag = this.tag();
+			var selectors = this.tag();
 			
 			var tmp = $.create('div').append(el).all().reverse().each(function() {
-				for(var tagname in tag) {
-					if( this.tagName.toLowerCase() === tagname || this.getAttribute('as') === tagname ) {
+				for(var selector in selectors) {
+					if( $(this).is(selector) || this.getAttribute('as') === selector ) {
+					//if( this.tagName.toLowerCase() === selector || this.getAttribute('as') === selector ) {
 						var as = this.getAttribute('as');
 						var el = this;
-						var fn = tag[tagname];
+						var fn = selectors[selector];
 						var options = convert2options(el);
 						
 						if( as ) {
