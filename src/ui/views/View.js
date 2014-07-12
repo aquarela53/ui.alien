@@ -1,4 +1,12 @@
 (function() {
+	function evaljson(script) {
+		with({}) {
+			var fn;
+			eval('fn = function() { return ' + script + ';}');
+			return fn();
+		}
+	}
+	
 	"use strict"
 
 	// class view
@@ -9,6 +17,21 @@
 	View.prototype = {
 		build: function() {
 			var self = this;
+			
+			this.loader(function(err, data, type, url, xhr) {
+				if( err ) return console.log('[' + this.accessor() + '] load fail', url);
+				if( typeof(data) === 'string' && type === 'html' ) {
+					this.items($(data).array());
+				} else if( type === 'json' ) {
+					if( typeof(data) === 'string' ) data = evaljson(data);
+					this.items(data);
+				} else if( type === 'js' ) {
+					var module = require.resolve(data, url);
+					if( module && typeof(module.exports) === 'function' ) module.exports(this);
+				} else {
+					return console.error('[' + this.accessor() + '] unsupported type [' + type + '] of contents', url, data);
+				}
+			});
 
 			// process options
 			var o = this.options;
@@ -33,7 +56,7 @@
 
 			this.on('removed', function(e) {
 				var removed = e.removed;
-				removed = this.byItem(removed);
+				removed = this.packed(removed);
 				
 				if( removed instanceof $ ) removed.detach();
 				else if( removed instanceof Component ) removed.detach();

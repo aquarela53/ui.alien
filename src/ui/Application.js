@@ -9,7 +9,7 @@ function convert2options(el) {
 		if( name === 'as' ) continue;
 		
 		if( name.toLowerCase().startsWith('on') ) {
-			var ename = name.substring(2);
+			var ename = name.substring(2).trim().split('_').join('.');
 			if( ename ) {
 				if( !attrs.e ) attrs.e = {};
 				attrs.e[ename] = value;
@@ -21,6 +21,8 @@ function convert2options(el) {
 		
 		attrs[name] = value;
 	}
+	
+	el.removeAttribute('as');
 	return attrs;
 }
 
@@ -51,24 +53,28 @@ var Application = (function() {
 		}
 		
 		for(var k in BUNDLES.translators) {
-			this.tag(k, BUNDLES.translators[k]);
+			this.translator(k, BUNDLES.translators[k]);
 		}
 		
-		this.options = options = options || {};
-		options.src = (typeof(options) === 'string') ? options : options.src;
-		options.el = isElement(options) ? options : options.el;
-		options.origin = options.origin || options.src || location.href;
-		
-		this.origin(options.origin);
-		
+		options = options || {};
+		var src = ((typeof(options) === 'string') ? options : (options.src || '')).trim();
+		if( src ) options.src = src;
+				
 		// validate options
-		if( typeof(options.src) === 'string' ) {
-			if( Path.uri(options.src) === Path.uri(location.href) ) throw new Error('cannot load current location url', options.src);
+		if( src ) {			
+			if( src.startsWith('javascript:') ) {
+				options.initializer = src.substring('javascript:'.length);
+				console.log('initializer', initializer);
+			} else {			
+				if( Path.uri(src) === Path.uri(location.href) ) throw new Error('cannot load current location url', src);
 			
-			var result = require(Path.join(location.href, options.src));
-			if( typeof(result) === 'function' ) options.initializer = result;
-			else if( typeof(result) === 'object' ) options.items = [result];
-			else if( Array.isArray(result) ) options.items = result;
+				this.origin(src);
+			
+				var result = require(Path.join(location.href, src));
+				if( typeof(result) === 'function' ) options.initializer = result;
+				else if( typeof(result) === 'object' ) options.items = [result];
+				else if( Array.isArray(result) ) options.items = result;
+			}
 			
 			// invoke initializer
 			if( options.initializer ) {
@@ -77,7 +83,7 @@ var Application = (function() {
 			}
 		}
 		
-		this.$super(this.options);
+		this.$super(options);
 		
 		APPLICATIONS.push(this);
 		
@@ -153,13 +159,25 @@ var Application = (function() {
 		},
 		
 		origin: function(origin) {
-			if( !arguments.length ) return this._origin;
-			
-			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);
-			
-			this._origin = Path.uri(Path.join(Path.uri(location.href), origin));
-			return this; 
+			if( !arguments.length ) return this._origin || location.href;			
+			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);			
+			this._origin = Path.join(location.href, origin);
+			return this;
 		},
+		base: function(base) {
+			if( !arguments.length ) return this._base || Path.dir(this._origin || location.href);
+			
+			if( !base ) this.base(Path.dir(origin));
+			else if( base && typeof(base) === 'string' ) base = Path.join(location.href, base);
+			else return console.error('invalid base', base);
+			
+			base = base.trim();
+			if( !base.endsWith('/') ) base = base + '/';
+			this._base = base;
+			
+			return this;
+		},
+		
 		icons: function(icons) {
 			if( !arguments.length ) return this._icons;
 			if( typeof(icons) === 'string' ) icons = {'default': icons};
@@ -174,16 +192,17 @@ var Application = (function() {
 		},
 		
 		// inspects DOM Elements for translates as component
-		tag: function(selector, fn) {
-			if( !arguments.length ) return this._tags || {};
-			else if( arguments.length === 1 ) return this._tags && this._tags[selector];
+		translator: function(selector, fn) {	
+			var translators = this._translators = this._translators || {};
+			
+			if( !arguments.length ) return translators || {};
+			else if( arguments.length === 1 ) return translators && translators[selector];
 			
 			if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('[' + this.applicationId() + '] invalid parameter(string, function)', arguments);
 			
-			this._tags = this._tags || {};
-			this._tags[selector] = fn;
+			translators[selector] = fn;
 			
-			this.fire('tag.added', {
+			this.fire('translator.added', {
 				selector: selector,
 				fn: fn
 			});
@@ -257,9 +276,7 @@ var Application = (function() {
 				if( fn ) {
 					var result = fn.apply(self, [this, options]);
 					
-					if( as ) {
-						this.removeAttribute('as');
-					} else {				
+					if( !as ) {
 						if( result instanceof Component ) $(this).before(result.dom()).detach();
 						else if( (result instanceof $) || isElement(result) ) $(this).before(result).detach();
 						else $(this).detach();
@@ -267,11 +284,11 @@ var Application = (function() {
 				}
 			}).end(1);
 			
-			// additional tag translation
-			var tags = this.tag();
+			// process additional translators
+			var translators = this.translator();
 			
 			
-			// preprocessing include tags
+			// process include tags
 			var fn_include = function() {
 				var el = $(this);
 				var src = el.attr('src');
@@ -316,7 +333,7 @@ var Application = (function() {
 				var arr = [];
 				var self = this;
 				source.each(function() {
-					var translated = this.translate(this);
+					var translated = self.translate(this);
 					if( translated ) arr.push(translated);
 				});
 				packed = $(arr).owner(source);
@@ -409,16 +426,6 @@ var Application = (function() {
 			
 			var accessor = (this.applicationAccessor() + '.' + ids.reverse().join('.')).trim();
 			
-			if( false ) {
-				var parser = new less.Parser({});
-				parser.parse(Ajax.get('login/login.less'), function (err, root) { 
-					if( err ) return console.error(err);
-					console.log(root);
-				   	var css = root.toCSS(); 
-					console.log(css);
-				});
-			}
-			
 			cmp.application = function() {
 				return self;
 			};
@@ -459,8 +466,6 @@ var Application = (function() {
 			var translator = cls.translator || function(el) {
 				console.warn('[' + this.applicationId() + '] component [' + id + '] does not support custom tag');
 			};
-			
-			this.tag(id, translator);
 			
 			cmp.translator = function() {
 				return translator;
@@ -509,38 +514,15 @@ var Application = (function() {
 		BUNDLES.translators[selector] = fn;
 		
 		APPLICATIONS.forEach(function(application) {
-			application.tag(selector, fn);
+			application.translator(selector, fn);
 		});
 	};
 	
 	// bind default translators
 	Application.translator('page', function(el, attrs) {
-		var ctx = this;
-	
-		var hash = attrs.hash;
-		if( typeof(hash) !== 'string' ) return console.warn('[' + Framework.id + '] attributes "hash" required', el);
-	
-		ctx.hash(hash, function(e) {
-			var actions = $(this).children('action');
-			
-			if(debug('hash')) console.info('[' + ctx.applicationId() + '] actions', actions);
-			
-			var target = attrs.target;
-			var src = attrs.src;
-			if( typeof(target) !== 'string' ) return console.warn('[' + ctx.applicationId() + '] attributes "target" required', el);
-			if( typeof(src) !== 'string' ) return console.warn('[' + ctx.applicationId() + '] attributes "src" required', el);
-		
-			var app = ctx.load(src);
-		
-			if( app ) {
-				var cmp = el.data('component');
-				if( cmp ) {
-					console.log('[' + ctx.applicationId() + '] target cmp', cmp);
-				} else {
-					console.log('[' + ctx.applicationId() + '] target el', el);
-				}
-			}
-		});
+		if( !attrs.hash || typeof(attrs.hash) !== 'string' ) return console.warn('[' + Framework.id + '] attributes "hash" required', el);
+		if( !attrs.action || typeof(attrs.action) !== 'string' ) return console.warn('[' + Framework.id + '] attributes "action" required', el);
+		this.page(attrs.hash, attrs.action);	
 		return false;
 	});
 		
@@ -572,9 +554,9 @@ var UI = Application;
 			var applications = [];
 			appels.each(function() {
 				var options = convert2options(this);
-				options.items = Array.prototype.slice.call(this.childNodes);
+				if( this.tagName.toLowerCase() !== 'application' ) options.el = this;
 				var application = new Application(options);
-				$(this).before(application.dom()).detach();		
+				if( !options.el ) $(this).before(application.dom()).detach();
 				applications.push(application);
 			});
 			
@@ -601,7 +583,7 @@ var UI = Application;
 				});
 				if( e.cancelBubble === true ) return false;
 			}
-		});
+		}, true);
 	});
 	
 	// invoke current hash after application ready

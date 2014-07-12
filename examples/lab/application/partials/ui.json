@@ -10,7 +10,7 @@
 			padding: 15,
 			items: [
 				{
-					component: 'html',
+					component: 'markup',
 					name: 'gnb',
 					html: '부엌에 참기름이 어디 있는지 생각해 보라.'
 				}
@@ -29,7 +29,7 @@
 					width: 250,
 					items: [
 						{
-							component: 'html',
+							component: 'markup',
 							flex: 1,
 							theme: 'test',
 							name: 'snb',
@@ -41,16 +41,7 @@
 					name: 'contents',
 					context: true,
 					width: 'auto',
-					bg: 'white',
-					css: {
-						padding: 10,
-						flex: 1
-					},
-					style: {
-					},
-					items: [
-						
-					]
+					bg: 'white'
 				}
 			]
 		}, {
@@ -58,10 +49,7 @@
 			name: 'footer',
 			bg: '#3f3e3e',
 			height: 45,
-			horizontal: true,
-			items: [
-				
-			]
+			horizontal: true
 		}
 	]
 }

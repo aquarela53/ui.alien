@@ -89,6 +89,8 @@ var Container = (function() {
 			for(var i=items.length; i >= 0;i--) {
 				this.remove(i);
 			}
+			
+			this._marks = {};
 
 			this.fire('cleared');
 			return this;
@@ -97,7 +99,10 @@ var Container = (function() {
 			if( !arguments.length ) return this._items.slice();
 			if( typeof(items) === 'number' ) return this.get(items);
 
-			this.clear();
+			var current = this._items.slice();
+			for(var i=current.length; i >= 0;i--) {
+				this.remove(i);
+			}
 			
 			if( items || items === 0 ) this.add(items);
 			return this;

@@ -30,8 +30,43 @@ var Component = (function() {
 	
 	var array_return = $.util.array_return;
 	
+	function normalizeContentsType(mimeType, url) {
+		if( mimeType && typeof(mimeType) === 'string' ) {
+			mimeType = mimeType.split(';')[0];
+			
+			if( ~mimeType.indexOf('javascript') ) return 'js';
+			else if( ~mimeType.indexOf('html') ) return 'html';
+			else if( ~mimeType.indexOf('json') ) return 'json';
+			else if( ~mimeType.indexOf('xml') ) return 'xml';
+			else if( ~mimeType.indexOf('css') ) return 'css';
+			else return mimeType;
+		} else if( url && typeof(url) === 'string' ) {
+			var ext = Path.ext(url).toLowerCase();
+			if( ext === 'htm') return 'html';
+			else return ext;
+		} else {
+			return console.error('illegal parameter', mimeType, url);
+		}
+	}
+	
 	// privates
-	function makeup(o) {
+	function makeup(options) {
+		var o = {};
+		if( isElement(options) ) {
+			o.el = options;
+		} else if( options instanceof $ ) {
+			o.el = options[0];
+		} else if( typeof(options) === 'function' ) {
+			o.build = options;
+		} else if( typeof(options) === 'object' ) {
+			o = options;
+		} else {
+			console.error('illegal options', options);
+			throw new TypeError('illegal options:' + options);
+		}
+		
+		o = this.options = new Options(o);
+		
 		var cls = this.constructor;
 
 		if( o.debug ) this.debug = true;
@@ -53,31 +88,30 @@ var Component = (function() {
 					
 		// confirm event scope
 		var events = o.e || o.events;
-		var scope = (events && events.scope) || this;
-		if( scope == 'el' ) scope = el;
-		else if( scope == 'element' ) scope = el[0];
-
-		// bind event in options
-		var dispatcher = this._dispatcher = new EventDispatcher(this, {
-			source: (o.e && o.e.source) || this,
-			scope: scope
-		});
-
-		for(var k in events) {
-			var fn = events[k];
+		if( events ) {
+			// bind event in options
+			var dispatcher = this._dispatcher = this._dispatcher || new EventDispatcher(this);
 			
-			if( typeof(fn) === 'string' ) {
-				fn = wrappingevalscript.call(this, fn);
+			if( events.soruce ) dispatcher.source(events.source);
+			if( events.scope ) dispatcher.scope( ((events.scope == 'dom') ? el[0] : events.scope) );
+
+			for(var k in events) {
+				var fn = events[k];
+			
+				if( typeof(fn) === 'string' ) {
+					fn = wrappingevalscript.call(this, fn);
+				}
+			
+				if( typeof(fn) === 'function' ) this.on(k, fn);
+				else console.warn('[' + this.accessor() + '] illegal type of event listener:', fn);
 			}
-			
-			if( typeof(fn) === 'function' ) this.on(k, fn);
-			else console.warn('[' + this.accessor() + '] illegal type of event listener:', fn);
 		}
 		
 		// setup application & name
 		if( o.id ) this.id(o.id);
 		if( o.name ) this.name(o.name);
 		if( o.origin ) this.origin(o.origin);
+		if( o.base ) this.base(o.base);
 		if( o.title ) this.title(o.title);
 		this.classes(o.classes || o.class || '');
 		if( o.origin ) this.origin(o.origin);
@@ -136,8 +170,7 @@ var Component = (function() {
 
 	// class Component
 	function Component(options) {
-		this.options = new Options(options);
-		makeup.call(this, this.options);
+		makeup.call(this, options);
 	}
 
 	Component.prototype = {
@@ -173,21 +206,30 @@ var Component = (function() {
 			return this.constructor.application();
 		},
 		origin: function(origin) {
-			if( !arguments.length ) return this._origin || this.application().origin();
-			
-			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);
-			
+			if( !arguments.length ) return this._origin || this.application().origin();			
+			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);			
 			this._origin = Path.join(this.application().origin(), origin);
-			this._base = Path.dir(this._origin);
+			this.base(Path.dir(origin));
 			return this; 
 		},
 		base: function(base) {
-			if( !arguments.length ) return this._base || Path.dir(this.origin());
-			if( base && typeof(base) === 'string' ) this._base = base;
+			if( !arguments.length ) return this._base || this.application().base();
+			
+			if( !base ) this.base(Path.dir(origin));
+			else if( base && typeof(base) === 'string' ) base = Path.join(this.application().base(), base);
 			else return console.error('invalid base', base);
+			
+			base = base.trim();
+			if( !base.endsWith('/') ) base = base + '/';
+			this._base = base;
+			
 			return this;
 		},
 		path: function(src) {
+			//console.log('origin', this.origin());
+			//console.log('base', this.base());
+			//console.log('requested', src);
+			//console.log('src', Path.join(this.base(), src));
 			return Path.join(this.base(), src);
 		},
 		
@@ -554,12 +596,7 @@ var Component = (function() {
 		on: function(actions, fn, bubble) {
 			if( typeof(actions) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', actions, fn, bubble);
 			
-			var dispatcher = this._dispatcher;
-			if( !dispatcher ) {
-				this.options.e = this.options.e || {};
-				this.options.e[actions] = fn;
-				return this;
-			}
+			var dispatcher = this._dispatcher = this._dispatcher || new EventDispatcher(this);
 			
 			actions = actions.split(' ');
 			for(var i=0; i < actions.length; i++) {
@@ -586,7 +623,7 @@ var Component = (function() {
 			if( typeof(actions) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', actions, fn, bubble);
 	
 			var dispatcher = this._dispatcher;
-			if( !dispatcher ) return console.error('[ERROR] where is event dispatcher?');
+			if( !dispatcher ) return this;
 
 			actions = actions.split(' ');
 			for(var i=0; i < actions.length; i++) {
@@ -605,58 +642,75 @@ var Component = (function() {
 		},
 		fireASync: function() {
 			var d = this._dispatcher;
-			if( !d ) return;
+			if( !d ) return {};
 			return d.fireASync.apply(d, arguments);
 		},
 		fire: function() {
 			var d = this._dispatcher;
-			if( !d ) return;
+			if( !d ) return {};
 			return d.fire.apply(d, arguments);
 		},
 
 		
 		// page mapping by url hash
-		hash: function(hash, fn) {
-			if( arguments.length === 1 && hash === false ) {
-				// 다 지움
-				var hashset = this._hashset;
-				if( !hashset ) return this;
+		pages: function(pages) {
+			if( !arguments.length ) return this._pages;
+			if( arguments.length === 1 && pages === false ) {
+				pages = this._pages;
+				if( !pages ) return this;
 				
-				for(var k in hashset) {
-					if( !hashset.hasOwnProperty(k) ) continue;
-					
-					var fn = hashset[k];
-					if( fn ) this.off('hash', fn.listener);
-					
-					hashset[k] = null;
-					try { delete hashset[k]; } catch(e) {}
+				for(var k in pages) {
+					if( pages.hasOwnProperty(k) ) this.page(k, false);
 				}
 				
+				return this;				
+			} else if( typeof(pages) === 'object' ) {
+				for(var k in pages) {
+					if( pages.hasOwnProperty(k)) this.page(k, pages[k]);
+				}
 				return this;
-			} else if( typeof(hash) === 'string' && fn === false ) {
+			} else {
+				return console.error('illegal parameter', pages);
+			}
+		},
+		page: function(hash, fn) {
+			if( typeof(hash) === 'string' && fn === false ) {
 				// 해당 hash 만 지움
-				var hashset = this._hashset;
-				if( !hashset ) return this;
+				var pages = this._pages;
+				if( !pages ) return this;
 				
-				var fn = hashset[hash];				
-				if( fn ) this.off('hash', fn.listener);
+				var fn = pages[hash];				
+				if( fn && fn.listener ) this.off('hash', fn.listener);
+				if( fn && fn.def_listener ) this.off('ready', fn.def_listener);
 								
-				hashset[hash] = null;
-				try { delete hashset[hash]; } catch(e) {}
+				pages[hash] = null;
+				try { delete pages[hash]; } catch(e) {}
 				
 				return this;
 			} else if( typeof(hash) === 'string' && typeof(fn) === 'function' ) {
 				// hash 이벤트 등록
-				var hashset = this._hashset;
-				if( !hashset ) hashset = this._hashset = {};
+				var pages = this._pages = this._pages || {};
+				
+				var def_listener = false;
+				if( hash === '@default' ) {
+					var def_listener = (function(fn) {
+						return function(e) {
+							fn.call(this, e);
+						};
+					})(fn);
+				}
 				
 				var listener = (function(hash, fn) {
 					return function(e) {
-						if( hash === '*' || e.hash === hash ) return fn.call(this, e);
+						if( hash === '*' || e.hash === hash || (hash === '@default' && e.hash === '')) return fn.call(this, e);
 					};
 				})(hash, fn);
 				
 				fn.listener = listener;
+				if( def_listener ) {
+					fn.def_listener = def_listener;
+					this.on('ready', def_listener);
+				}
 				
 				this.on('hash', listener);
 				
@@ -665,6 +719,32 @@ var Component = (function() {
 				return console.error('illegal parameter', hash, fn);
 			}
 			
+			return this;
+		},
+		
+		// loader
+		loader: function(fn) {
+			if( !arguments.length ) return this._loader;
+			if( typeof(fn) === 'function' ) this._loader = fn;
+			else return console.error('loader must be a function', fn);
+			return this;
+		},
+		load: function(src, fn, ajaxOptions) {
+			if( typeof(src) !== 'string' ) return console.error('illegal src', fn);
+			var contentType = ( typeof(fn) === 'string' ) ? fn : null;
+			
+			if( typeof(fn) !== 'function' ) fn = this._loader;
+			if( !fn ) return console.error('[' + this.accessor + '] component has no loader');
+			
+			ajaxOptions = ajaxOptions || {};
+			ajaxOptions.url = src;
+			ajaxOptions.url = this.path(ajaxOptions.url);
+			var self = this;
+			Ajax.ajax(ajaxOptions).done(function(err, data, xhr) {
+				if( err ) return fn.apply(self, [err, data]);
+				contentType = normalizeContentsType(contentType || xhr.getResponseHeader('content-type'), ajaxOptions.url);
+				fn.apply(self, [err, data, contentType, ajaxOptions.url, xhr]);
+			});
 			return this;
 		},
 		

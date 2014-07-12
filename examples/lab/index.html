@@ -13,7 +13,7 @@
 		
 		<title>예약관리자</title>
 		
-		<script type="text/javascript" src="../../build/ui.alien.min.js"></script>
+		<script type="text/javascript" src="../../build/ui.alien.js"></script>
 		
 		<link rel="stylesheet/less" type="text/css" href="css/style.less" />
 		<script type="text/javascript" src="lib/less.js"></script>
@@ -28,7 +28,7 @@
 		<view class="full">
 			<view class="horizontal bg-gray-light">
 				<div class="logo large" onclick="console.log(this, cmp, app, e);" as="markup">로고</div>
-			
+				
 				<view class="horizontal fit" min-height="10px">
 					<btn name="guides" type="text" href="#guides">예약관리</btn>
 					<btn name="examples" type="text" href="#examples">서비스관리</btn>
@@ -48,19 +48,8 @@
 				</view>
 				<view id="contents" class="fit" style="padding:15px;">
 					<h1 as="markup" onclick="app.test(this);">Title</h1>
-					<view id="page" onclick="app.test(this);">
-						<timetable cols="room1,room2,room3" rows="date">
-							<option name="mapper" content="object">
-								{
-									col: function(data) {
-										var booked = data.booked;
-									},
-									row: function(data) {
-									}
-								}
-							</option>
-						</timetable>
-					</view>
+					
+					<view id="contents-body"></view>
 				</view>
 			</view>
 			<view id="footer" class="bg-gray-dark">
@@ -69,7 +58,7 @@
 						Copyright 2014 <a href="https://grifix.io" target="_blank">Grifix, Inc</a>
 					</div>
 					<div class="links">
-						<a class="twitter" href="http://twitter.com/emberjs">
+						<a class="twitter" href="http://twitter.com/grifix">
 							<i class="icon-twitter"></i><span>Twitter</span>
 						</a>
 					</div>

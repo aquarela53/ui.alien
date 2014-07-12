@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-11 22:24:2
+ * @date: 2014-07-13 1:26:53
 */
 
 // es6 shim
@@ -116,7 +116,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-11 19:19:28
+ * @date: 2014-07-13 1:26:8
 */
 
 /*!
@@ -124,7 +124,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-11 0:26:55
+ * @date: 2014-07-13 1:25:54
 */
 
 (function() {
@@ -151,6 +151,9 @@ var Path = (function() {
 		},
 		filename: function() {
 			return Path.filename(this.src);
+		},
+		ext: function() {
+			return Path.ext(this.src);
 		},
 		querystring: function() {
 			return Path.querystring(this.src);
@@ -217,7 +220,7 @@ var Path = (function() {
 	};
 	
 	Path.dir = function(path) {
-		if( !path ) return null;
+		if( !path ) return '';
 		if( path instanceof Path ) path = path.src;
 
 		path = path.trim();
@@ -247,13 +250,10 @@ var Path = (function() {
 	};
 	
 	Path.filename = function(path) {
-		if( !path ) return null;
+		if( !path ) return '';
 		if( path instanceof Path ) path = path.src;
 
-		path = path.trim();
-
-		if( ~path.indexOf('?') ) path = path.substring(0, path.indexOf('?'));
-		if( ~path.indexOf('#') ) path = path.substring(0, path.indexOf('#'));
+		path = Path.uri(path).trim();
 
 		if( path.endsWith('/') ) {
 			path = path.substring(0, path.length - 1);
@@ -262,9 +262,20 @@ var Path = (function() {
 			return path.substring(path.lastIndexOf('/') + 1);
 		}
 	};
+	
+	Path.ext = function(path) {
+		if( !path ) return '';
+		if( path instanceof Path ) path = path.src;
+		
+		path = Path.filename(path);
+		
+		var arg = path.split('.');
+		if( arg.length <= 1 ) return '';
+		return arg[arg.length - 1];		
+	};
 
 	Path.uri = function(path) {
-		if( !path ) return null;
+		if( !path ) return '';
 		if( path instanceof Path ) path = path.src;
 
 		path = path.trim();
@@ -276,7 +287,7 @@ var Path = (function() {
 	};
 
 	Path.querystring = function(path) {
-		if( !path ) return null;
+		if( !path ) return '';
 		if( path instanceof Path ) path = path.src;
 
 		path = path.trim();
@@ -286,7 +297,7 @@ var Path = (function() {
 	};
 
 	Path.query = function(path) {
-		if( !path ) return null;
+		if( !path ) return '';
 		if( path instanceof Path ) path = path.src;
 
 		var q = this.querystring(q);
@@ -311,7 +322,7 @@ var Path = (function() {
 	};
 
 	Path.host = function(url) {
-		if( !url ) return null;
+		if( !url ) return '';
 		if( url instanceof Path ) url = url.src;
 
 		if( (i = url.indexOf('://')) >= 0 ) {
@@ -325,7 +336,7 @@ var Path = (function() {
 	};
 
 	Path.parse = function(url) {
-		if( !url ) return null;
+		if( !url ) return {};
 		if( url instanceof Path ) url = url.src;
 
 		return {
@@ -341,7 +352,7 @@ var Path = (function() {
 	};
 
 	Path.parent = function(path) {
-		if( !path ) return null;
+		if( !path ) return '';
 		if( path instanceof Path ) path = path.src;
 
 		path = this.dir(path);
@@ -619,7 +630,7 @@ var Ajax = (function() {
 										var json = JSON.parse(data);
 										data = json;
 									} catch(e) {
-										console.error('json parse error:', e.message, '[in ' + url + ']');
+										console.warn('[warn] json parse error:', e.message, '[in ' + url + ']');
 									}
 								} else if( o.parse && contentType && contentType.indexOf('xml') >= 0 && data ) {
 									data = string2xml(data);
@@ -1002,8 +1013,9 @@ var Require = (function() {
 
 		// class Require, singleton
 		function Require() {}
-
+		
 		Require.prototype = {
+			resolve: eval_as_module,
 			bundles: function() {
 				return bundles;
 			},
@@ -1104,6 +1116,7 @@ var Require = (function() {
 	var require = function(src, cache) {
 		return Require.sync(src, cache);
 	};
+	require.resolve = Require.resolve;
 
 	window.require = require;
 	window.define = Require.define;
@@ -4587,6 +4600,10 @@ var $ = (function() {
 		});
 	};
 	
+	prototype.array = function() {
+		return this.slice();	
+	};
+	
 	prototype.out = prototype.end = function(step) {
 		step = step || 1;
 				
@@ -7895,8 +7912,43 @@ var Component = (function() {
 	
 	var array_return = $.util.array_return;
 	
+	function normalizeContentsType(mimeType, url) {
+		if( mimeType && typeof(mimeType) === 'string' ) {
+			mimeType = mimeType.split(';')[0];
+			
+			if( ~mimeType.indexOf('javascript') ) return 'js';
+			else if( ~mimeType.indexOf('html') ) return 'html';
+			else if( ~mimeType.indexOf('json') ) return 'json';
+			else if( ~mimeType.indexOf('xml') ) return 'xml';
+			else if( ~mimeType.indexOf('css') ) return 'css';
+			else return mimeType;
+		} else if( url && typeof(url) === 'string' ) {
+			var ext = Path.ext(url).toLowerCase();
+			if( ext === 'htm') return 'html';
+			else return ext;
+		} else {
+			return console.error('illegal parameter', mimeType, url);
+		}
+	}
+	
 	// privates
-	function makeup(o) {
+	function makeup(options) {
+		var o = {};
+		if( isElement(options) ) {
+			o.el = options;
+		} else if( options instanceof $ ) {
+			o.el = options[0];
+		} else if( typeof(options) === 'function' ) {
+			o.build = options;
+		} else if( typeof(options) === 'object' ) {
+			o = options;
+		} else {
+			console.error('illegal options', options);
+			throw new TypeError('illegal options:' + options);
+		}
+		
+		o = this.options = new Options(o);
+		
 		var cls = this.constructor;
 
 		if( o.debug ) this.debug = true;
@@ -7918,31 +7970,30 @@ var Component = (function() {
 					
 		// confirm event scope
 		var events = o.e || o.events;
-		var scope = (events && events.scope) || this;
-		if( scope == 'el' ) scope = el;
-		else if( scope == 'element' ) scope = el[0];
-
-		// bind event in options
-		var dispatcher = this._dispatcher = new EventDispatcher(this, {
-			source: (o.e && o.e.source) || this,
-			scope: scope
-		});
-
-		for(var k in events) {
-			var fn = events[k];
+		if( events ) {
+			// bind event in options
+			var dispatcher = this._dispatcher = this._dispatcher || new EventDispatcher(this);
 			
-			if( typeof(fn) === 'string' ) {
-				fn = wrappingevalscript.call(this, fn);
+			if( events.soruce ) dispatcher.source(events.source);
+			if( events.scope ) dispatcher.scope( ((events.scope == 'dom') ? el[0] : events.scope) );
+
+			for(var k in events) {
+				var fn = events[k];
+			
+				if( typeof(fn) === 'string' ) {
+					fn = wrappingevalscript.call(this, fn);
+				}
+			
+				if( typeof(fn) === 'function' ) this.on(k, fn);
+				else console.warn('[' + this.accessor() + '] illegal type of event listener:', fn);
 			}
-			
-			if( typeof(fn) === 'function' ) this.on(k, fn);
-			else console.warn('[' + this.accessor() + '] illegal type of event listener:', fn);
 		}
 		
 		// setup application & name
 		if( o.id ) this.id(o.id);
 		if( o.name ) this.name(o.name);
 		if( o.origin ) this.origin(o.origin);
+		if( o.base ) this.base(o.base);
 		if( o.title ) this.title(o.title);
 		this.classes(o.classes || o.class || '');
 		if( o.origin ) this.origin(o.origin);
@@ -8001,8 +8052,7 @@ var Component = (function() {
 
 	// class Component
 	function Component(options) {
-		this.options = new Options(options);
-		makeup.call(this, this.options);
+		makeup.call(this, options);
 	}
 
 	Component.prototype = {
@@ -8038,21 +8088,30 @@ var Component = (function() {
 			return this.constructor.application();
 		},
 		origin: function(origin) {
-			if( !arguments.length ) return this._origin || this.application().origin();
-			
-			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);
-			
+			if( !arguments.length ) return this._origin || this.application().origin();			
+			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);			
 			this._origin = Path.join(this.application().origin(), origin);
-			this._base = Path.dir(this._origin);
+			this.base(Path.dir(origin));
 			return this; 
 		},
 		base: function(base) {
-			if( !arguments.length ) return this._base || Path.dir(this.origin());
-			if( base && typeof(base) === 'string' ) this._base = base;
+			if( !arguments.length ) return this._base || this.application().base();
+			
+			if( !base ) this.base(Path.dir(origin));
+			else if( base && typeof(base) === 'string' ) base = Path.join(this.application().base(), base);
 			else return console.error('invalid base', base);
+			
+			base = base.trim();
+			if( !base.endsWith('/') ) base = base + '/';
+			this._base = base;
+			
 			return this;
 		},
 		path: function(src) {
+			//console.log('origin', this.origin());
+			//console.log('base', this.base());
+			//console.log('requested', src);
+			//console.log('src', Path.join(this.base(), src));
 			return Path.join(this.base(), src);
 		},
 		
@@ -8419,12 +8478,7 @@ var Component = (function() {
 		on: function(actions, fn, bubble) {
 			if( typeof(actions) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', actions, fn, bubble);
 			
-			var dispatcher = this._dispatcher;
-			if( !dispatcher ) {
-				this.options.e = this.options.e || {};
-				this.options.e[actions] = fn;
-				return this;
-			}
+			var dispatcher = this._dispatcher = this._dispatcher || new EventDispatcher(this);
 			
 			actions = actions.split(' ');
 			for(var i=0; i < actions.length; i++) {
@@ -8451,7 +8505,7 @@ var Component = (function() {
 			if( typeof(actions) !== 'string' || typeof(fn) !== 'function') return console.error('[ERROR] invalid event parameter', actions, fn, bubble);
 	
 			var dispatcher = this._dispatcher;
-			if( !dispatcher ) return console.error('[ERROR] where is event dispatcher?');
+			if( !dispatcher ) return this;
 
 			actions = actions.split(' ');
 			for(var i=0; i < actions.length; i++) {
@@ -8470,58 +8524,75 @@ var Component = (function() {
 		},
 		fireASync: function() {
 			var d = this._dispatcher;
-			if( !d ) return;
+			if( !d ) return {};
 			return d.fireASync.apply(d, arguments);
 		},
 		fire: function() {
 			var d = this._dispatcher;
-			if( !d ) return;
+			if( !d ) return {};
 			return d.fire.apply(d, arguments);
 		},
 
 		
 		// page mapping by url hash
-		hash: function(hash, fn) {
-			if( arguments.length === 1 && hash === false ) {
-				// 다 지움
-				var hashset = this._hashset;
-				if( !hashset ) return this;
+		pages: function(pages) {
+			if( !arguments.length ) return this._pages;
+			if( arguments.length === 1 && pages === false ) {
+				pages = this._pages;
+				if( !pages ) return this;
 				
-				for(var k in hashset) {
-					if( !hashset.hasOwnProperty(k) ) continue;
-					
-					var fn = hashset[k];
-					if( fn ) this.off('hash', fn.listener);
-					
-					hashset[k] = null;
-					try { delete hashset[k]; } catch(e) {}
+				for(var k in pages) {
+					if( pages.hasOwnProperty(k) ) this.page(k, false);
 				}
 				
+				return this;				
+			} else if( typeof(pages) === 'object' ) {
+				for(var k in pages) {
+					if( pages.hasOwnProperty(k)) this.page(k, pages[k]);
+				}
 				return this;
-			} else if( typeof(hash) === 'string' && fn === false ) {
+			} else {
+				return console.error('illegal parameter', pages);
+			}
+		},
+		page: function(hash, fn) {
+			if( typeof(hash) === 'string' && fn === false ) {
 				// 해당 hash 만 지움
-				var hashset = this._hashset;
-				if( !hashset ) return this;
+				var pages = this._pages;
+				if( !pages ) return this;
 				
-				var fn = hashset[hash];				
-				if( fn ) this.off('hash', fn.listener);
+				var fn = pages[hash];				
+				if( fn && fn.listener ) this.off('hash', fn.listener);
+				if( fn && fn.def_listener ) this.off('ready', fn.def_listener);
 								
-				hashset[hash] = null;
-				try { delete hashset[hash]; } catch(e) {}
+				pages[hash] = null;
+				try { delete pages[hash]; } catch(e) {}
 				
 				return this;
 			} else if( typeof(hash) === 'string' && typeof(fn) === 'function' ) {
 				// hash 이벤트 등록
-				var hashset = this._hashset;
-				if( !hashset ) hashset = this._hashset = {};
+				var pages = this._pages = this._pages || {};
+				
+				var def_listener = false;
+				if( hash === '@default' ) {
+					var def_listener = (function(fn) {
+						return function(e) {
+							fn.call(this, e);
+						};
+					})(fn);
+				}
 				
 				var listener = (function(hash, fn) {
 					return function(e) {
-						if( hash === '*' || e.hash === hash ) return fn.call(this, e);
+						if( hash === '*' || e.hash === hash || (hash === '@default' && e.hash === '')) return fn.call(this, e);
 					};
 				})(hash, fn);
 				
 				fn.listener = listener;
+				if( def_listener ) {
+					fn.def_listener = def_listener;
+					this.on('ready', def_listener);
+				}
 				
 				this.on('hash', listener);
 				
@@ -8530,6 +8601,32 @@ var Component = (function() {
 				return console.error('illegal parameter', hash, fn);
 			}
 			
+			return this;
+		},
+		
+		// loader
+		loader: function(fn) {
+			if( !arguments.length ) return this._loader;
+			if( typeof(fn) === 'function' ) this._loader = fn;
+			else return console.error('loader must be a function', fn);
+			return this;
+		},
+		load: function(src, fn, ajaxOptions) {
+			if( typeof(src) !== 'string' ) return console.error('illegal src', fn);
+			var contentType = ( typeof(fn) === 'string' ) ? fn : null;
+			
+			if( typeof(fn) !== 'function' ) fn = this._loader;
+			if( !fn ) return console.error('[' + this.accessor + '] component has no loader');
+			
+			ajaxOptions = ajaxOptions || {};
+			ajaxOptions.url = src;
+			ajaxOptions.url = this.path(ajaxOptions.url);
+			var self = this;
+			Ajax.ajax(ajaxOptions).done(function(err, data, xhr) {
+				if( err ) return fn.apply(self, [err, data]);
+				contentType = normalizeContentsType(contentType || xhr.getResponseHeader('content-type'), ajaxOptions.url);
+				fn.apply(self, [err, data, contentType, ajaxOptions.url, xhr]);
+			});
 			return this;
 		},
 		
@@ -8875,6 +8972,8 @@ var Container = (function() {
 			for(var i=items.length; i >= 0;i--) {
 				this.remove(i);
 			}
+			
+			this._marks = {};
 
 			this.fire('cleared');
 			return this;
@@ -8883,7 +8982,10 @@ var Container = (function() {
 			if( !arguments.length ) return this._items.slice();
 			if( typeof(items) === 'number' ) return this.get(items);
 
-			this.clear();
+			var current = this._items.slice();
+			for(var i=current.length; i >= 0;i--) {
+				this.remove(i);
+			}
 			
 			if( items || items === 0 ) this.add(items);
 			return this;
@@ -8996,7 +9098,7 @@ function convert2options(el) {
 		if( name === 'as' ) continue;
 		
 		if( name.toLowerCase().startsWith('on') ) {
-			var ename = name.substring(2);
+			var ename = name.substring(2).trim().split('_').join('.');
 			if( ename ) {
 				if( !attrs.e ) attrs.e = {};
 				attrs.e[ename] = value;
@@ -9008,6 +9110,8 @@ function convert2options(el) {
 		
 		attrs[name] = value;
 	}
+	
+	el.removeAttribute('as');
 	return attrs;
 }
 
@@ -9038,24 +9142,28 @@ var Application = (function() {
 		}
 		
 		for(var k in BUNDLES.translators) {
-			this.tag(k, BUNDLES.translators[k]);
+			this.translator(k, BUNDLES.translators[k]);
 		}
 		
-		this.options = options = options || {};
-		options.src = (typeof(options) === 'string') ? options : options.src;
-		options.el = isElement(options) ? options : options.el;
-		options.origin = options.origin || options.src || location.href;
-		
-		this.origin(options.origin);
-		
+		options = options || {};
+		var src = ((typeof(options) === 'string') ? options : (options.src || '')).trim();
+		if( src ) options.src = src;
+				
 		// validate options
-		if( typeof(options.src) === 'string' ) {
-			if( Path.uri(options.src) === Path.uri(location.href) ) throw new Error('cannot load current location url', options.src);
+		if( src ) {			
+			if( src.startsWith('javascript:') ) {
+				options.initializer = src.substring('javascript:'.length);
+				console.log('initializer', initializer);
+			} else {			
+				if( Path.uri(src) === Path.uri(location.href) ) throw new Error('cannot load current location url', src);
 			
-			var result = require(Path.join(location.href, options.src));
-			if( typeof(result) === 'function' ) options.initializer = result;
-			else if( typeof(result) === 'object' ) options.items = [result];
-			else if( Array.isArray(result) ) options.items = result;
+				this.origin(src);
+			
+				var result = require(Path.join(location.href, src));
+				if( typeof(result) === 'function' ) options.initializer = result;
+				else if( typeof(result) === 'object' ) options.items = [result];
+				else if( Array.isArray(result) ) options.items = result;
+			}
 			
 			// invoke initializer
 			if( options.initializer ) {
@@ -9064,7 +9172,7 @@ var Application = (function() {
 			}
 		}
 		
-		this.$super(this.options);
+		this.$super(options);
 		
 		APPLICATIONS.push(this);
 		
@@ -9140,13 +9248,25 @@ var Application = (function() {
 		},
 		
 		origin: function(origin) {
-			if( !arguments.length ) return this._origin;
-			
-			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);
-			
-			this._origin = Path.uri(Path.join(Path.uri(location.href), origin));
-			return this; 
+			if( !arguments.length ) return this._origin || location.href;			
+			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);			
+			this._origin = Path.join(location.href, origin);
+			return this;
 		},
+		base: function(base) {
+			if( !arguments.length ) return this._base || Path.dir(this._origin || location.href);
+			
+			if( !base ) this.base(Path.dir(origin));
+			else if( base && typeof(base) === 'string' ) base = Path.join(location.href, base);
+			else return console.error('invalid base', base);
+			
+			base = base.trim();
+			if( !base.endsWith('/') ) base = base + '/';
+			this._base = base;
+			
+			return this;
+		},
+		
 		icons: function(icons) {
 			if( !arguments.length ) return this._icons;
 			if( typeof(icons) === 'string' ) icons = {'default': icons};
@@ -9161,16 +9281,17 @@ var Application = (function() {
 		},
 		
 		// inspects DOM Elements for translates as component
-		tag: function(selector, fn) {
-			if( !arguments.length ) return this._tags || {};
-			else if( arguments.length === 1 ) return this._tags && this._tags[selector];
+		translator: function(selector, fn) {	
+			var translators = this._translators = this._translators || {};
+			
+			if( !arguments.length ) return translators || {};
+			else if( arguments.length === 1 ) return translators && translators[selector];
 			
 			if( typeof(selector) !== 'string' || typeof(fn) !== 'function' ) return console.error('[' + this.applicationId() + '] invalid parameter(string, function)', arguments);
 			
-			this._tags = this._tags || {};
-			this._tags[selector] = fn;
+			translators[selector] = fn;
 			
-			this.fire('tag.added', {
+			this.fire('translator.added', {
 				selector: selector,
 				fn: fn
 			});
@@ -9244,9 +9365,7 @@ var Application = (function() {
 				if( fn ) {
 					var result = fn.apply(self, [this, options]);
 					
-					if( as ) {
-						this.removeAttribute('as');
-					} else {				
+					if( !as ) {
 						if( result instanceof Component ) $(this).before(result.dom()).detach();
 						else if( (result instanceof $) || isElement(result) ) $(this).before(result).detach();
 						else $(this).detach();
@@ -9254,11 +9373,11 @@ var Application = (function() {
 				}
 			}).end(1);
 			
-			// additional tag translation
-			var tags = this.tag();
+			// process additional translators
+			var translators = this.translator();
 			
 			
-			// preprocessing include tags
+			// process include tags
 			var fn_include = function() {
 				var el = $(this);
 				var src = el.attr('src');
@@ -9303,7 +9422,7 @@ var Application = (function() {
 				var arr = [];
 				var self = this;
 				source.each(function() {
-					var translated = this.translate(this);
+					var translated = self.translate(this);
 					if( translated ) arr.push(translated);
 				});
 				packed = $(arr).owner(source);
@@ -9396,16 +9515,6 @@ var Application = (function() {
 			
 			var accessor = (this.applicationAccessor() + '.' + ids.reverse().join('.')).trim();
 			
-			if( false ) {
-				var parser = new less.Parser({});
-				parser.parse(Ajax.get('login/login.less'), function (err, root) { 
-					if( err ) return console.error(err);
-					console.log(root);
-				   	var css = root.toCSS(); 
-					console.log(css);
-				});
-			}
-			
 			cmp.application = function() {
 				return self;
 			};
@@ -9446,8 +9555,6 @@ var Application = (function() {
 			var translator = cls.translator || function(el) {
 				console.warn('[' + this.applicationId() + '] component [' + id + '] does not support custom tag');
 			};
-			
-			this.tag(id, translator);
 			
 			cmp.translator = function() {
 				return translator;
@@ -9496,38 +9603,15 @@ var Application = (function() {
 		BUNDLES.translators[selector] = fn;
 		
 		APPLICATIONS.forEach(function(application) {
-			application.tag(selector, fn);
+			application.translator(selector, fn);
 		});
 	};
 	
 	// bind default translators
 	Application.translator('page', function(el, attrs) {
-		var ctx = this;
-	
-		var hash = attrs.hash;
-		if( typeof(hash) !== 'string' ) return console.warn('[' + Framework.id + '] attributes "hash" required', el);
-	
-		ctx.hash(hash, function(e) {
-			var actions = $(this).children('action');
-			
-			if(debug('hash')) console.info('[' + ctx.applicationId() + '] actions', actions);
-			
-			var target = attrs.target;
-			var src = attrs.src;
-			if( typeof(target) !== 'string' ) return console.warn('[' + ctx.applicationId() + '] attributes "target" required', el);
-			if( typeof(src) !== 'string' ) return console.warn('[' + ctx.applicationId() + '] attributes "src" required', el);
-		
-			var app = ctx.load(src);
-		
-			if( app ) {
-				var cmp = el.data('component');
-				if( cmp ) {
-					console.log('[' + ctx.applicationId() + '] target cmp', cmp);
-				} else {
-					console.log('[' + ctx.applicationId() + '] target el', el);
-				}
-			}
-		});
+		if( !attrs.hash || typeof(attrs.hash) !== 'string' ) return console.warn('[' + Framework.id + '] attributes "hash" required', el);
+		if( !attrs.action || typeof(attrs.action) !== 'string' ) return console.warn('[' + Framework.id + '] attributes "action" required', el);
+		this.page(attrs.hash, attrs.action);	
 		return false;
 	});
 		
@@ -9559,9 +9643,9 @@ var UI = Application;
 			var applications = [];
 			appels.each(function() {
 				var options = convert2options(this);
-				options.items = Array.prototype.slice.call(this.childNodes);
+				if( this.tagName.toLowerCase() !== 'application' ) options.el = this;
 				var application = new Application(options);
-				$(this).before(application.dom()).detach();		
+				if( !options.el ) $(this).before(application.dom()).detach();
 				applications.push(application);
 			});
 			
@@ -9588,7 +9672,7 @@ var UI = Application;
 				});
 				if( e.cancelBubble === true ) return false;
 			}
-		});
+		}, true);
 	});
 	
 	// invoke current hash after application ready
@@ -9950,6 +10034,14 @@ var ThemeManager = (function() {
 })();
 
 (function() {
+	function evaljson(script) {
+		with({}) {
+			var fn;
+			eval('fn = function() { return ' + script + ';}');
+			return fn();
+		}
+	}
+	
 	"use strict"
 
 	// class view
@@ -9960,6 +10052,21 @@ var ThemeManager = (function() {
 	View.prototype = {
 		build: function() {
 			var self = this;
+			
+			this.loader(function(err, data, type, url, xhr) {
+				if( err ) return console.log('[' + this.accessor() + '] load fail', url);
+				if( typeof(data) === 'string' && type === 'html' ) {
+					this.items($(data).array());
+				} else if( type === 'json' ) {
+					if( typeof(data) === 'string' ) data = evaljson(data);
+					this.items(data);
+				} else if( type === 'js' ) {
+					var module = require.resolve(data, url);
+					if( module && typeof(module.exports) === 'function' ) module.exports(this);
+				} else {
+					return console.error('[' + this.accessor() + '] unsupported type [' + type + '] of contents', url, data);
+				}
+			});
 
 			// process options
 			var o = this.options;
@@ -9984,7 +10091,7 @@ var ThemeManager = (function() {
 
 			this.on('removed', function(e) {
 				var removed = e.removed;
-				removed = this.byItem(removed);
+				removed = this.packed(removed);
 				
 				if( removed instanceof $ ) removed.detach();
 				else if( removed instanceof Component ) removed.detach();
