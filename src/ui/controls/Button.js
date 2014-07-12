@@ -135,5 +135,5 @@
 	Button.fname = 'Button';
 	Button.acceptable = true;
 	
-	return Button = UI.component('btn', Button);
+	return Button = UI.component('button', Button);
 })();

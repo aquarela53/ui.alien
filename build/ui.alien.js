@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-13 8:43:26
+ * @date: 2014-07-13 8:50:35
 */
 
 // es6 shim
@@ -10391,7 +10391,7 @@ var ThemeManager = (function() {
 	Button.fname = 'Button';
 	Button.acceptable = true;
 	
-	return Button = UI.component('btn', Button);
+	return Button = UI.component('button', Button);
 })();
 
 
