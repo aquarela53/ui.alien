@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-13 1:26:53
+ * @date: 2014-07-13 5:14:39
 */
 
 // es6 shim
@@ -116,7 +116,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-13 1:26:8
+ * @date: 2014-07-13 5:9:37
 */
 
 /*!
@@ -2843,10 +2843,10 @@ if( false ) {
 */
 
 var Device = (function() {
-	"use strict"
-
 	// class device
 	function Device() {
+		"use strict";
+		
 		var nav = window.navigator;
 		var _platform = nav.platform;
 		var agent = nav.userAgent;
@@ -2925,15 +2925,40 @@ var Device = (function() {
 		this.device = device;
 		this.engine = engine;
 		this.browser = browser;
-		this.version = version;
+		this.versionString = version;
+		this.version = parseInt(version.split('.')[0]);
 		this.retina = retina;
 		this.touchable = touchable;
 		this.prefix = prefix;
-		this.hasTransform = hasTransform;
+		this.transform = hasTransform;
 		this.has3d = has3d;
 		this.resolution = resolution;
 
 		this.calibrator = new CSS3Calibrator(this);
+		
+		// represent attributes
+		this.gecko = (this.engine === 'gecko');
+		this.webkit = (this.engine === 'webkit');
+		
+		this.firefox = (this.browser === 'firefox');
+		this.ie = (this.browser === 'msie');
+		this.opera = (this.browser === 'opera');
+		this.chrome = (this.browser === 'chrome');
+		this.safari = (this.browser === 'safari');
+		
+		this.iphone = (this.device === 'iphone');
+		this.ipad = (this.device === 'ipad');
+		this.ipod = (this.device === 'ios');
+
+		this.ios = (this.platform.name === 'ios');
+		this.android = (this.platform.name === 'android');
+		this.osx = (this.platform.name === 'osx');
+		this.windows = (this.platform.name === 'windows');
+		this.linux = (this.platform.name === 'linux');		
+
+		this.phone = (this.platform.type === 'phone');
+		this.tablet = (this.platform.type === 'tablet');
+		this.desktop = (this.platform.type === 'desktop');		
 
 		// gecko 의 경우 innerText 바인딩
 		if( engine === 'gecko' && window.HTMLElement && window.HTMLElement.prototype.__defineGetter__ ) {
@@ -2958,54 +2983,22 @@ var Device = (function() {
 
 	Device.prototype = {
 		is: function(query) {
-			// engine
-			if( query === 'webkit' ) return (this.engine === 'webkit');
-			if( query === 'gecko' ) return (this.engine === 'gecko');
-			if( query === 'netfront' ) return (this.engine === 'netfront');
-			if( query === 'presto' ) return (this.engine === 'presto');
-			if( query === 'trident' ) return (this.engine === 'trident');
-
-			// platform type
-			if( query === 'phone' ) return (this.platform.type === 'phone');
-			if( query === 'tablet' ) return (this.platform.type === 'tablet');
-			if( query === 'dsektop' ) return (this.platform.type === 'dsektop');
-
-			// platform name
-			if( query === 'ios' ) return (this.platform.name === 'ios');
-			if( query === 'iphone' ) return (this.device === 'iphone');
-			if( query === 'ipad' ) return (this.device === 'ipad');
-			if( query === 'ipod' ) return (this.device === 'ipod');			
-			if( query === 'android' ) return (this.platform.name === 'android');
-			if( query === 'mac' ) return (this.platform.type === 'osx' || this.platform.type === 'mac');
-			if( query === 'osx' ) return (this.platform.name === 'osx');
-			if( query === 'windows' ) return (this.platform.name === 'windows');
-			if( query === 'linux' ) return (this.platform.name === 'linux');
-			
-			// features
-			if( query === 'retina' ) return this.retina;
-			if( query === 'touchable' ) return this.touchable;
-			if( query === '3d' ) return this.has3d;
-			if( query === 'transform' ) return this.hasTransform;
-			
-			// browser
-			if( query === 'ie' || query === 'ms' || query === 'msie' ) return (this.browser === 'msie');
-			if( query === 'firefox' ) return (this.browser === 'firefox');
-			if( query === 'kindle' ) return (this.browser === 'kindle');
-			if( query === 'opera' ) return (this.browser === 'opera');
-			if( query === 'chrome' ) return (this.browser === 'chrome');
-			if( query === 'chromium' ) return (this.browser === 'chromium');
-			if( query === 'safari' ) return (this.browser === 'safari');
-			if( query === 'blackberry' ) return (this.browser === 'blackberry');
-			if( query === 'webkit browser' ) return (this.browser === 'webkit');
-			if( query === 'android browser' ) return (this.browser === 'android');			
-
-			return false;
+			with(this) {
+				try {
+					return eval(query);
+				} catch(err) {
+					console.warn('incorrect query [' + query + ']', err.message);
+					return false;
+				} 
+			}
 		}
 	};
 
 	return new Device();
 })();
 
+
+//console.log('Device', Device.is('webkit && version > 30 && desktop'));
 
 var StyleSession = (function() {
 	"use strict"
@@ -4268,6 +4261,18 @@ var $ = (function() {
 		return items;
 	};
 	
+	$.html = function(text) {
+		var el = document.createElement('div');
+		el.innerHTML = text;
+		return $(el).contents().owner(null);
+	};
+	
+	$.text = function(text) {
+		var el = document.createElement('div');
+		el.innerText = text;
+		return $(el).contents().owner(null);
+	};
+	
 	$.fn = prototype;	
 	
 	// common functions
@@ -4429,15 +4434,15 @@ var $ = (function() {
 		return false;
 	}
 	
-	function create(accessor, contents) {
+	function create(accessor, contents, force) {
 		if( !accessor || typeof(accessor) !== 'string' ) return console.error('invalid parameter', accessor);
 		
 		var el;
-		if( isHtml(accessor) ) {
+		if( force === true || isHtml(accessor) ) {
 			el = evalHtml(accessor)[0];
 			if( !el ) return null;
 			if( html ) el.innerHTML = html;
-			return el; 
+			return el;
 		} else {		
 			var o = assemble(accessor);
 			var tag = o.tag;
@@ -6147,6 +6152,8 @@ var $ = (function() {
 			console.info('* [' + Framework.id + '] info');
 			console.info('\tversion: ' + Framework.version );
 			console.info('\tcore build: ' + Framework.buildtime + ' ms');
+			console.info('\tready: ' + Framework.readytime + ' ms');
+			console.info('\tload: ' + Framework.loadtime + ' ms');
 			console.info('\telapsed time to here: ' + (new Date().getTime() - Framework.finishtime) + ' ms');
 			console.info('\ttotal elapsed time: ' + (new Date().getTime() - Framework.starttime) + ' ms');
 		}
@@ -6737,7 +6744,7 @@ var EventDispatcher = (function() {
 			var items = global.concat(listeners[event.type] || []);
 			
 			if( items ) {
-				for(var i=(items.length - 1);i >= 0;i--) {					
+				for(var i=0; i < items.length ;i++) {					
 					var item = items[i];
 					var handler = item.handler;
 					
@@ -7094,9 +7101,14 @@ var HashController = (function() {
 
 	// singleton
 	function HashController() {
+		this.options = {};
 	}
 
 	HashController.prototype = {
+		config: function(options) {
+			if( typeof(options) !== 'object' ) return console.error('illegal parameter', options);
+			this.options = options;
+		},
 		current: function() {
 			var hash = window.location.hash || '#';
 			return hash.substring(1);
@@ -7892,6 +7904,12 @@ function wrappingevalscript(script) {
 	};
 }
 
+function evaljson(script) {
+	var fn;
+	eval('fn = function() { return ' + script + ';}');
+	return fn();
+}
+
 var Component = (function() { 
 	"use strict"
 
@@ -8047,6 +8065,8 @@ var Component = (function() {
 
 		// block build method
 		this.build = function() { throw new Error('illegal access'); };
+		
+		this.fire('ready');
 	}
 	
 
@@ -8574,6 +8594,7 @@ var Component = (function() {
 				var pages = this._pages = this._pages || {};
 				
 				var def_listener = false;
+				if( hash === '@' ) hash = '@default';
 				if( hash === '@default' ) {
 					var def_listener = (function(fn) {
 						return function(e) {
@@ -8612,6 +8633,8 @@ var Component = (function() {
 			return this;
 		},
 		load: function(src, fn, ajaxOptions) {
+			if( debug('loader') ) console.info('[' + this.accessor() + '] load url', src, fn, ajaxOptions);
+
 			if( typeof(src) !== 'string' ) return console.error('illegal src', fn);
 			var contentType = ( typeof(fn) === 'string' ) ? fn : null;
 			
@@ -8621,13 +8644,16 @@ var Component = (function() {
 			ajaxOptions = ajaxOptions || {};
 			ajaxOptions.url = src;
 			ajaxOptions.url = this.path(ajaxOptions.url);
+			ajaxOptions.sync = true;
+			ajaxOptions.cache = true;
+			var result;
 			var self = this;
 			Ajax.ajax(ajaxOptions).done(function(err, data, xhr) {
 				if( err ) return fn.apply(self, [err, data]);
 				contentType = normalizeContentsType(contentType || xhr.getResponseHeader('content-type'), ajaxOptions.url);
-				fn.apply(self, [err, data, contentType, ajaxOptions.url, xhr]);
+				result = fn.apply(self, [err, data, contentType, ajaxOptions.url, xhr]);
 			});
-			return this;
+			return result || this;
 		},
 		
 		// misc		
@@ -9095,6 +9121,7 @@ function convert2options(el) {
 		var name = attributes[i].name;
 		var value = attributes[i].value;
 		
+		if( name.startsWith('data-') ) name = name.substring(5);
 		if( name === 'as' ) continue;
 		
 		if( name.toLowerCase().startsWith('on') ) {
@@ -9111,7 +9138,7 @@ function convert2options(el) {
 		attrs[name] = value;
 	}
 	
-	el.removeAttribute('as');
+	//el.removeAttribute('data-as');
 	return attrs;
 }
 
@@ -9121,6 +9148,8 @@ var Application = (function() {
 	
 	var APPLICATIONS = [];
 	var seq = 1;
+	
+	var array_return = $.util.array_return;
 	
 	// class Application
 	function Application(options) {
@@ -9145,10 +9174,28 @@ var Application = (function() {
 			this.translator(k, BUNDLES.translators[k]);
 		}
 		
+		// regist loader 
+		this.loader(function(err, data, type, url, xhr) {
+			if( err ) return console.log('[' + this.accessor() + '] load fail', url);
+			
+			if( debug('loader') ) console.info('[' + this.accessor() + '] loaded', {data:data, type:type, url:url, xhr:xhr});
+			if( typeof(data) === 'string' && type === 'html' ) {
+				data = $(data).array();
+			} else if( type === 'json' ) {
+				data = (typeof(data) === 'string') ? evaljson(data) : data;
+			} else if( type === 'js' ) {
+				return require.resolve(data, url).exports;
+			} else {
+				return data;
+			}
+			
+			return this.application().pack(data);
+		});
+		
 		options = options || {};
 		var src = ((typeof(options) === 'string') ? options : (options.src || '')).trim();
 		if( src ) options.src = src;
-				
+		
 		// validate options
 		if( src ) {			
 			if( src.startsWith('javascript:') ) {
@@ -9175,8 +9222,6 @@ var Application = (function() {
 		this.$super(options);
 		
 		APPLICATIONS.push(this);
-		
-		this.fire('ready', {application:this});
 	}
 	
 	Application.prototype = {
@@ -9340,8 +9385,8 @@ var Application = (function() {
 				var application = new Application(options);
 				$(this).before(application.dom()).detach();
 			};
-			if( el.is('application') || el.attr('as') === 'application' ) return el.each(fn_application).void();
-			else el.find('application, *[as="application"]').each(fn_application);
+			if( el.is('application') || el.attr('data-as') === 'application' ) return el.each(fn_application).void();
+			else el.find('application, *[data-as="application"]').each(fn_application);
 			
 			// remove defines tag
 			if( el.is('defines') ) return el.detach().void();
@@ -9349,7 +9394,7 @@ var Application = (function() {
 			
 			// component parsing...
 			var tmp = $.create('div').append(el).all().reverse().each(function() {
-				var as = this.getAttribute('as');
+				var as = this.getAttribute('data-as');
 				var tag = this.tagName.toLowerCase();
 				var options = convert2options(this);
 				var cmp;
@@ -9403,42 +9448,45 @@ var Application = (function() {
 		
 		
 		// translate from ui json to component
-		pack: function(source) {
-			if( source instanceof Component ) return source;
+		pack: function(items) {
+			if( items instanceof Component ) return items;
 			
-			var packed;
+			var packed = [];
 			
-			if( typeof(source) === 'string' ) {
-				var origin = source;
-				source = Ajax.json(source);
-				source.origin = origin;
+			if( typeof(items) === 'string' ) {
+				if( $.util.isHtml(items) ) items = $.create(items).array();
+				else items = $.html(items).array();
 			}
 			
-			if( isElement(source) ) {
-				packed = this.translate(source);
-			} else if( isNode(source) ) {
-				packed = source;
-			} else if( source instanceof $ ) {
-				var arr = [];
-				var self = this;
-				source.each(function() {
-					var translated = self.translate(this);
-					if( translated ) arr.push(translated);
-				});
-				packed = $(arr).owner(source);
-			} else if( source && typeof(source.component) === 'string' ) {
-				var cmp = this.component(source.component);
-				if( !cmp ) return console.error('[' + this.applicationId() + '] unknown component [' + source.component + ']');
-				packed = new cmp(source);
-			} else {
-				return console.error('[' + this.applicationId() + '] unsupported source type', source);
+			var items = items;
+			if( !Array.isArray(items) ) items = [items];
+			
+			for(var i=0; i < items.length; i++) {
+				var item = items[i]
+				if( isElement(item) ) {
+					packed.push(this.translate(item));
+				} else if( isNode(item) ) {
+					packed.push(item);
+				} else if( item instanceof $ ) {
+					var self = this;
+					item.each(function() {
+						var translated = self.translate(this);
+						if( translated ) packed.push(translated);
+					});
+				} else if( typeof(item) === 'object' && typeof(item.component) === 'string' ) {
+					var cmp = this.component(item.component);
+					if( !cmp ) return console.error('[' + this.applicationId() + '] unknown component [' + item.component + ']');
+					packed.push(new cmp(item));
+				} else {
+					return console.error('[' + this.applicationId() + '] unsupported source type', item);
+				}
 			}
 			
 			this.fire('packed', {
 				packed: packed
 			});
 			
-			return packed;
+			return array_return(packed);
 		},
 		
 
@@ -9565,6 +9613,16 @@ var Application = (function() {
 			});
 
 			return cmp;
+		},
+		
+		// override
+		items: function(items) {
+			if( typeof(items) === 'string' ) items = this.load(items);
+			if( typeof(items) === 'function' ) {
+				items.call(this.application(), this);
+				return this;
+			}
+			return this.$super(items);			
 		}
 	};
 	
@@ -9638,7 +9696,7 @@ var UI = Application;
 		if( debug('ui') ) console.info('[' + Framework.id + '] autopack on');
 		
 		$.ready(function(e) {
-			var appels = $('application, *[as="application"]');
+			var appels = $('application, *[data-as="application"]');
 			
 			var applications = [];
 			appels.each(function() {
@@ -9678,7 +9736,7 @@ var UI = Application;
 	// invoke current hash after application ready
 	$.on('load', function(e) {
 		if( debug('hash') ) console.log('hash controller invoke');
-		HashController.invoke();
+		if( HashController.current() ) HashController.invoke();
 	});
 })();
 
@@ -10033,15 +10091,7 @@ var ThemeManager = (function() {
 	};
 })();
 
-(function() {
-	function evaljson(script) {
-		with({}) {
-			var fn;
-			eval('fn = function() { return ' + script + ';}');
-			return fn();
-		}
-	}
-	
+(function() {	
 	"use strict"
 
 	// class view
@@ -10052,29 +10102,11 @@ var ThemeManager = (function() {
 	View.prototype = {
 		build: function() {
 			var self = this;
-			
-			this.loader(function(err, data, type, url, xhr) {
-				if( err ) return console.log('[' + this.accessor() + '] load fail', url);
-				if( typeof(data) === 'string' && type === 'html' ) {
-					this.items($(data).array());
-				} else if( type === 'json' ) {
-					if( typeof(data) === 'string' ) data = evaljson(data);
-					this.items(data);
-				} else if( type === 'js' ) {
-					var module = require.resolve(data, url);
-					if( module && typeof(module.exports) === 'function' ) module.exports(this);
-				} else {
-					return console.error('[' + this.accessor() + '] unsupported type [' + type + '] of contents', url, data);
-				}
-			});
-
-			// process options
 			var o = this.options;
-			if( o.direction ) this.direction(o.direction);
-			if( o.horizontal === true ) this.direction('horizontal');
+			
+			this.loader(this.application().loader());
 
-			this.cmpmap = new Map();
-
+			// regist event listener
 			this.on('added', function(e) {		
 				var added = e.added;
 				if( added === '-' ) added = new UI.Separator({flex:1});
@@ -10100,10 +10132,15 @@ var ThemeManager = (function() {
 			
 			// call super's build
 			this.$super();
+			
+			// process options
+			if( o.direction ) this.direction(o.direction);
+			if( o.horizontal === true ) this.direction('horizontal');
 		},
 		packed: function(item, cmp) {
-			if( arguments.length == 1 ) return this.cmpmap.get(item);
-			if( item && cmp ) return this.cmpmap.set(item, cmp);
+			var cm = this.cmpmap = this.cmpmap || new Map();
+			if( arguments.length == 1 ) return cm.get(item);
+			if( item && cmp ) return cm.set(item, cmp);
 			return null;
 		},
 		direction: function(direction) {
@@ -10120,6 +10157,18 @@ var ThemeManager = (function() {
 			});
 
 			return this;
+		},
+		
+		// override
+		items: function(items) {
+			if( typeof(items) === 'string' && !$.util.isHtml(items) ) {
+				items = this.load(items);
+			} else if( typeof(items) === 'function' ) {
+				items.call(this.application(), this);
+				return this;
+			}
+			
+			return this.$super(items);			
 		}
 	};
 	
@@ -10157,83 +10206,14 @@ var ThemeManager = (function() {
 
 
 (function() {
-	"use strict"
+	"use strict";
 	
 	function Markup(options) {
-		if( typeof(options) === 'string' ) options = {html:options};
+		if( typeof(options) === 'string' ) options = {items:[options]};
 		this.$super(options);
 	}
-
-	Markup.prototype = {
-		build: function() {
-			var o = this.options;
-			
-			if( o.html ) this.html(o.html, true);
-			else if( o.text ) this.text(o.text, true);
-			else if( o.src ) this.src(o.src, o.cache, 'html');
-		},
-		src: function(url, cache, mode, append) {
-			console.log('html', this.base(), url, this.context().base());
-			url = this.path(url);
-
-			var self = this;
-			Ajax.ajax(url).cache(cache).done(function(err, data) {
-				if( err ) return console.error('[ERROR] remote html load fail', err);
-				
-				if( mode === 'text' ) self.text(data, append);
-				else self.html(data, append);
-
-				self.fire('html.loaded', {contents:data, mode:mode});
-			});
-			return this;
-		},
-		html: function(html, append) {
-			if( !arguments.length ) return this.el.html();
-			this.el.html(html, append);
-			this._original = this.el.html();
-			this.fire('html.changed', {contents:html, mode:'html'});
-			return this;
-		},
-		text: function(text, append) {
-			if( !arguments.length ) return this.el.text();
-			this.el.text(text, append);
-			this._original = this.el.html();
-			this.fire('html.changed', {contents:text, mode:'text'});
-			return this;
-		},
-		bind: function(data, fns) {
-			this.el.tpl(data, fns);
-			this.fire('html.changed', {contents:this.el.html(), mode:'html'});
-			return this;
-		}
-	};
 	
-	Markup.style = {
-		'background-color': 'transparent',
-		'user-select': 'all',
-
-		'..center': {
-			'text-align': 'center'
-		},
-		'..left': {
-			'text-align': 'left'
-		},
-		'..right': {
-			'text-align': 'right'
-		},
-		'..darkshadow': {
-			'text-shadow': '0 -1px 0 rgba(0,0,0,0.8)'
-		},
-		'..lightshadow': {
-			'text-shadow': '0 1px 0 rgba(255,255,255,0.8)'
-		},
-		'..h3': {
-			'font-weight': 'bold',
-			'letter-spacing': 0,
-			'font-size': 13
-		}
-	};
-	
+	Markup.inherit = 'view';
 	Markup.fname = 'Markup';
 	Markup.translator = Component.translator('markup');
 		
@@ -10403,6 +10383,14 @@ var ThemeManager = (function() {
 	
 	// mark build time
 	Framework.buildtime = (Framework.finishtime = new Date().getTime()) - Framework.starttime;
+	
+	$.on('DOMContentLoaded', function() {
+		Framework.readytime = new Date().getTime() - Framework.starttime;
+	});
+	
+	$.on('load', function() {
+		Framework.loadtime = new Date().getTime() - Framework.starttime;
+	});
 })();
 
 // End Of File (attrs.ui.js), Authored by joje6 ({https://github.com/joje6})

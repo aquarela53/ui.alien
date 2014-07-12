@@ -10,6 +10,12 @@ function wrappingevalscript(script) {
 	};
 }
 
+function evaljson(script) {
+	var fn;
+	eval('fn = function() { return ' + script + ';}');
+	return fn();
+}
+
 var Component = (function() { 
 	"use strict"
 
@@ -165,6 +171,8 @@ var Component = (function() {
 
 		// block build method
 		this.build = function() { throw new Error('illegal access'); };
+		
+		this.fire('ready');
 	}
 	
 
@@ -692,6 +700,7 @@ var Component = (function() {
 				var pages = this._pages = this._pages || {};
 				
 				var def_listener = false;
+				if( hash === '@' ) hash = '@default';
 				if( hash === '@default' ) {
 					var def_listener = (function(fn) {
 						return function(e) {
@@ -730,6 +739,8 @@ var Component = (function() {
 			return this;
 		},
 		load: function(src, fn, ajaxOptions) {
+			if( debug('loader') ) console.info('[' + this.accessor() + '] load url', src, fn, ajaxOptions);
+
 			if( typeof(src) !== 'string' ) return console.error('illegal src', fn);
 			var contentType = ( typeof(fn) === 'string' ) ? fn : null;
 			
@@ -739,13 +750,16 @@ var Component = (function() {
 			ajaxOptions = ajaxOptions || {};
 			ajaxOptions.url = src;
 			ajaxOptions.url = this.path(ajaxOptions.url);
+			ajaxOptions.sync = true;
+			ajaxOptions.cache = true;
+			var result;
 			var self = this;
 			Ajax.ajax(ajaxOptions).done(function(err, data, xhr) {
 				if( err ) return fn.apply(self, [err, data]);
 				contentType = normalizeContentsType(contentType || xhr.getResponseHeader('content-type'), ajaxOptions.url);
-				fn.apply(self, [err, data, contentType, ajaxOptions.url, xhr]);
+				result = fn.apply(self, [err, data, contentType, ajaxOptions.url, xhr]);
 			});
-			return this;
+			return result || this;
 		},
 		
 		// misc		

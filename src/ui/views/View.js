@@ -1,12 +1,4 @@
-(function() {
-	function evaljson(script) {
-		with({}) {
-			var fn;
-			eval('fn = function() { return ' + script + ';}');
-			return fn();
-		}
-	}
-	
+(function() {	
 	"use strict"
 
 	// class view
@@ -17,29 +9,11 @@
 	View.prototype = {
 		build: function() {
 			var self = this;
-			
-			this.loader(function(err, data, type, url, xhr) {
-				if( err ) return console.log('[' + this.accessor() + '] load fail', url);
-				if( typeof(data) === 'string' && type === 'html' ) {
-					this.items($(data).array());
-				} else if( type === 'json' ) {
-					if( typeof(data) === 'string' ) data = evaljson(data);
-					this.items(data);
-				} else if( type === 'js' ) {
-					var module = require.resolve(data, url);
-					if( module && typeof(module.exports) === 'function' ) module.exports(this);
-				} else {
-					return console.error('[' + this.accessor() + '] unsupported type [' + type + '] of contents', url, data);
-				}
-			});
-
-			// process options
 			var o = this.options;
-			if( o.direction ) this.direction(o.direction);
-			if( o.horizontal === true ) this.direction('horizontal');
+			
+			this.loader(this.application().loader());
 
-			this.cmpmap = new Map();
-
+			// regist event listener
 			this.on('added', function(e) {		
 				var added = e.added;
 				if( added === '-' ) added = new UI.Separator({flex:1});
@@ -65,10 +39,15 @@
 			
 			// call super's build
 			this.$super();
+			
+			// process options
+			if( o.direction ) this.direction(o.direction);
+			if( o.horizontal === true ) this.direction('horizontal');
 		},
 		packed: function(item, cmp) {
-			if( arguments.length == 1 ) return this.cmpmap.get(item);
-			if( item && cmp ) return this.cmpmap.set(item, cmp);
+			var cm = this.cmpmap = this.cmpmap || new Map();
+			if( arguments.length == 1 ) return cm.get(item);
+			if( item && cmp ) return cm.set(item, cmp);
 			return null;
 		},
 		direction: function(direction) {
@@ -85,6 +64,18 @@
 			});
 
 			return this;
+		},
+		
+		// override
+		items: function(items) {
+			if( typeof(items) === 'string' && !$.util.isHtml(items) ) {
+				items = this.load(items);
+			} else if( typeof(items) === 'function' ) {
+				items.call(this.application(), this);
+				return this;
+			}
+			
+			return this.$super(items);			
 		}
 	};
 	

@@ -19,6 +19,14 @@
 	
 	// mark build time
 	Framework.buildtime = (Framework.finishtime = new Date().getTime()) - Framework.starttime;
+	
+	$.on('DOMContentLoaded', function() {
+		Framework.readytime = new Date().getTime() - Framework.starttime;
+	});
+	
+	$.on('load', function() {
+		Framework.loadtime = new Date().getTime() - Framework.starttime;
+	});
 })();
 
 // End Of File (attrs.ui.js), Authored by joje6 ({https://github.com/joje6})

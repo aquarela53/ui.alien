@@ -1,26 +1,32 @@
 module.exports = function(app) {
+	
+	// for cache
+	var ui = {};
+	
 	// setup pages
 	app.pages({
-		'@default': function(e) {
-			this.byId('contents-body').load('partials/index.html');
+		'@': function(e) {
+			ui.index = ui.index || app.load('ui/index.html');
+			this.byId('contents-body').items(ui.index);
 		},
 		'json': function(e) {
-			this.byId('contents-body').load('partials/ui.json');
+			ui.json = ui.json || app.load('ui/ui.json');
+			this.byId('contents-body').items(ui.json);
 		},
 		'js': function(e) {
-			this.byId('contents-body').load('partials/ui.js');
+			ui.js = ui.js || app.load('ui/ui.js');
+			this.byId('contents-body').items(ui.js);
 		},
 		'reservations': function(e) {
-			this.byId('contents-body').load('partials/reservations.html');
+			ui.reservations = ui.reservations || app.load('ui/reservations.html');
+			this.byId('contents-body').items(ui.reservations);
 		}
 	});
 	
 	app.test = function(arg) {
-		console.log('hello, test', arg);
+		require('framework').print();
 	};
 	
 	app.ready(function(e) {
-		console.log('application is ready!', e.application.accessor());
-		require('framework').print();
 	});
 };

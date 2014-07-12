@@ -8,10 +8,11 @@
 		<!-- attrs.ui initial paramters -->
 		<meta name="attrs.ui.autopack" content="true">
 		<meta name="attrs.ui.debug" content="false">
-		<meta name="attrs.ui.debug.translator" content="true">
+		<meta name="attrs.ui.debug.loader" content="false">
+		<meta name="attrs.ui.debug.translator" content="false">
 		<meta name="attrs.ui.debug.hash" content="false">
 		
-		<title>예약관리자</title>
+		<title>UI Alien</title>
 		
 		<script type="text/javascript" src="../../build/ui.alien.js"></script>
 		
@@ -19,7 +20,7 @@
 		<script type="text/javascript" src="lib/less.js"></script>
 	</head>
 	
-	<body as="application" src="application/index.js">
+	<body data-as="application" src="application/index.js">
 		<defines>
 			<component id="side-navigation" src="components/side-navigation/SideNavigation.js"></component>
 			<component id="timetable" src="components/timetable/Timetable.js"></component>
@@ -27,7 +28,7 @@
 		
 		<view class="full">
 			<view class="horizontal bg-gray-light">
-				<div class="logo large" onclick="console.log(this, cmp, app, e);" as="markup">로고</div>
+				<div class="logo large" onclick="console.log(this, cmp, app, e);" data-as="markup">로고</div>
 				
 				<view class="horizontal fit" min-height="10px">
 					<btn name="guides" type="text" href="#guides">예약관리</btn>
@@ -47,7 +48,7 @@
 					</side-navigation>
 				</view>
 				<view id="contents" class="fit" style="padding:15px;">
-					<h1 as="markup" onclick="app.test(this);">Title</h1>
+					<h1 data-as="markup" onclick="app.test(this);">Title</h1>
 					
 					<view id="contents-body"></view>
 				</view>

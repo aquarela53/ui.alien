@@ -21,6 +21,8 @@
 			console.info('* [' + Framework.id + '] info');
 			console.info('\tversion: ' + Framework.version );
 			console.info('\tcore build: ' + Framework.buildtime + ' ms');
+			console.info('\tready: ' + Framework.readytime + ' ms');
+			console.info('\tload: ' + Framework.loadtime + ' ms');
 			console.info('\telapsed time to here: ' + (new Date().getTime() - Framework.finishtime) + ' ms');
 			console.info('\ttotal elapsed time: ' + (new Date().getTime() - Framework.starttime) + ' ms');
 		}

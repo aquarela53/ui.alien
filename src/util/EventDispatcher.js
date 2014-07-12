@@ -292,7 +292,7 @@ var EventDispatcher = (function() {
 			var items = global.concat(listeners[event.type] || []);
 			
 			if( items ) {
-				for(var i=(items.length - 1);i >= 0;i--) {					
+				for(var i=0; i < items.length ;i++) {					
 					var item = items[i];
 					var handler = item.handler;
 					

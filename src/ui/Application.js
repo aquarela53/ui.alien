@@ -6,6 +6,7 @@ function convert2options(el) {
 		var name = attributes[i].name;
 		var value = attributes[i].value;
 		
+		if( name.startsWith('data-') ) name = name.substring(5);
 		if( name === 'as' ) continue;
 		
 		if( name.toLowerCase().startsWith('on') ) {
@@ -22,7 +23,7 @@ function convert2options(el) {
 		attrs[name] = value;
 	}
 	
-	el.removeAttribute('as');
+	//el.removeAttribute('data-as');
 	return attrs;
 }
 
@@ -32,6 +33,8 @@ var Application = (function() {
 	
 	var APPLICATIONS = [];
 	var seq = 1;
+	
+	var array_return = $.util.array_return;
 	
 	// class Application
 	function Application(options) {
@@ -56,10 +59,28 @@ var Application = (function() {
 			this.translator(k, BUNDLES.translators[k]);
 		}
 		
+		// regist loader 
+		this.loader(function(err, data, type, url, xhr) {
+			if( err ) return console.log('[' + this.accessor() + '] load fail', url);
+			
+			if( debug('loader') ) console.info('[' + this.accessor() + '] loaded', {data:data, type:type, url:url, xhr:xhr});
+			if( typeof(data) === 'string' && type === 'html' ) {
+				data = $(data).array();
+			} else if( type === 'json' ) {
+				data = (typeof(data) === 'string') ? evaljson(data) : data;
+			} else if( type === 'js' ) {
+				return require.resolve(data, url).exports;
+			} else {
+				return data;
+			}
+			
+			return this.application().pack(data);
+		});
+		
 		options = options || {};
 		var src = ((typeof(options) === 'string') ? options : (options.src || '')).trim();
 		if( src ) options.src = src;
-				
+		
 		// validate options
 		if( src ) {			
 			if( src.startsWith('javascript:') ) {
@@ -86,8 +107,6 @@ var Application = (function() {
 		this.$super(options);
 		
 		APPLICATIONS.push(this);
-		
-		this.fire('ready', {application:this});
 	}
 	
 	Application.prototype = {
@@ -251,8 +270,8 @@ var Application = (function() {
 				var application = new Application(options);
 				$(this).before(application.dom()).detach();
 			};
-			if( el.is('application') || el.attr('as') === 'application' ) return el.each(fn_application).void();
-			else el.find('application, *[as="application"]').each(fn_application);
+			if( el.is('application') || el.attr('data-as') === 'application' ) return el.each(fn_application).void();
+			else el.find('application, *[data-as="application"]').each(fn_application);
 			
 			// remove defines tag
 			if( el.is('defines') ) return el.detach().void();
@@ -260,7 +279,7 @@ var Application = (function() {
 			
 			// component parsing...
 			var tmp = $.create('div').append(el).all().reverse().each(function() {
-				var as = this.getAttribute('as');
+				var as = this.getAttribute('data-as');
 				var tag = this.tagName.toLowerCase();
 				var options = convert2options(this);
 				var cmp;
@@ -314,42 +333,45 @@ var Application = (function() {
 		
 		
 		// translate from ui json to component
-		pack: function(source) {
-			if( source instanceof Component ) return source;
+		pack: function(items) {
+			if( items instanceof Component ) return items;
 			
-			var packed;
+			var packed = [];
 			
-			if( typeof(source) === 'string' ) {
-				var origin = source;
-				source = Ajax.json(source);
-				source.origin = origin;
+			if( typeof(items) === 'string' ) {
+				if( $.util.isHtml(items) ) items = $.create(items).array();
+				else items = $.html(items).array();
 			}
 			
-			if( isElement(source) ) {
-				packed = this.translate(source);
-			} else if( isNode(source) ) {
-				packed = source;
-			} else if( source instanceof $ ) {
-				var arr = [];
-				var self = this;
-				source.each(function() {
-					var translated = self.translate(this);
-					if( translated ) arr.push(translated);
-				});
-				packed = $(arr).owner(source);
-			} else if( source && typeof(source.component) === 'string' ) {
-				var cmp = this.component(source.component);
-				if( !cmp ) return console.error('[' + this.applicationId() + '] unknown component [' + source.component + ']');
-				packed = new cmp(source);
-			} else {
-				return console.error('[' + this.applicationId() + '] unsupported source type', source);
+			var items = items;
+			if( !Array.isArray(items) ) items = [items];
+			
+			for(var i=0; i < items.length; i++) {
+				var item = items[i]
+				if( isElement(item) ) {
+					packed.push(this.translate(item));
+				} else if( isNode(item) ) {
+					packed.push(item);
+				} else if( item instanceof $ ) {
+					var self = this;
+					item.each(function() {
+						var translated = self.translate(this);
+						if( translated ) packed.push(translated);
+					});
+				} else if( typeof(item) === 'object' && typeof(item.component) === 'string' ) {
+					var cmp = this.component(item.component);
+					if( !cmp ) return console.error('[' + this.applicationId() + '] unknown component [' + item.component + ']');
+					packed.push(new cmp(item));
+				} else {
+					return console.error('[' + this.applicationId() + '] unsupported source type', item);
+				}
 			}
 			
 			this.fire('packed', {
 				packed: packed
 			});
 			
-			return packed;
+			return array_return(packed);
 		},
 		
 
@@ -476,6 +498,16 @@ var Application = (function() {
 			});
 
 			return cmp;
+		},
+		
+		// override
+		items: function(items) {
+			if( typeof(items) === 'string' ) items = this.load(items);
+			if( typeof(items) === 'function' ) {
+				items.call(this.application(), this);
+				return this;
+			}
+			return this.$super(items);			
 		}
 	};
 	
@@ -549,7 +581,7 @@ var UI = Application;
 		if( debug('ui') ) console.info('[' + Framework.id + '] autopack on');
 		
 		$.ready(function(e) {
-			var appels = $('application, *[as="application"]');
+			var appels = $('application, *[data-as="application"]');
 			
 			var applications = [];
 			appels.each(function() {
@@ -589,7 +621,7 @@ var UI = Application;
 	// invoke current hash after application ready
 	$.on('load', function(e) {
 		if( debug('hash') ) console.log('hash controller invoke');
-		HashController.invoke();
+		if( HashController.current() ) HashController.invoke();
 	});
 })();
 

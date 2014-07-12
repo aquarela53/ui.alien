@@ -5,9 +5,14 @@ var HashController = (function() {
 
 	// singleton
 	function HashController() {
+		this.options = {};
 	}
 
 	HashController.prototype = {
+		config: function(options) {
+			if( typeof(options) !== 'object' ) return console.error('illegal parameter', options);
+			this.options = options;
+		},
 		current: function() {
 			var hash = window.location.hash || '#';
 			return hash.substring(1);
