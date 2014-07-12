@@ -33,6 +33,8 @@ var files = [
 	'./src/ui/views/View.js',
 	'./src/ui/controls/Markup.js',
 	'./src/ui/controls/Button.js',
+	'./src/ui/controls/Breadcrumb.js',
+	'./src/ui/controls/Image.js',
 	
 	/*
 	'./src/ui/UI.Container.js',

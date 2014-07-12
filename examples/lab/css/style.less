@@ -161,6 +161,56 @@ body {
 	}
 }
 
+// breadchrumb
+.aui.breadcrumb {
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	
+	.breadcrumbs {
+		list-style-type: none;
+		list-style: none;
+		padding: 0;
+		margin-bottom: 18px;
+		background: none;
+		height: 38px;
+		overflow: hidden;
+		line-height: 3em;
+		margin: 0;
+		font-weight: bold;
+		text-shadow: 0 1px 0 #fff;
+		
+		li {
+			background: none;
+			float: left;
+			margin: 0;
+			padding: 0 0 0 1em
+		}
+	
+		li a {
+			color: #666;
+			float: left;
+			text-decoration: none;
+			padding: 0 1.75em 0 0;
+			margin-left: 0px;
+			background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAABdCAMAAACIPFYVAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF29vb////0lAD4QAAAAJ0Uk5T/wDltzBKAAAAoElEQVR42qyWyQ2AMBDEPP03TQM4xBJ8zUo55gjs/QMhzAEC5gABc4CAOUDAHCBgDhAwBwiYAwTMAQLmAAFzcPfXZOR2jTf7nYzcn/b3zU1Gim6+NDgZaQ44u2kyUr18yoUYMYOfQklXRd059XSpN0hVCVWJVLVTHUV1LTUZqOlDTThqilKTmtoG1Mahthq1OantTH0BUF8ZOTQsfh4BBgArjQgu2PVF4gAAAABJRU5ErkJggg==") no-repeat 100% 50%
+		}
+		
+		li:last-child a {
+			background: none;
+		}
+	
+		li a.selected {
+			color: #333;
+			background: none
+		}
+	
+		li a:hover {
+			color: #333;
+			text-decoration: none
+		}
+	}
+}
+
 // Timetable
 .aui.timetable {
 	line-height: 20px;

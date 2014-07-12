@@ -14,7 +14,7 @@
 			this.loader(this.application().loader());
 
 			// regist event listener
-			this.on('added', function(e) {		
+			this.on('added', function(e) {
 				var added = e.added;
 				if( added === '-' ) added = new UI.Separator({flex:1});
 				
@@ -29,12 +29,18 @@
 			});
 
 			this.on('removed', function(e) {
+				console.log('removed', e.removed);
 				var removed = e.removed;
 				removed = this.packed(removed);
 				
 				if( removed instanceof $ ) removed.detach();
 				else if( removed instanceof Component ) removed.detach();
-				else if( isElement(removed) ) this.attachTarget() && this.attachTarget().removeChild(removed);
+				else if( isNode(removed) ) this.attachTarget() && this.attachTarget().removeChild(removed);
+			});
+			
+			// add original element
+			$(this.dom()).contents().each(function() {
+				self.add(this);
 			});
 			
 			// call super's build

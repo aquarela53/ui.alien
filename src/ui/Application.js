@@ -410,9 +410,17 @@ var Application = (function() {
 		},
 		
 		// define ui component
-		component: function(id, cls) {				
+		component: function(id, cls) {
 			if( arguments.length === 1 ) {
 				return this._cmps[id];
+			}
+			
+			if( ~id.indexOf(',') ) {
+				var ids = id.split(',');
+				for(var i=0; i < ids.length; i++) {
+					this.component(ids[i].trim(), cls);
+				}
+				return this;
 			}
 			
 			if( typeof(id) !== 'string' || ~id.indexOf('.') ) return console.error('[' + this.applicationId() + '] illegal component id:' + id);		
@@ -472,11 +480,11 @@ var Application = (function() {
 			
 			this._cmps[id] = cmp;				
 			if( fname ) {
-				if( this[fname] ) {
-					console.warn('[' + this.applicationId() + '] component fname conflict, so overwrited. before=', this[cmp.fname()], '/after=', cmp);
-				} else {
+				//if( this[fname] ) {
+					//console.warn('[' + this.applicationId() + '] component fname conflict, so overwrited. before=', this[cmp.fname()], '/after=', cmp);
+					//} else {
 					this[fname] = cmp;
-				}
+					//}
 			} else {
 				console.warn('[' + this.applicationId() + '] function name was empty', fname);
 			}

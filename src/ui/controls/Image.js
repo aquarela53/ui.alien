@@ -1,5 +1,5 @@
-UI.Image = (function() {
-	"use strict"
+(function() {
+	"use strict";
 
 	function Image(options) {
 		if( typeof(options) === 'string' ) options = {src:options};
@@ -44,10 +44,7 @@ UI.Image = (function() {
 	};
 	
 	Image.tag = 'img';
-	Image.style = {
-	};
-
-	return Image = UI.inherit(Image, UI.Component);
+	Image.translator = Component.translator('picture');
+	
+	return Image = UI.component('picture', Image);
 })();
-
-UI.Image = UI.component('image', UI.Image);
