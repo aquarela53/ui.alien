@@ -132,10 +132,75 @@ body {
 	.m10 {
 		margin: 10px;
 	}
+	
+
+	
+	@-webkit-keyframes blinking {
+		from {
+		   -webkit-box-shadow: 
+		   		inset 0 19px 0 rgba(0,115,215,0), 
+				inset 0 1px 0 rgba(255,255,255,1),
+				0 1px 0 rgba(0,0,0,0.09);
+		}
+		50% {
+		   -webkit-box-shadow: 
+		   		inset 0 19px 0 rgba(0,115,215,0.2), 
+				inset 0 1px 0 rgba(255,255,255,1),
+				0 1px 0 rgba(0,0,0,0.09);
+		}
+		to {
+		   -webkit-box-shadow: 
+		   		inset 0 19px 0 rgba(0,115,215,0), 
+				inset 0 1px 0 rgba(255,255,255,1),
+				0 1px 0 rgba(0,0,0,0.09);
+		}
+	}
+
+	@-moz-keyframes blinking {
+		from {
+		   -moz-box-shadow: 
+		   		inset 0 19px 0 rgba(0,115,215,0), 
+				inset 0 1px 0 rgba(255,255,255,1),
+				0 1px 0 rgba(0,0,0,0.09);
+		}
+		50% {
+		   -moz-box-shadow: 
+		   		inset 0 19px 0 rgba(0,115,215,0.2), 
+				inset 0 1px 0 rgba(255,255,255,1),
+				0 1px 0 rgba(0,0,0,0.09);
+		}
+		to {
+		   -moz-box-shadow: 
+		   		inset 0 19px 0 rgba(0,115,215,0), 
+				inset 0 1px 0 rgba(255,255,255,1),
+				0 1px 0 rgba(0,0,0,0.09);
+		}
+	}
+
+	@keyframes blinking {
+		from {
+		   box-shadow: 
+		   		inset 0 19px 0 rgba(0,115,215,0), 
+				inset 0 1px 0 rgba(255,255,255,1),
+				0 1px 0 rgba(0,0,0,0.09);
+		}
+		50% {
+		   box-shadow: 
+		   		inset 0 19px 0 rgba(0,115,215,0.2), 
+				inset 0 1px 0 rgba(255,255,255,1),
+				0 1px 0 rgba(0,0,0,0.09);
+		}
+		to {
+		   box-shadow: 
+		   		inset 0 19px 0 rgba(0,115,215,0), 
+				inset 0 1px 0 rgba(255,255,255,1),
+				0 1px 0 rgba(0,0,0,0.09);
+		}
+	}
 }
 
 .aui.application {
-	font: 13px Helvetica, arial, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+	font: 13px Helvetica, arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 // Block
@@ -212,6 +277,8 @@ body {
 
 .aui.buttons {
 	position: relative;
+	display: inline-block;
+	margin: 8px 0;
 	
 	& > .button {
 		display: inline-block;
@@ -304,75 +371,13 @@ body {
 			animation-duration: 1s;
 		}
 	}
-	
-	@-webkit-keyframes blinking {
-		from {
-		   -webkit-box-shadow: 
-		   		inset 0 19px 0 rgba(0,115,215,0), 
-				inset 0 1px 0 rgba(255,255,255,1),
-				0 1px 0 rgba(0,0,0,0.09);
-		}
-		50% {
-		   -webkit-box-shadow: 
-		   		inset 0 19px 0 rgba(0,115,215,0.2), 
-				inset 0 1px 0 rgba(255,255,255,1),
-				0 1px 0 rgba(0,0,0,0.09);
-		}
-		to {
-		   -webkit-box-shadow: 
-		   		inset 0 19px 0 rgba(0,115,215,0), 
-				inset 0 1px 0 rgba(255,255,255,1),
-				0 1px 0 rgba(0,0,0,0.09);
-		}
-	}
-
-	@-moz-keyframes blinking {
-		from {
-		   -moz-box-shadow: 
-		   		inset 0 19px 0 rgba(0,115,215,0), 
-				inset 0 1px 0 rgba(255,255,255,1),
-				0 1px 0 rgba(0,0,0,0.09);
-		}
-		50% {
-		   -moz-box-shadow: 
-		   		inset 0 19px 0 rgba(0,115,215,0.2), 
-				inset 0 1px 0 rgba(255,255,255,1),
-				0 1px 0 rgba(0,0,0,0.09);
-		}
-		to {
-		   -moz-box-shadow: 
-		   		inset 0 19px 0 rgba(0,115,215,0), 
-				inset 0 1px 0 rgba(255,255,255,1),
-				0 1px 0 rgba(0,0,0,0.09);
-		}
-	}
-
-	@keyframes blinking {
-		from {
-		   box-shadow: 
-		   		inset 0 19px 0 rgba(0,115,215,0), 
-				inset 0 1px 0 rgba(255,255,255,1),
-				0 1px 0 rgba(0,0,0,0.09);
-		}
-		50% {
-		   box-shadow: 
-		   		inset 0 19px 0 rgba(0,115,215,0.2), 
-				inset 0 1px 0 rgba(255,255,255,1),
-				0 1px 0 rgba(0,0,0,0.09);
-		}
-		to {
-		   box-shadow: 
-		   		inset 0 19px 0 rgba(0,115,215,0), 
-				inset 0 1px 0 rgba(255,255,255,1),
-				0 1px 0 rgba(0,0,0,0.09);
-		}
-	}
 }
 
 .aui.pagination {
 	text-align: center;
 	user-select: none;
 	-webkit-user-select: none;
+	margin: 8px 0;
 
 	& > .page {
 		display: inline-block;

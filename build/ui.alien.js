@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-13 22:15:10
+ * @date: 2014-07-14 1:29:50
 */
 
 // es6 shim
