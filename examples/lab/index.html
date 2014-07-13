@@ -30,35 +30,55 @@
 			<view class="horizontal bg-gray-light">
 				<div class="logo large" onclick="console.log(this, cmp, app, e);" data-as="markup" href="#">로고</div>
 				
-				<view class="horizontal fit" min-height="10px">
+				<block min-height="10px">
 					<button name="reservations" type="text" href="#reservations" class="yellow">예약관리</button>
 					<button name="service" type="text" href="#service">서비스관리</button>
 					<button name="statistics" type="text" href="#statistics">통계</button>
-				</view>
+				</block>
 			</view>
 			<view class="horizontal fit">
-				<view id="side" class="bg-gray-lighter">
-					<side-navigation name="snb" class="fit" data="./data/ia.json" style="width:200px;inner-border-color:#333;outer-border:none;">
-						<option name="template" content="element">
-							<li class="row">
-								<div class="icon">{icon}</div>
-								<div class="title">{title}</div>
-							</li>
-						</option>
-					</side-navigation>
+				<block id="side" style="width:250px;overflow-y:auto;overflow-x:hidden;">
+					<div class="simple-box m10">
+						<h3 class="title">예약관리</h3>
+						<div class="contents">
+							<side-navigation name="snb" data="./data/ia.json">
+								<option name="template" content="element">
+									<li class="row">
+										<div class="icon">{icon}</div>
+										<div class="title">{title}</div>
+									</li>
+								</option>
+							</side-navigation>
+						</div>
+					</div>
+					<div class="simple-box m10">
+						<h3 class="title">설정</h3>
+						<div class="contents">
+							<side-navigation name="snb" data="./data/ia.json" style="width:200px;">
+								<option name="template" content="element">
+									<li class="row">
+										<div class="icon">{icon}</div>
+										<div class="title">{title}</div>
+									</li>
+								</option>
+							</side-navigation>
+						</div>
+					</div>
 					<picture src="images/javascript.png" alt="javascript logo" style="width:150px;margin:0 auto;margin-bottom:20px;opacity:.3;filter:grayscale(70%);"></picture>
-				</view>
-				<view id="contents" class="fit" style="padding:15px;">
+				</block>
+				<block id="contents" class="fit" style="padding:15px;">
 					<breadcrumb style="margin-bottom: 15px;">
 						<item href="location.relead();" title="Home"></item>
 						<item href="#menu" title="menu"></item>
 						<item href="#menu2" title="menu2"></item>
+						<item href="location.relead();" title="Home" data-content-name="tpl" data-content-type="element">
+							<div>{item test}</div>
+						</item>
 					</breadcrumb>
 					
 					<h1 id="contents-title" data-as="markup" onclick="app.test(this);" style="margin-bottom: 15px;">Title</h1>
-					
-					<view id="contents-body"></view>
-				</view>
+					<block id="contents-body"></block>
+				</block>
 			</view>
 			<view id="footer" class="bg-gray-dark">
 				<view>

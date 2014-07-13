@@ -457,7 +457,7 @@ var Component = (function() {
 
 			return this;
 		},
-		_abs: function(abs) {
+		abs: function(abs) {
 			var el = this.el;
 			if( !arguments.length ) return el.is('abs');
 			
@@ -659,43 +659,48 @@ var Component = (function() {
 
 		
 		// page mapping by url hash
-		pages: function(pages) {
-			if( !arguments.length ) return this._pages;
-			if( arguments.length === 1 && pages === false ) {
-				pages = this._pages;
-				if( !pages ) return this;
+		routes: function(routes) {
+			if( !arguments.length ) return this._routes;
+			if( arguments.length === 1 && routes === false ) {
+				routes = this._routes;
+				if( !routes ) return this;
 				
-				for(var k in pages) {
-					if( pages.hasOwnProperty(k) ) this.page(k, false);
+				for(var k in routes) {
+					if( routes.hasOwnProperty(k) ) this.route(k, false);
 				}
 				
-				return this;				
-			} else if( typeof(pages) === 'object' ) {
-				for(var k in pages) {
-					if( pages.hasOwnProperty(k)) this.page(k, pages[k]);
+				this.fire('routes.added', routes);
+				return this;	
+			} else if( typeof(routes) === 'object' ) {
+				for(var k in routes) {
+					if( routes.hasOwnProperty(k)) this.route(k, routes[k]);
 				}
+				
+				this.fire('routes.added', routes);
 				return this;
 			} else {
-				return console.error('illegal parameter', pages);
+				return console.error('illegal parameter', routes);
 			}
 		},
-		page: function(hash, fn) {
+		route: function(hash, fn) {
 			if( typeof(hash) === 'string' && fn === false ) {
 				// 해당 hash 만 지움
-				var pages = this._pages;
-				if( !pages ) return this;
+				var routes = this._routes;
+				if( !routes ) return this;
 				
-				var fn = pages[hash];				
+				var fn = routes[hash];				
 				if( fn && fn.listener ) this.off('hash', fn.listener);
 				if( fn && fn.def_listener ) this.off('ready', fn.def_listener);
 								
-				pages[hash] = null;
-				try { delete pages[hash]; } catch(e) {}
+				routes[hash] = null;
+				try { delete routes[hash]; } catch(e) {}
+				
+				this.fire('route.removed', listener);
 				
 				return this;
 			} else if( typeof(hash) === 'string' && typeof(fn) === 'function' ) {
 				// hash 이벤트 등록
-				var pages = this._pages = this._pages || {};
+				var routes = this._routes = this._routes || {};
 				
 				var def_listener = false;
 				if( hash === '@' ) hash = '@default';
@@ -720,6 +725,7 @@ var Component = (function() {
 				}
 				
 				this.on('hash', listener);
+				this.fire('route.added', listener);
 				
 				return this;
 			} else {
@@ -841,7 +847,7 @@ var Component = (function() {
 	Component.translator = function(cmpid) {
 		return function(el, options) {
 			var concrete = this.component(cmpid);
-			if( !concrete ) return console.warn('cannot find component [' + id + ']');
+			if( !concrete ) return console.warn('cannot find component [' + cmpid + ']');
 			return new concrete(options);
 		};
 	};

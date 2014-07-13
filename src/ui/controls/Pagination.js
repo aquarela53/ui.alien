@@ -1,5 +1,5 @@
-UI.Pagination = (function() {
-	"use strict"
+(function() {
+	"use strict";
 
 	function Pagination(options) {
 		this.$super(options);
@@ -10,7 +10,11 @@ UI.Pagination = (function() {
 			var o = this.options;
 			
 			if( o.min || o.min === 0 ) this.min(o.min);
+			else this.min(1);
+			
 			if( o.max || o.max === 0 ) this.max(o.max);
+			else this.max(5);
+			
 			if( o.current || o.current === 0 ) this.current(o.current);
 			if( o.prev ) this.prevButton(o.prev);
 			if( o.next ) this.nextButton(o.next);
@@ -28,14 +32,11 @@ UI.Pagination = (function() {
 			if( (!per && per !== 0 ) || per <= 0 ) per = 10;
 
 			var self = this;
-			this.el.empty();
 
-			var prevButton = $('<span class="page prev">이전</span>');
-			this.el.attach(prevButton);
+			this.el.empty().create('span.page.prev').html('이전');
 
 			for(var i=min; i <= max;i++) {
-				var pageel = $('<span class="page">' + i + '</span>');
-				this.el.attach(pageel);
+				var pageel = this.el.create('span.page').html(i);
 
 				if( i === current ) pageel.ac('selected');
 				
@@ -46,8 +47,7 @@ UI.Pagination = (function() {
 				})(pageel, i);
 			}
 
-			var nextButton = $('<span class="page next">다음</span>');
-			this.el.attach(nextButton);
+			this.el.create('span.page.next').html('다음');
 		},
 		prevButton: function(prev) {
 			if( !arguments.length ) return this._prev;
@@ -116,45 +116,11 @@ UI.Pagination = (function() {
 	};
 	
 	Pagination.style = {
-		'text-align': 'center',
-
-		'> .page': {
-			'display': 'inline-block',
-			'cursor': 'pointer',
-			'margin': '-1px',
-			'padding': '7px 12px 6px',
-			'border': '1px solid',
-			'border-color': '#e5e6e7',
-			'background-color': '#fbfbfb',
-			'font-weight': 'bold',
-			'line-height': '16px',
-			'vertical-align': 'top'
-		},
-		'> .page:hover': {
-			'text-decoration': 'underline',
-			'color': '#080'
-		},
-		'> .page.selected': {
-			'background-color': '#fff',
-			'color': '#080'
-		},
-		'> .prev': {
-			'padding-left': '23px',
-			'background': '#fbfbfb url(data:image/gif;base64,R0lGODlhBQAHAJEAAPz8/ExOVvv7+wAAACH5BAAAAAAALAAAAAAFAAcAAAIKhBMiqLypXpQRFQA7) no-repeat 13px 12px'
-		},
-		'> .prev:hover': {
-			'background': '#fbfbfb url(data:image/gif;base64,R0lGODlhBQAHAIABAAXDAP///yH5BAEAAAEALAAAAAAFAAcAAAIJjAGXgWr+WgQFADs=) no-repeat 13px 12px'
-		},
-		'> .next': {
-			'padding-right': '23px',
-			'background': '#fbfbfb url(data:image/gif;base64,R0lGODlhBQAHAJEAAPz8/ExOVvv7+wAAACH5BAAAAAAALAAAAAAFAAcAAAIKTIRiqZfbEDSgFgA7) no-repeat 41px 12px'
-		},
-		'> .next:hover': {
-			'background': '#fbfbfb url(data:image/gif;base64,R0lGODlhBQAHAIABAAXDAP///yH5BAEAAAEALAAAAAAFAAcAAAIKBIJhqZfbEIShAAA7) no-repeat 41px 12px'
-		}
 	};
 
-	return Pagination = UI.inherit(Pagination, UI.Component);
+	Pagination.fname = 'Pagination';
+	Pagination.translator = Component.translator('pagination');
+	
+	return Pagination = UI.component('pagination', Pagination);
 })();
-
-UI.Pagination = UI.component('pagination', UI.Pagination);
+	

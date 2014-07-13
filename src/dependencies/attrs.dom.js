@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-13 14:15:17
+ * @date: 2014-07-13 19:32:19
 */
 
 /*!
@@ -2931,6 +2931,7 @@ var StyleSession = (function() {
 						var key = keyvalue[0];
 						var value = keyvalue[1];
 						if( typeof(value) === 'string') value = value.trim();
+						
 						this.set(key.trim(), value);
 					}
 				}
@@ -2989,7 +2990,7 @@ var StyleSession = (function() {
 			var calibrated = calibrator.values(o);
 			var merged = calibrated.merged;
 			var buffer = this.buffer;
-
+			
 			if( merged ) {
 				for(var key in merged) {
 					if( !merged.hasOwnProperty(key) ) continue;
@@ -4919,7 +4920,7 @@ var $ = (function() {
 		return this.classes(s, true);
 	};
 		
-	fn.hasClass = function(s) {
+	fn.has = fn.hasClass = function(s) {
 		if( !s || typeof(s) !== 'string' ) return s;
 		s = s.split(' ');
 		

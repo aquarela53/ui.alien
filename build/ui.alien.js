@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-13 14:34:28
+ * @date: 2014-07-13 22:15:10
 */
 
 // es6 shim
@@ -116,7 +116,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-13 14:15:17
+ * @date: 2014-07-13 19:32:19
 */
 
 /*!
@@ -3044,6 +3044,7 @@ var StyleSession = (function() {
 						var key = keyvalue[0];
 						var value = keyvalue[1];
 						if( typeof(value) === 'string') value = value.trim();
+						
 						this.set(key.trim(), value);
 					}
 				}
@@ -3102,7 +3103,7 @@ var StyleSession = (function() {
 			var calibrated = calibrator.values(o);
 			var merged = calibrated.merged;
 			var buffer = this.buffer;
-
+			
 			if( merged ) {
 				for(var key in merged) {
 					if( !merged.hasOwnProperty(key) ) continue;
@@ -5032,7 +5033,7 @@ var $ = (function() {
 		return this.classes(s, true);
 	};
 		
-	fn.hasClass = function(s) {
+	fn.has = fn.hasClass = function(s) {
 		if( !s || typeof(s) !== 'string' ) return s;
 		s = s.split(' ');
 		
@@ -8351,7 +8352,7 @@ var Component = (function() {
 
 			return this;
 		},
-		_abs: function(abs) {
+		abs: function(abs) {
 			var el = this.el;
 			if( !arguments.length ) return el.is('abs');
 			
@@ -8553,43 +8554,48 @@ var Component = (function() {
 
 		
 		// page mapping by url hash
-		pages: function(pages) {
-			if( !arguments.length ) return this._pages;
-			if( arguments.length === 1 && pages === false ) {
-				pages = this._pages;
-				if( !pages ) return this;
+		routes: function(routes) {
+			if( !arguments.length ) return this._routes;
+			if( arguments.length === 1 && routes === false ) {
+				routes = this._routes;
+				if( !routes ) return this;
 				
-				for(var k in pages) {
-					if( pages.hasOwnProperty(k) ) this.page(k, false);
+				for(var k in routes) {
+					if( routes.hasOwnProperty(k) ) this.route(k, false);
 				}
 				
-				return this;				
-			} else if( typeof(pages) === 'object' ) {
-				for(var k in pages) {
-					if( pages.hasOwnProperty(k)) this.page(k, pages[k]);
+				this.fire('routes.added', routes);
+				return this;	
+			} else if( typeof(routes) === 'object' ) {
+				for(var k in routes) {
+					if( routes.hasOwnProperty(k)) this.route(k, routes[k]);
 				}
+				
+				this.fire('routes.added', routes);
 				return this;
 			} else {
-				return console.error('illegal parameter', pages);
+				return console.error('illegal parameter', routes);
 			}
 		},
-		page: function(hash, fn) {
+		route: function(hash, fn) {
 			if( typeof(hash) === 'string' && fn === false ) {
 				// 해당 hash 만 지움
-				var pages = this._pages;
-				if( !pages ) return this;
+				var routes = this._routes;
+				if( !routes ) return this;
 				
-				var fn = pages[hash];				
+				var fn = routes[hash];				
 				if( fn && fn.listener ) this.off('hash', fn.listener);
 				if( fn && fn.def_listener ) this.off('ready', fn.def_listener);
 								
-				pages[hash] = null;
-				try { delete pages[hash]; } catch(e) {}
+				routes[hash] = null;
+				try { delete routes[hash]; } catch(e) {}
+				
+				this.fire('route.removed', listener);
 				
 				return this;
 			} else if( typeof(hash) === 'string' && typeof(fn) === 'function' ) {
 				// hash 이벤트 등록
-				var pages = this._pages = this._pages || {};
+				var routes = this._routes = this._routes || {};
 				
 				var def_listener = false;
 				if( hash === '@' ) hash = '@default';
@@ -8614,6 +8620,7 @@ var Component = (function() {
 				}
 				
 				this.on('hash', listener);
+				this.fire('route.added', listener);
 				
 				return this;
 			} else {
@@ -8735,7 +8742,7 @@ var Component = (function() {
 	Component.translator = function(cmpid) {
 		return function(el, options) {
 			var concrete = this.component(cmpid);
-			if( !concrete ) return console.warn('cannot find component [' + id + ']');
+			if( !concrete ) return console.warn('cannot find component [' + cmpid + ']');
 			return new concrete(options);
 		};
 	};
@@ -8972,7 +8979,7 @@ var Container = (function() {
 						this._items = this._items.splice(at, 0, item);
 					}
 
-					e = this.fire('added', {added:item, index:this.indexOf(item)});
+					e = this.fire('added', {item:item, index:this.indexOf(item)});
 				}
 			}
 
@@ -8987,7 +8994,7 @@ var Container = (function() {
 			this._items = this._items.filter(function(c) {
 				return (c === item) ? false : true;
 			});
-			this.fire('removed', {removed:item, index:index});
+			this.fire('removed', {item:item, index:index});
 
 			return this;
 		},
@@ -9105,6 +9112,107 @@ var Container = (function() {
 			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
 			return selectable.last.apply(this, arguments);
 		}
+	};
+	
+	
+
+	var aaa = function(el, options) {
+		var concrete = this.component('breadcrumb');
+		
+		var items = [];
+		$(el).children('item').each(function() {
+			var el = $(this);
+			items.push({
+				title: el.attr('title'),
+				href: el.attr('href'),
+				html: el.html()
+			});
+		});
+		
+		options.items = items;
+		
+		return new concrete(options);
+	};
+	
+	function default_item_processor() {
+		if( this.tagName && this.tagName.toLowerCase() === 'item' ) {
+			var attributes = this.attributes;
+			var attrs = {};
+			var contentName = '@default', contentType = 'html';
+			for(var i=0; i < attributes.length; i++) {
+				var name = attributes[i].name, n;
+				var value = attributes[i].value;
+		
+				if( (n = name.toLowerCase()).startsWith('data-') ) {
+					if( n === 'data-content-name' ) contentName = value;
+					else if( n === 'data-content-type' ) contentType = value;
+					continue;
+				}
+		
+				attrs[name] = value;
+			}
+			
+			var def = false;
+			if( contentName === '@default' ) {
+				if( attrs.hasOwnProperty('html') ) contentName = null;
+				else contentName = 'html';
+				def = true;
+			}
+			
+			if( contentName ) {
+				if( contentType === 'element' ) {
+					attrs[contentName] = this.children[0];
+				} else if( contentType === 'elements' ) {
+					attrs[contentName] = this.children;
+				} else if( contentType === 'contents' ) {
+					attrs[contentName] = this.childNodes;
+				} else if( contentType == 'html' ) {
+					if( !def ) attrs[contentName] = this.innerHTML;
+					else if( this.innerHTML ) attrs[contentName] = this.innerHTML;
+				} else if( contentType == 'text' ) {
+					attrs[contentName] = this.innerText;
+				} else if( contentType == 'function' ) {
+					eval('attrs[contentName] = ' + this.innerText + ';');
+				} else if( contentType == 'object' ) {
+					eval('attrs[contentName] = ' + this.innerText + ';');
+				} else if( contentType == 'script' ) {
+					eval(this.innerText);
+				} else if( contentType == 'json' ) {
+					attrs[contentName] = JSON.parse(this.innerText);
+				} else {
+					console.error('unknown type of contents', this, contentType);
+				}
+			}
+			
+			return attrs;
+		}
+	}
+	
+	Container.translator = function(cmpid, fn) {
+		if( !fn ) fn = default_item_processor;
+		return function(el, options) {
+			var concrete = this.component(cmpid);
+			if( !concrete ) return console.warn('cannot find component [' + cmpid + ']');
+			
+			var items = [];
+			if( options.items ) {
+				if( typeof(options.items) === 'string' ) items = options.items.split(' ').join(',').split(',');
+				else if( Array.isArray(options.items) ) items = options.items; 
+				
+				options.items = null;
+			}
+			
+			var container = new concrete(options);
+			var children = el.childNodes;
+			
+			for(var i=0; i < children.length; i++) {
+				var c = fn.call(children[i]);				
+				if( c ) items.push(c);
+			}
+		
+			container.items(items);
+			return container;
+		};
 	};
 
 	return Container = Class.inherit(Container, Component);
@@ -9229,7 +9337,7 @@ var Application = (function() {
 			
 			this.cmpmap = new Map();			
 			this.on('added', function(e) {
-				var added = e.added;
+				var added = e.item;
 				
 				var packed;
 				if( o.translation !== false ) packed = this.pack(added);				
@@ -9239,7 +9347,7 @@ var Application = (function() {
 			});
 
 			this.on('removed', function(e) {
-				var packed = this.packed(e.removed);
+				var packed = this.packed(e.item);
 				
 				if( packed instanceof $ ) packed.detach();
 				else if( packed instanceof Component ) packed.detach();
@@ -9320,6 +9428,16 @@ var Application = (function() {
 			
 			var self = this;
 			
+			// preprocessing application tags
+			var fn_application = function() {
+				var options = convert2options(this);
+				options.items = Array.prototype.slice.call(this.childNodes);
+				var application = new Application(options);
+				$(this).before(application.dom()).detach();
+			};
+			if( el.is('application') || el.attr('data-as') === 'application' ) return el.each(fn_application).void();
+			else el.find('application, *[data-as="application"]').each(fn_application);
+			
 			// preprocessing component & on & theme tags
 			var fn_component = function() {
 				var el = $(this);
@@ -9335,28 +9453,18 @@ var Application = (function() {
 				} finally {
 					el.detach();
 				}
-			};			
+			};
 			if( el.is('component') ) return el.each(fn_component).void();
 			else el.find('component').each(fn_component);
 			
-			// preprocessing onhash tags
-			var fn_onhash = function() {
+			// preprocessing route tags
+			var fn_route = function() {
 				var el = $(this);
 				// TODO : 미구현
 				el.detach();
 			};			
-			if( el.is('onhash') ) return el.each(fn_onhash).void();
-			else el.find('onhash').each(fn_onhash);
-			
-			// preprocessing application tags
-			var fn_application = function() {
-				var options = convert2options(this);
-				options.items = Array.prototype.slice.call(this.childNodes);
-				var application = new Application(options);
-				$(this).before(application.dom()).detach();
-			};
-			if( el.is('application') || el.attr('data-as') === 'application' ) return el.each(fn_application).void();
-			else el.find('application, *[data-as="application"]').each(fn_application);
+			if( el.is('route') ) return el.each(fn_route).void();
+			else el.find('route').each(fn_route);
 			
 			// remove defines tag
 			if( el.is('defines') ) return el.detach().void();
@@ -9505,7 +9613,7 @@ var Application = (function() {
 			else if( inherit === 'application' ) inherit = this.Application;
 			else if( typeof(inherit) === 'string' ) inherit = this.component(inherit);
 						
-			if( !inherit ) return console.error('[' + this.applicationId() + '] illegal state, cannot find superclass', inherit);
+			if( !inherit ) return console.error('[' + this.applicationId() + '] cannot find superclass :', cls.inherit);
 			
 			var cmp = Class.inherit(cls, inherit);
 			var style = null;	//this.theme().component(id).reset(cls.style);
@@ -9653,6 +9761,7 @@ var Application = (function() {
 		}
 	};
 	
+	Application.fname = 'Application';
 	Application = Class.inherit(Application, Container);
 	
 	Application.Component = Component;
@@ -10118,15 +10227,15 @@ var ThemeManager = (function() {
 	};
 })();
 
-(function() {	
-	"use strict"
+(function() {
+	"use strict";
 
-	// class view
-	function View(options) {
+	// class Block
+	function Block(options) {
 		this.$super(options);
 	}
 
-	View.prototype = {
+	Block.prototype = {
 		build: function() {
 			var self = this;
 			var o = this.options;
@@ -10135,7 +10244,7 @@ var ThemeManager = (function() {
 
 			// regist event listener
 			this.on('added', function(e) {
-				var added = e.added;
+				var added = e.item;
 				if( added === '-' ) added = new UI.Separator({flex:1});
 				
 				var packed;
@@ -10149,7 +10258,7 @@ var ThemeManager = (function() {
 			});
 
 			this.on('removed', function(e) {
-				var removed = e.removed;
+				var removed = e.item;
 				removed = this.packed(removed);
 				
 				if( removed instanceof $ ) removed.detach();
@@ -10164,16 +10273,47 @@ var ThemeManager = (function() {
 			
 			// call super's build
 			this.$super();
-			
-			// process options
-			if( o.direction ) this.direction(o.direction);
-			if( o.horizontal === true ) this.direction('horizontal');
 		},
 		packed: function(item, cmp) {
 			var cm = this.cmpmap = this.cmpmap || new Map();
 			if( arguments.length == 1 ) return cm.get(item);
 			if( item && cmp ) return cm.set(item, cmp);
 			return null;
+		}
+	};
+
+	Block.style = {
+		'position': 'relative'
+	};
+
+	Block.translator = Container.translator('block', function() {
+		return this.__aui__ || this;
+	});
+	
+	Block.inherit = UI.Container;
+	
+	return Block = UI.component('block', Block);
+})();
+
+(function() {
+	"use strict";
+
+	// class view
+	function View(options) {
+		this.$super(options);
+	}
+
+	View.prototype = {
+		build: function() {
+			var self = this;
+			var o = this.options;
+			
+			// call super's build
+			this.$super();
+			
+			// process options
+			if( o.direction ) this.direction(o.direction);
+			if( o.horizontal === true ) this.direction('horizontal');
 		},
 		direction: function(direction) {
 			var el = this.el;
@@ -10215,23 +10355,11 @@ var ThemeManager = (function() {
 		}
 	};
 	
-	View.translator = function(el, options) {
-		var view = new this.View(options);
-		var children = el.childNodes;
-		var items = [];
-		
-		for(var i=0; i < children.length; i++) {
-			var c = children[i];
-			var cmp = c.__aui__;
-			if( cmp ) items.push(cmp);
-			else items.push(c);
-		}
-		
-		view.add(items);
-		return view;
-	};
+	View.translator = Container.translator('view', function() {
+		return this.__aui__ || this;
+	});
 	
-	View.inherit = UI.Container;
+	View.inherit = 'block';
 	
 	return View = UI.component('view', View);
 })();
@@ -10253,7 +10381,8 @@ var ThemeManager = (function() {
 			if( o.html ) this.html(o.html);	
 		},
 		html: function(html) {
-			this.el.empty().append(this.application().pack(html));
+			this.el.empty();
+			if( html ) this.el.append(this.application().pack(html));
 			return this;
 		},
 		src: function(src) {
@@ -10267,6 +10396,58 @@ var ThemeManager = (function() {
 	Markup.translator = Component.translator('markup');
 	
 	return Markup = UI.component('markup', Markup);
+})();
+
+
+(function() {
+	"use strict";
+
+	function Image(options) {
+		if( typeof(options) === 'string' ) options = {src:options};
+		this.$super(options);
+	}
+
+	Image.prototype = {
+		build: function() {
+			var self = this;
+			var el = this.el;
+			
+			el.on('load', function(e) {
+				self.fire('image.load', e);
+			});
+
+			el.on('error', function(e) {
+				self.fire('image.error', e);
+			});
+
+			el.on('abort', function(e) {
+				self.fire('image.abort', e);
+			});
+			
+			var o = this.options;
+			this.block(((o.block === false) ? false : true));
+			if( o.src ) this.src(o.src);	
+		},
+		src: function(src) {
+			if( !arguments.length ) return this.el.attr('src');
+			
+			if( typeof(src) === 'string' ) this.el.attr('src', this.path(src));
+			return this;
+		},
+		block: function(block) {
+			if( !arguments.length ) return (this.el.style('display') === 'block');
+
+			if( block === true ) this.el.style('display', 'block');
+			else this.el.style('display', false);
+
+			return this;
+		}
+	};
+	
+	Image.tag = 'img';
+	Image.translator = Component.translator('picture');
+	
+	return Image = UI.component('picture', Image);
 })();
 
 
@@ -10322,6 +10503,98 @@ var ThemeManager = (function() {
 (function() {
 	"use strict";
 
+	function Buttons(options) {
+		this.$super(options);
+	}
+
+	Buttons.prototype = {
+		build: function() {
+			var o = this.options;
+			
+			var btns = this.btns = new Map();
+
+			this.on('added', function(e) {
+				var item = e.item;
+
+				var btn = this.el.create('div.button');
+				if( item.disabled ) btn.ac('disabled');
+
+				var w = item.width || item.w;
+				if( typeof(w) === 'number' ) btn.css('width', w + 'px');
+				if( typeof(w) === 'string' ) btn.css('width', w);
+
+				var xw = item.maxWidth || item.xw;
+				if( typeof(xw) === 'number' ) btn.css('max-width', xw + 'px');
+				if( typeof(xw) === 'string' ) btn.css('max-width', xw);
+
+				var mw = item.minWidth || item.mw;
+				if( typeof(mw) === 'number' ) btn.css('min-width', mw + 'px');
+				if( typeof(mw) === 'string' ) btn.css('min-width', mw);
+				
+				if( item.html ) btn.html(item.html);
+				else if( item.image ) btn.html('<img src="' + item.image + '" />');
+				else if( item.text ) btn.html('<span>' + item.text + '</span>');
+				else btn.html('<span>' + item + '</span>');
+				
+				var self = this;
+				btn.on('mousedown', function(e) {
+					self.select(item);
+				});
+				
+				btns.set(item, btn);
+
+				if( item.selected ) this.select(item);
+			});
+			
+			this.on('removed', function(e) {
+				var btn = this.btns.get(e.item);
+				if( btn ) {
+					btn.detach();
+					this.btns.remove(e.item);
+				}
+			});
+
+			this.on('select', function(e) {
+				var btn = this.btns.get(e.item);
+				if( btn.has('disabled') ) return false;
+			});
+
+			this.on('selected', function(e) {
+				var btn = this.btns.get(e.item);
+				if( btn ) {
+					btn.ac('active');						
+					this.fire('active', {
+						originalEvent: e,
+						item: e.item
+					});
+				}
+			});
+
+			this.on('deselected', function(e) {
+				var btn = this.btns.get(e.item);
+				if( btn ) {
+					btn.rc('active');
+					this.fire('deactive', {
+						originalEvent: e,
+						item: e.item
+					});
+				}
+			});
+		}
+	};
+
+	Buttons.style = {};
+	
+	Buttons.inherit = 'container';
+	Buttons.fname = 'Buttons';
+	Buttons.translator = Container.translator('buttons');
+	
+	return Buttons = UI.component('buttons', Buttons);
+})();
+
+(function() {
+	"use strict";
+
 	function Breadcrumb(options) {
 		this.$super(options);
 	}
@@ -10337,7 +10610,7 @@ var ThemeManager = (function() {
 			var ol = el.create('ol.breadcrumbs');
 			
 			this.on('added', function(e) {
-				var item = e.added;
+				var item = e.item;
 
 				var tab = ol.create('li').create('a').attr('href', '#').html((item.html || item.title || 'untitled')).end('li');
 
@@ -10352,7 +10625,7 @@ var ThemeManager = (function() {
 			});
 
 			this.on('removed', function(e) {
-				var tab = map.get(e.removed);
+				var tab = map.get(e.item);
 				if( tab ) tab.detach();
 			});
 
@@ -10371,23 +10644,7 @@ var ThemeManager = (function() {
 	};
 		
 	Breadcrumb.inherit = 'container';
-	Breadcrumb.translator = function(el, options) {
-		var concrete = this.component('breadcrumb');
-		
-		var items = [];
-		$(el).children('item').each(function() {
-			var el = $(this);
-			items.push({
-				title: el.attr('title'),
-				href: el.attr('href'),
-				html: el.html()
-			});
-		});
-		
-		options.items = items;
-		
-		return new concrete(options);
-	};
+	Breadcrumb.translator = Container.translator('breadcrumb');
 	
 	return Breadcrumb = UI.component('breadcrumb', Breadcrumb);
 })();
@@ -10527,53 +10784,212 @@ ol.breadcrumbs li.home a:hover {
 (function() {
 	"use strict";
 
-	function Image(options) {
-		if( typeof(options) === 'string' ) options = {src:options};
+	function Pagination(options) {
 		this.$super(options);
 	}
 
-	Image.prototype = {
+	Pagination.prototype = {
 		build: function() {
-			var self = this;
-			var el = this.el;
-			
-			el.on('load', function(e) {
-				self.fire('image.load', e);
-			});
-
-			el.on('error', function(e) {
-				self.fire('image.error', e);
-			});
-
-			el.on('abort', function(e) {
-				self.fire('image.abort', e);
-			});
-			
 			var o = this.options;
-			this.block(o.block);
-			this.src(o.src);	
-		},
-		src: function(src) {
-			if( !arguments.length ) return this.el.attr('src');
 			
-			if( typeof(src) === 'string' ) this.el.attr('src', this.path(src));
+			if( o.min || o.min === 0 ) this.min(o.min);
+			else this.min(1);
+			
+			if( o.max || o.max === 0 ) this.max(o.max);
+			else this.max(5);
+			
+			if( o.current || o.current === 0 ) this.current(o.current);
+			if( o.prev ) this.prevButton(o.prev);
+			if( o.next ) this.nextButton(o.next);
+		},
+		refresh: function() {
+			var min = this._min;
+			var max = this._max;
+			var current = this._current;
+			var per = this._per;
+			
+			if( !min && min !== 0 ) min = 1;
+			if( (!max && max !== 0) || max <= min ) max = min;
+			if( (!current && current !== 0) || current < min ) current = min;
+			if( current > max ) current = max;
+			if( (!per && per !== 0 ) || per <= 0 ) per = 10;
+
+			var self = this;
+
+			this.el.empty().create('span.page.prev').html('이전');
+
+			for(var i=min; i <= max;i++) {
+				var pageel = this.el.create('span.page').html(i);
+
+				if( i === current ) pageel.ac('selected');
+				
+				(function(pageel, i) {
+					pageel.on('click', function(e) {
+						self.current(i);
+					});
+				})(pageel, i);
+			}
+
+			this.el.create('span.page.next').html('다음');
+		},
+		prevButton: function(prev) {
+			if( !arguments.length ) return this._prev;
+			this._prev = prev;
 			return this;
 		},
-		block: function(block) {
-			if( !arguments.length ) return (this.el.style('display') === 'block');
+		nextButton: function(next) {
+			if( !arguments.length ) return this._next;
+			this._next = next;
+			return this;
+		},
+		min: function(min) {
+			if( !arguments.length ) return this._min;
+			
+			if( typeof(min) === 'string' ) min = parseInt(min);
+			
+			if( typeof(min) === 'number' ) {
+				this._min = min;
+				this.refresh();
+			}
 
-			if( block === true ) this.el.style('display', 'block');
-			else this.el.style('display', false);
+			return this;
+		},
+		per: function(per) {
+			if( !arguments.length ) return this._per;
+			
+			if( typeof(per) === 'string' ) per = parseInt(per);
+			
+			if( typeof(per) === 'number' ) {
+				this._per = per;
+				this.refresh();
+			}
+
+			return this;
+		},
+		max: function(max) {
+			if( !arguments.length ) return this._max;
+			
+			if( typeof(max) === 'string' ) max = parseInt(max);
+			
+			if( typeof(max) === 'number' ) {
+				this._max = max;
+				this.refresh();
+			} else {
+				console.error('WARN:invalid min value');
+			}
+
+			return this;
+		},
+		current: function(current) {
+			if( !arguments.length ) return this._current;
+			
+			if( typeof(current) === 'string' ) current = parseInt(current);
+			
+			if( typeof(current) === 'number' ) {
+				this._current = current;
+				this.refresh();
+
+				this.fire('changed', {current:current, min: this._min, max: this._max});
+			} else {
+				console.error('WARN:invalid min value');
+			}
 
 			return this;
 		}
 	};
 	
-	Image.tag = 'img';
-	Image.translator = Component.translator('picture');
+	Pagination.style = {
+	};
+
+	Pagination.fname = 'Pagination';
+	Pagination.translator = Component.translator('pagination');
 	
-	return Image = UI.component('picture', Image);
+	return Pagination = UI.component('pagination', Pagination);
 })();
+	
+
+(function() {
+	"use strict";
+	
+	function Tabs(options) {
+		this.$super(options);
+	}
+	
+	Tabs.prototype = {
+		build: function() {
+			var map = new Map();
+			
+			// sub dom
+			var ul = this.el.create('ul.tabs');
+			
+			// options
+			var o = this.options;
+			this.tabAlign(o.tabAlign);
+
+			// events			
+			this.on('added', function(e) {
+				var item = e.item;
+
+				var html = '<li>' + 
+					'<a href="javascript:;" class="tab">' + 
+						'<span class="octicon octicon-diff-added"></span>' + 
+						'<span class="title">' + (item.title || 'untitled') + '</span>' + 
+						((item.extra || item.extra === 0) ? '<span class="extra">' + item.extra + '</span>' : '') + 
+					'</a>' + 
+				'</li>';
+
+				var tab = $(html);
+				ul.append(tab);
+
+				map.set(item, tab);
+				
+				var self = this;
+				tab.on('click', function(e) {
+					self.select(item);
+					
+					// execute href action if exists
+					if( item.href ) self.action(item.href);					
+				});
+
+				if( !this.selected() || item.selected ) this.select(item);
+			});
+
+			this.on('removed', function(e) {
+				var tab = map.get(e.item);
+				if( tab ) tab.detach();
+			});
+
+			this.on('selected', function(e) {
+				var tab = map.get(e.item);
+				tab.find('.tab').ac('selected');
+			});
+
+			this.on('deselected', function(e) {
+				var tab = map.get(e.item);
+				tab.find('.tab').rc('selected');
+			});
+
+			this.$super();
+		},
+		tabAlign: function(tabAlign) {
+			if( !arguments.length ) return this.el.hc('bottom') ? 'bottom' : 'top';
+
+			if( tabAlign === 'bottom' ) this.el.rc('top').ac('bottom');
+			else this.el.rc('bottom').ac('top');
+
+			return this;
+		}
+	};
+	
+	Tabs.style = {};
+	
+	Tabs.inherit = 'container';
+	Tabs.fname = 'Tabs';
+	Tabs.translator = Container.translator('tabs');
+	
+	return Tabs = UI.component('tabs', Tabs);
+})();
+
 
 
 	// ends of class definitions

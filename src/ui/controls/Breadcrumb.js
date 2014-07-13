@@ -16,7 +16,7 @@
 			var ol = el.create('ol.breadcrumbs');
 			
 			this.on('added', function(e) {
-				var item = e.added;
+				var item = e.item;
 
 				var tab = ol.create('li').create('a').attr('href', '#').html((item.html || item.title || 'untitled')).end('li');
 
@@ -31,7 +31,7 @@
 			});
 
 			this.on('removed', function(e) {
-				var tab = map.get(e.removed);
+				var tab = map.get(e.item);
 				if( tab ) tab.detach();
 			});
 
@@ -50,23 +50,7 @@
 	};
 		
 	Breadcrumb.inherit = 'container';
-	Breadcrumb.translator = function(el, options) {
-		var concrete = this.component('breadcrumb');
-		
-		var items = [];
-		$(el).children('item').each(function() {
-			var el = $(this);
-			items.push({
-				title: el.attr('title'),
-				href: el.attr('href'),
-				html: el.html()
-			});
-		});
-		
-		options.items = items;
-		
-		return new concrete(options);
-	};
+	Breadcrumb.translator = Container.translator('breadcrumb');
 	
 	return Breadcrumb = UI.component('breadcrumb', Breadcrumb);
 })();

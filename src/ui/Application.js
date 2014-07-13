@@ -116,7 +116,7 @@ var Application = (function() {
 			
 			this.cmpmap = new Map();			
 			this.on('added', function(e) {
-				var added = e.added;
+				var added = e.item;
 				
 				var packed;
 				if( o.translation !== false ) packed = this.pack(added);				
@@ -126,7 +126,7 @@ var Application = (function() {
 			});
 
 			this.on('removed', function(e) {
-				var packed = this.packed(e.removed);
+				var packed = this.packed(e.item);
 				
 				if( packed instanceof $ ) packed.detach();
 				else if( packed instanceof Component ) packed.detach();
@@ -207,6 +207,16 @@ var Application = (function() {
 			
 			var self = this;
 			
+			// preprocessing application tags
+			var fn_application = function() {
+				var options = convert2options(this);
+				options.items = Array.prototype.slice.call(this.childNodes);
+				var application = new Application(options);
+				$(this).before(application.dom()).detach();
+			};
+			if( el.is('application') || el.attr('data-as') === 'application' ) return el.each(fn_application).void();
+			else el.find('application, *[data-as="application"]').each(fn_application);
+			
 			// preprocessing component & on & theme tags
 			var fn_component = function() {
 				var el = $(this);
@@ -222,28 +232,18 @@ var Application = (function() {
 				} finally {
 					el.detach();
 				}
-			};			
+			};
 			if( el.is('component') ) return el.each(fn_component).void();
 			else el.find('component').each(fn_component);
 			
-			// preprocessing onhash tags
-			var fn_onhash = function() {
+			// preprocessing route tags
+			var fn_route = function() {
 				var el = $(this);
 				// TODO : 미구현
 				el.detach();
 			};			
-			if( el.is('onhash') ) return el.each(fn_onhash).void();
-			else el.find('onhash').each(fn_onhash);
-			
-			// preprocessing application tags
-			var fn_application = function() {
-				var options = convert2options(this);
-				options.items = Array.prototype.slice.call(this.childNodes);
-				var application = new Application(options);
-				$(this).before(application.dom()).detach();
-			};
-			if( el.is('application') || el.attr('data-as') === 'application' ) return el.each(fn_application).void();
-			else el.find('application, *[data-as="application"]').each(fn_application);
+			if( el.is('route') ) return el.each(fn_route).void();
+			else el.find('route').each(fn_route);
 			
 			// remove defines tag
 			if( el.is('defines') ) return el.detach().void();
@@ -392,7 +392,7 @@ var Application = (function() {
 			else if( inherit === 'application' ) inherit = this.Application;
 			else if( typeof(inherit) === 'string' ) inherit = this.component(inherit);
 						
-			if( !inherit ) return console.error('[' + this.applicationId() + '] illegal state, cannot find superclass', inherit);
+			if( !inherit ) return console.error('[' + this.applicationId() + '] cannot find superclass :', cls.inherit);
 			
 			var cmp = Class.inherit(cls, inherit);
 			var style = null;	//this.theme().component(id).reset(cls.style);
@@ -540,6 +540,7 @@ var Application = (function() {
 		}
 	};
 	
+	Application.fname = 'Application';
 	Application = Class.inherit(Application, Container);
 	
 	Application.Component = Component;

@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-13 14:34:28
+ * @date: 2014-07-13 18:55:29
 */
 
 // es6 shim
@@ -8735,7 +8735,7 @@ var Component = (function() {
 	Component.translator = function(cmpid) {
 		return function(el, options) {
 			var concrete = this.component(cmpid);
-			if( !concrete ) return console.warn('cannot find component [' + id + ']');
+			if( !concrete ) return console.warn('cannot find component [' + cmpid + ']');
 			return new concrete(options);
 		};
 	};
@@ -9105,6 +9105,99 @@ var Container = (function() {
 			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
 			return selectable.last.apply(this, arguments);
 		}
+	};
+	
+	
+
+	var aaa = function(el, options) {
+		var concrete = this.component('breadcrumb');
+		
+		var items = [];
+		$(el).children('item').each(function() {
+			var el = $(this);
+			items.push({
+				title: el.attr('title'),
+				href: el.attr('href'),
+				html: el.html()
+			});
+		});
+		
+		options.items = items;
+		
+		return new concrete(options);
+	};
+	
+	function default_item_processor() {
+		if( this.tagName && this.tagName.toLowerCase() === 'item' ) {
+			var attributes = this.attributes;
+			var attrs = {};
+			var contentName, contentType = 'element';
+			for(var i=0; i < attributes.length; i++) {
+				var name = attributes[i].name, n;
+				var value = attributes[i].value;
+		
+				if( (n = name.toLowerCase()).startsWith('data-') ) {
+					if( n === 'data-content-name' ) contentName = value;
+					else if( n === 'data-content-type' ) contentType = value;
+					continue;
+				}
+		
+				attrs[name] = value;
+			}
+			
+			if( contentName ) {
+				if( contentType === 'element' ) {
+					attrs[contentName] = this.children[0];
+				} else if( contentType === 'elements' ) {
+					attrs[contentName] = this.children;
+				} else if( contentType === 'contents' ) {
+					attrs[contentName] = this.childNodes;
+				} else if( contentType == 'html' ) {
+					attrs[contentName] = this.innerHTML;
+				} else if( contentType == 'text' ) {
+					attrs[contentName] = this.innerText;
+				} else if( contentType == 'function' ) {
+					eval('attrs[contentName] = ' + this.innerText + ';');
+				} else if( contentType == 'object' ) {
+					eval('attrs[contentName] = ' + this.innerText + ';');
+				} else if( contentType == 'script' ) {
+					eval(this.innerText);
+				} else if( contentType == 'json' ) {
+					attrs[contentName] = JSON.parse(this.innerText);
+				} else {
+					console.error('unknown type of contents', this, contentType);
+				}
+			}
+			
+			return attrs;
+		}
+	}
+	
+	Container.translator = function(cmpid, fn) {
+		if( !fn ) fn = default_item_processor;
+		return function(el, options) {
+			var concrete = this.component(cmpid);
+			if( !concrete ) return console.warn('cannot find component [' + cmpid + ']');
+			
+			var items = [];
+			if( options.items ) {
+				if( typeof(options.items) === 'string' ) items = options.items.split(' ').join(',').split(',');
+				else if( Array.isArray(options.items) ) items = options.items; 
+				
+				options.items = null;
+			}
+			
+			var container = new concrete(options);
+			var children = el.childNodes;
+			
+			for(var i=0; i < children.length; i++) {
+				var c = fn.call(children[i]);				
+				if( c ) items.push(c);
+			}
+		
+			container.items(items);
+			return container;
+		};
 	};
 
 	return Container = Class.inherit(Container, Component);
@@ -9653,6 +9746,7 @@ var Application = (function() {
 		}
 	};
 	
+	Application.fname = 'Application';
 	Application = Class.inherit(Application, Container);
 	
 	Application.Component = Component;
@@ -10118,15 +10212,15 @@ var ThemeManager = (function() {
 	};
 })();
 
-(function() {	
-	"use strict"
+(function() {
+	"use strict";
 
-	// class view
-	function View(options) {
+	// class Block
+	function Block(options) {
 		this.$super(options);
 	}
 
-	View.prototype = {
+	Block.prototype = {
 		build: function() {
 			var self = this;
 			var o = this.options;
@@ -10164,16 +10258,47 @@ var ThemeManager = (function() {
 			
 			// call super's build
 			this.$super();
-			
-			// process options
-			if( o.direction ) this.direction(o.direction);
-			if( o.horizontal === true ) this.direction('horizontal');
 		},
 		packed: function(item, cmp) {
 			var cm = this.cmpmap = this.cmpmap || new Map();
 			if( arguments.length == 1 ) return cm.get(item);
 			if( item && cmp ) return cm.set(item, cmp);
 			return null;
+		}
+	};
+
+	Block.style = {
+		'position': 'relative'
+	};
+
+	Block.translator = Container.translator('block', function() {
+		return this.__aui__ || this;
+	});
+	
+	Block.inherit = UI.Container;
+	
+	return Block = UI.component('block', Block);
+})();
+
+(function() {
+	"use strict";
+
+	// class view
+	function View(options) {
+		this.$super(options);
+	}
+
+	View.prototype = {
+		build: function() {
+			var self = this;
+			var o = this.options;
+			
+			// call super's build
+			this.$super();
+			
+			// process options
+			if( o.direction ) this.direction(o.direction);
+			if( o.horizontal === true ) this.direction('horizontal');
 		},
 		direction: function(direction) {
 			var el = this.el;
@@ -10215,23 +10340,11 @@ var ThemeManager = (function() {
 		}
 	};
 	
-	View.translator = function(el, options) {
-		var view = new this.View(options);
-		var children = el.childNodes;
-		var items = [];
-		
-		for(var i=0; i < children.length; i++) {
-			var c = children[i];
-			var cmp = c.__aui__;
-			if( cmp ) items.push(cmp);
-			else items.push(c);
-		}
-		
-		view.add(items);
-		return view;
-	};
+	View.translator = Container.translator('view', function() {
+		return this.__aui__ || this;
+	});
 	
-	View.inherit = UI.Container;
+	View.inherit = 'block';
 	
 	return View = UI.component('view', View);
 })();
@@ -10371,23 +10484,7 @@ var ThemeManager = (function() {
 	};
 		
 	Breadcrumb.inherit = 'container';
-	Breadcrumb.translator = function(el, options) {
-		var concrete = this.component('breadcrumb');
-		
-		var items = [];
-		$(el).children('item').each(function() {
-			var el = $(this);
-			items.push({
-				title: el.attr('title'),
-				href: el.attr('href'),
-				html: el.html()
-			});
-		});
-		
-		options.items = items;
-		
-		return new concrete(options);
-	};
+	Breadcrumb.translator = Container.translator('breadcrumb');
 	
 	return Breadcrumb = UI.component('breadcrumb', Breadcrumb);
 })();

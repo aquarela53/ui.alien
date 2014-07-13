@@ -30,17 +30,17 @@ var files = [
 	'./src/ui/Theme.js',
 	'./src/ui/ThemeManager.js',
 	'./src/ui/themes/alien.js',
+	'./src/ui/views/Block.js',
 	'./src/ui/views/View.js',
 	'./src/ui/controls/Markup.js',
-	'./src/ui/controls/Button.js',
-	'./src/ui/controls/Breadcrumb.js',
 	'./src/ui/controls/Image.js',
+	'./src/ui/controls/Button.js',
+	'./src/ui/controls/Buttons.js',
+	'./src/ui/controls/Breadcrumb.js',
+	'./src/ui/controls/Pagination.js',
+	'./src/ui/controls/Tabs.js',
 	
 	/*
-	'./src/ui/UI.Container.js',
-	'./src/ui/UI.Attachable.js',
-	'./src/ui/UI.SelectableContainer.js',
-	'./src/ui/UI.SingleSelectableContainer.js',
 	'./src/ui/views/UI.Block.js',
 	'./src/ui/views/UI.View.js',
 	'./src/ui/views/UI.Bar.js',
@@ -90,65 +90,104 @@ module.exports = function(grunt) {
 			}
 		},
 		concat: {
-			options: {
-				separator: '\n\n',
-				stripBanners: true,
-				banner: '/*!\n' + 
-					' * <%= pkg.name %> - <%= pkg.description %> (MIT License)\n' +
-					' * \n' +
-					' * @author: <%= pkg.author.name %> (<%= pkg.author.url %>)\n' + 
-					' * @version: <%= pkg.version %>\n' + 
-					' * @date: <%= grunt.template.today("yyyy-mm-dd H:M:s") %>\n' + 
-					'*/\n\n',
-				process: function(src, filepath) {
-					return src
-						.replace('{pkg.bundleId}', pkg.bundleId || '')
-						.replace('{pkg.name}', pkg.name || '')
-						.replace('{pkg.description}', pkg.description || '')
-						.replace('{pkg.version}', pkg.version || '')
-						.replace('{pkg.author}', JSON.stringify(pkg.author) || '{}')
-						.replace('{pkg.repository}', JSON.stringify(pkg.repository) || '{}')
-						.replace('{pkg.licenses}', JSON.stringify(pkg.licenses) || '{}')
-						.replace('{pkg.dependencies}', JSON.stringify(pkg.dependencies) || '{}')
-						.replace('{pkg.keywords}', JSON.stringify(pkg.keywords) || '{}')
-						.replace('{pkg.bugs}', JSON.stringify(pkg.bugs) || '{}')
-		        }
-			},
-			basic_and_extras: {
-		      files: {
-		        'build/ui.alien.js': files,
-		        'build/ui.alien-<%= pkg.version %>.js': files				
-		      }
-		    }
-		},
-		uglify: {
-			options: {
-				banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-			},
-			dist: {
+			def: {
+				options: {
+					separator: '\n\n',
+					stripBanners: true,
+					banner: '/*!\n' + 
+						' * <%= pkg.name %> - <%= pkg.description %> (MIT License)\n' +
+						' * \n' +
+						' * @author: <%= pkg.author.name %> (<%= pkg.author.url %>)\n' + 
+						' * @version: <%= pkg.version %>\n' + 
+						' * @date: <%= grunt.template.today("yyyy-mm-dd H:M:s") %>\n' + 
+						'*/\n\n',
+					process: function(src, filepath) {
+						return src
+							.replace('{pkg.bundleId}', pkg.bundleId || '')
+							.replace('{pkg.name}', pkg.name || '')
+							.replace('{pkg.description}', pkg.description || '')
+							.replace('{pkg.version}', pkg.version || '')
+							.replace('{pkg.author}', JSON.stringify(pkg.author) || '{}')
+							.replace('{pkg.repository}', JSON.stringify(pkg.repository) || '{}')
+							.replace('{pkg.licenses}', JSON.stringify(pkg.licenses) || '{}')
+							.replace('{pkg.dependencies}', JSON.stringify(pkg.dependencies) || '{}')
+							.replace('{pkg.keywords}', JSON.stringify(pkg.keywords) || '{}')
+							.replace('{pkg.bugs}', JSON.stringify(pkg.bugs) || '{}');
+					}
+				},
 				files: {
-					'build/ui.alien.min.js': ['build/ui.alien.js'],
-					'build/ui.alien-<%= pkg.version %>.min.js': ['build/ui.alien.js']
+					'build/ui.alien.js': files		
+				}
+			},
+			ver: {
+				options: {
+					separator: '\n\n',
+					stripBanners: true,
+					banner: '/*!\n' + 
+						' * <%= pkg.name %> - <%= pkg.description %> (MIT License)\n' +
+						' * \n' +
+						' * @author: <%= pkg.author.name %> (<%= pkg.author.url %>)\n' + 
+						' * @version: <%= pkg.version %>\n' + 
+						' * @date: <%= grunt.template.today("yyyy-mm-dd H:M:s") %>\n' + 
+						'*/\n\n',
+					process: function(src, filepath) {
+						return src
+							.replace('{pkg.bundleId}', pkg.bundleId || '')
+							.replace('{pkg.name}', pkg.name || '')
+							.replace('{pkg.description}', pkg.description || '')
+							.replace('{pkg.version}', pkg.version || '')
+							.replace('{pkg.author}', JSON.stringify(pkg.author) || '{}')
+							.replace('{pkg.repository}', JSON.stringify(pkg.repository) || '{}')
+							.replace('{pkg.licenses}', JSON.stringify(pkg.licenses) || '{}')
+							.replace('{pkg.dependencies}', JSON.stringify(pkg.dependencies) || '{}')
+							.replace('{pkg.keywords}', JSON.stringify(pkg.keywords) || '{}')
+							.replace('{pkg.bugs}', JSON.stringify(pkg.bugs) || '{}');
+					}
+				},
+				files: {
+					'build/ui.alien-<%= pkg.version %>.js': files				
 				}
 			}
+		},
+		uglify: {
+			def: {
+				options: {
+					sourceMap: true,
+					sourceMapName: 'build/ui.alien.map',
+					banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+				},
+				files: {
+					'build/ui.alien.min.js': ['build/ui.alien.js']
+				}
+			},
+			ver: {
+				options: {
+					sourceMap: true,
+					sourceMapName: 'build/ui.alien-<%= pkg.version %>.map',
+					banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+				},
+				files: {
+					'build/ui.alien-<%= pkg.version %>.min.js': ['build/ui.alien.js']
+				}
+			}			
 		},
 		qunit: {
 			files: ['test/**/*.html']
 		},
 		jshint: {
-			files: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
+			files: ['Gruntfile.js', 'build/ui.alien.js'],
 			options: {
 				// options here to override JSHint defaults
 				globals: {
 					console: true,
-					module: true,
+					module: false,
 					document: true
 				}
 			}
 		},
 		watch: {
 			files: ['Gruntfile.js', 'src/**/*'],
-			tasks: ['concat', 'uglify'],
+			tasks: ['concat:def', 'uglify:def']
 		}
 	});
 
@@ -161,6 +200,6 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('refresh', ['http', 'concat', 'uglify']);
 	grunt.registerTask('default', ['concat', 'uglify', 'jshint']);
-	grunt.registerTask('lint', ['http', 'concat', 'uglify', 'jshint']);
+	grunt.registerTask('lint', ['concat:def', 'jshint']);
 	grunt.registerTask('test', ['http', 'concat', 'uglify', 'jshint', 'qunit']);	
 };

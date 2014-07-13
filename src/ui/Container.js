@@ -65,7 +65,7 @@ var Container = (function() {
 						this._items = this._items.splice(at, 0, item);
 					}
 
-					e = this.fire('added', {added:item, index:this.indexOf(item)});
+					e = this.fire('added', {item:item, index:this.indexOf(item)});
 				}
 			}
 
@@ -80,7 +80,7 @@ var Container = (function() {
 			this._items = this._items.filter(function(c) {
 				return (c === item) ? false : true;
 			});
-			this.fire('removed', {removed:item, index:index});
+			this.fire('removed', {item:item, index:index});
 
 			return this;
 		},
@@ -198,6 +198,107 @@ var Container = (function() {
 			if( !selectable ) return console.error('[' + this.accessor() + '] component is not selectable');
 			return selectable.last.apply(this, arguments);
 		}
+	};
+	
+	
+
+	var aaa = function(el, options) {
+		var concrete = this.component('breadcrumb');
+		
+		var items = [];
+		$(el).children('item').each(function() {
+			var el = $(this);
+			items.push({
+				title: el.attr('title'),
+				href: el.attr('href'),
+				html: el.html()
+			});
+		});
+		
+		options.items = items;
+		
+		return new concrete(options);
+	};
+	
+	function default_item_processor() {
+		if( this.tagName && this.tagName.toLowerCase() === 'item' ) {
+			var attributes = this.attributes;
+			var attrs = {};
+			var contentName = '@default', contentType = 'html';
+			for(var i=0; i < attributes.length; i++) {
+				var name = attributes[i].name, n;
+				var value = attributes[i].value;
+		
+				if( (n = name.toLowerCase()).startsWith('data-') ) {
+					if( n === 'data-content-name' ) contentName = value;
+					else if( n === 'data-content-type' ) contentType = value;
+					continue;
+				}
+		
+				attrs[name] = value;
+			}
+			
+			var def = false;
+			if( contentName === '@default' ) {
+				if( attrs.hasOwnProperty('html') ) contentName = null;
+				else contentName = 'html';
+				def = true;
+			}
+			
+			if( contentName ) {
+				if( contentType === 'element' ) {
+					attrs[contentName] = this.children[0];
+				} else if( contentType === 'elements' ) {
+					attrs[contentName] = this.children;
+				} else if( contentType === 'contents' ) {
+					attrs[contentName] = this.childNodes;
+				} else if( contentType == 'html' ) {
+					if( !def ) attrs[contentName] = this.innerHTML;
+					else if( this.innerHTML ) attrs[contentName] = this.innerHTML;
+				} else if( contentType == 'text' ) {
+					attrs[contentName] = this.innerText;
+				} else if( contentType == 'function' ) {
+					eval('attrs[contentName] = ' + this.innerText + ';');
+				} else if( contentType == 'object' ) {
+					eval('attrs[contentName] = ' + this.innerText + ';');
+				} else if( contentType == 'script' ) {
+					eval(this.innerText);
+				} else if( contentType == 'json' ) {
+					attrs[contentName] = JSON.parse(this.innerText);
+				} else {
+					console.error('unknown type of contents', this, contentType);
+				}
+			}
+			
+			return attrs;
+		}
+	}
+	
+	Container.translator = function(cmpid, fn) {
+		if( !fn ) fn = default_item_processor;
+		return function(el, options) {
+			var concrete = this.component(cmpid);
+			if( !concrete ) return console.warn('cannot find component [' + cmpid + ']');
+			
+			var items = [];
+			if( options.items ) {
+				if( typeof(options.items) === 'string' ) items = options.items.split(' ').join(',').split(',');
+				else if( Array.isArray(options.items) ) items = options.items; 
+				
+				options.items = null;
+			}
+			
+			var container = new concrete(options);
+			var children = el.childNodes;
+			
+			for(var i=0; i < children.length; i++) {
+				var c = fn.call(children[i]);				
+				if( c ) items.push(c);
+			}
+		
+			container.items(items);
+			return container;
+		};
 	};
 
 	return Container = Class.inherit(Container, Component);

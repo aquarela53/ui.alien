@@ -14,7 +14,8 @@
 			if( o.html ) this.html(o.html);	
 		},
 		html: function(html) {
-			this.el.empty().append(this.application().pack(html));
+			this.el.empty();
+			if( html ) this.el.append(this.application().pack(html));
 			return this;
 		},
 		src: function(src) {

@@ -24,8 +24,8 @@
 			});
 			
 			var o = this.options;
-			this.block(o.block);
-			this.src(o.src);	
+			this.block(((o.block === false) ? false : true));
+			if( o.src ) this.src(o.src);	
 		},
 		src: function(src) {
 			if( !arguments.length ) return this.el.attr('src');
