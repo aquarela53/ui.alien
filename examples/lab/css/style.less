@@ -71,6 +71,9 @@ body {
 	box-sizing: border-box;
 	padding: 0;
 	margin: 0;
+
+	user-select: none;
+	-webkit-user-select: none;
 	
 	a {
 		color: #4183c4;
@@ -255,7 +258,10 @@ body {
 
 // Button
 .aui.button {
+	position: relative;
 	display: inline-block;
+	margin: 8px 0;
+	
 	cursor: hand;
 	cursor: pointer;
 	min-height: 32;
@@ -279,6 +285,7 @@ body {
 	position: relative;
 	display: inline-block;
 	margin: 8px 0;
+	vertical-align: middle;
 	
 	& > .button {
 		display: inline-block;
@@ -374,10 +381,10 @@ body {
 }
 
 .aui.pagination {
-	text-align: center;
-	user-select: none;
-	-webkit-user-select: none;
+	position: relative;
+	display: inline-block;
 	margin: 8px 0;
+	vertical-align: middle;
 
 	& > .page {
 		display: inline-block;
@@ -389,7 +396,6 @@ body {
 		background-color: #fbfbfb;
 		font-weight: bold;
 		line-height: 16px;
-		vertical-align: top;
 	}
 	& > .page:hover {
 		text-decoration: underline;
@@ -429,18 +435,21 @@ body {
 
 // breadchrumb
 .aui.breadcrumb {
-	border: 1px solid #ddd;
+	position: relative;
+	display: inline-block;
+	margin: 8px 0;
+	vertical-align: middle;
+	
+	border: 1px solid @color-border;
 	border-radius: 6px;
 	
 	.breadcrumbs {
-		list-style-type: none;
 		list-style: none;
 		padding: 0;
-		margin-bottom: 18px;
 		background: none;
 		height: 38px;
+		line-height: 38px;
 		overflow: hidden;
-		line-height: 3em;
 		margin: 0;
 		font-weight: bold;
 		text-shadow: 0 1px 0 #fff;
