@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-13 8:50:35
+ * @date: 2014-07-13 14:34:28
 */
 
 // es6 shim
@@ -116,7 +116,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-13 5:9:37
+ * @date: 2014-07-13 14:15:17
 */
 
 /*!
@@ -4994,8 +4994,8 @@ var $ = (function() {
 			var arr = [];
 			this.each(function() {
 				arr.push(this.className.trim().split(' '));
-			});			
-			return arr;
+			});
+			return array_return(arr);
 		}
 				
 		return this.each(function() {			
@@ -8279,9 +8279,7 @@ var Component = (function() {
 		},
 		classes: function(classes) {
 			var cls = this.constructor;
-			var accessor;
-			if( cls === Application || cls.prototype instanceof Application ) accessor = this.accessor(); 
-			else accessor = cls.accessor();
+			var accessor = cls.accessor();
 			
 			var el = this.el;
 			
@@ -8982,9 +8980,7 @@ var Container = (function() {
 		},
 		remove: function(index) {
 			var item = this.get(index);
-			var index = this.indexOf(item);
-				
-			
+			var index = this.indexOf(item);			
 
 			if( !item ) return;
 			
@@ -9182,7 +9178,7 @@ var Application = (function() {
 			
 			if( debug('loader') ) console.info('[' + this.accessor() + '] loaded', {data:data, type:type, url:url, xhr:xhr});
 			if( typeof(data) === 'string' && type === 'html' ) {
-				data = $(data).array();
+				data = $.html(data).array();
 			} else if( type === 'json' ) {
 				data = (typeof(data) === 'string') ? evaljson(data) : data;
 			} else if( type === 'js' ) {
@@ -9269,8 +9265,7 @@ var Application = (function() {
 		selector: function(selector) {
 			// request : div#id.a.b.c[name="name"]
 			// accessor : .app-x.application
-			// result = div#id.app-x.application.a.b.c[name="name"]
-			
+			// result = div#id.app-x.application.a.b.c[name="name"]			
 			selector = selector || '*';
 			var appaccessor = this.applicationAccessor();
 			if( selector === '*' ) return appaccessor;
@@ -9287,33 +9282,6 @@ var Application = (function() {
 		applicationAccessor: function() {
 			return this._accessor;
 		},
-		accessor: function() {
-			return this._accessor + '.application';
-		},
-		application: function() {
-			return this;
-		},
-		
-		origin: function(origin) {
-			if( !arguments.length ) return this._origin || location.href;			
-			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);			
-			this._origin = Path.join(location.href, origin);
-			return this;
-		},
-		base: function(base) {
-			if( !arguments.length ) return this._base || Path.dir(this._origin || location.href);
-			
-			if( !base ) this.base(Path.dir(origin));
-			else if( base && typeof(base) === 'string' ) base = Path.join(location.href, base);
-			else return console.error('invalid base', base);
-			
-			base = base.trim();
-			if( !base.endsWith('/') ) base = base + '/';
-			this._base = base;
-			
-			return this;
-		},
-		
 		icons: function(icons) {
 			if( !arguments.length ) return this._icons;
 			if( typeof(icons) === 'string' ) icons = {'default': icons};
@@ -9493,23 +9461,6 @@ var Application = (function() {
 		
 
 		// theme & components
-		theme: function(name) {
-			/*if( !this._themes ) this._themes = {};
-
-			var themes = this._themes;
-			var theme = themes[name];
-			if( !theme ) theme = themes[name] = new Theme(this, name);
-			
-			return theme;*/
-			//TODO: 지정된 테마를 기본테마로 변경
-			if( !arguments.length ) return this.themes().current();
-			
-			if( !this.themes().current(name) ) {
-				console.warn('[' + this.applicationId() + '] not exists theme name', name);
-			}
-			
-			return this;
-		},
 		themes: function() {
 			return this._themes;
 		},
@@ -9561,18 +9512,32 @@ var Application = (function() {
 			var acceptable = cls.acceptable;
 			acceptable = (acceptable === false) ? false : true;
 			
-			var ids = [id];
-			for(var c = cmp;c = c.superclass();) {
-				if( typeof(c.id) === 'function' ) {
-					if(c.id()) ids.push(c.id());
-				}
+			var classes = [id];
+			if( cls.classes !== false ) {
+				if( typeof(cls.classes) === 'string' ) {
+					var arg = cls.classes.split(' ');
+					arg.forEach(function(s) {
+						if( s ) classes.push(s);
+					});
+				} else {
+					for(var c = cmp;c = c.superclass();) {
+						if( typeof(c.id) === 'function' ) {
+							if(c.id()) classes.push(c.id());
+						}
 				
-				if( typeof(c.acceptable) === 'function' && !c.acceptable() ) acceptable = false;
-				if( !c.superclass ) break;
+						if( typeof(c.acceptable) === 'function' && !c.acceptable() ) acceptable = false;
+						if( !c.superclass ) break;
+					}
+				}
 			}
 			
-			var accessor = (this.applicationAccessor() + '.' + ids.reverse().join('.')).trim();
+			var accessor = (this.applicationAccessor() + '.' + classes.reverse().join('.')).trim();
+			classes = classes.join(' ');
 			
+			cmp.classes = function() {
+				if( arguments.length ) return console.error('illegal operation cannot set class to component\'s concrete');
+				return classes;	
+			};
 			cmp.application = function() {
 				return self;
 			};
@@ -9597,11 +9562,11 @@ var Application = (function() {
 			
 			this._cmps[id] = cmp;				
 			if( fname ) {
-				//if( this[fname] ) {
-					//console.warn('[' + this.applicationId() + '] component fname conflict, so overwrited. before=', this[cmp.fname()], '/after=', cmp);
-					//} else {
+				if( this[fname] ) {
+					console.warn('[' + this.applicationId() + '] component fname conflict, so overwrited. before=', this[cmp.fname()], '/after=', cmp);
+				} else {
 					this[fname] = cmp;
-					//}
+				}
 			} else {
 				console.warn('[' + this.applicationId() + '] function name was empty', fname);
 			}
@@ -9626,6 +9591,58 @@ var Application = (function() {
 		},
 		
 		// override
+		classes: function(classes) {
+			var cls = this.constructor;
+			var accessor = this.accessor(); 
+			
+			var el = this.el;
+			
+			if( !arguments.length ) {
+				var args = accessor.split('.');
+				return 'application ' + el.classes().filter(function(item) {
+					return !~args.indexOf(item);
+				}).join(' ');
+			}
+			
+			el.classes(accessor.split('.').join(' '));
+			if( classes && typeof(classes) === 'string' ) el.ac(classes);
+			return this;
+		},
+		application: function() {
+			return this;
+		},
+		accessor: function() {
+			return this._accessor + '.application';
+		},
+		origin: function(origin) {
+			if( !arguments.length ) return this._origin || location.href;			
+			if( typeof(origin) !== 'string' ) return console.error('invalid origin', origin);			
+			this._origin = Path.join(location.href, origin);
+			return this;
+		},
+		base: function(base) {
+			if( !arguments.length ) return this._base || Path.dir(this._origin || location.href);
+			
+			if( !base ) this.base(Path.dir(origin));
+			else if( base && typeof(base) === 'string' ) base = Path.join(location.href, base);
+			else return console.error('invalid base', base);
+			
+			base = base.trim();
+			if( !base.endsWith('/') ) base = base + '/';
+			this._base = base;
+			
+			return this;
+		},
+		theme: function(name) {
+			//TODO: 지정된 테마를 기본테마로 변경
+			if( !arguments.length ) return this.themes().current();
+			
+			if( !this.themes().current(name) ) {
+				console.warn('[' + this.applicationId() + '] not exists theme name', name);
+			}
+			
+			return this;
+		},
 		items: function(items) {
 			if( typeof(items) === 'string' ) items = this.load(items);
 			if( typeof(items) === 'function' ) {
@@ -10132,7 +10149,6 @@ var ThemeManager = (function() {
 			});
 
 			this.on('removed', function(e) {
-				console.log('removed', e.removed);
 				var removed = e.removed;
 				removed = this.packed(removed);
 				
@@ -10290,101 +10306,9 @@ var ThemeManager = (function() {
 			return this;
 		}
 	};
-
-	Button.style = {
-		'cursor': ['hand', 'pointer'],
-		'min-height': 32,
-		'color': '#f6f6f6',
-		'background-color': 'transparent',
-		
-		'.inner': {
-			'display': 'table',
-			'table-layout': 'fixed',
-			'width': '100%',
-			'height': '100%'
-		},
-		'.text': {
-			'display': 'table-cell',
-			'box-sizing': 'border-box',
-			'vertical-align': 'middle',
-			'width': '100%',
-			'height': '100%',
-			'text-align': 'center',
-			'letter-spacing': 0,
-			'font-weight': 'bold',
-			'font-size': 12,
-			'line-height': 12,
-			'padding': '9px'
-		},
-		
-		'..glass': {
-			':hover': {
-				'background-image': 'linear-gradient(top, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 51%)'
-			}
-		},
-
-		':hover': {
-			'background-image': 'linear-gradient(top, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%)'
-		},
-		
-		'..grey': {
-			'background-color': '#2e2e2e'
-		},
-		'..grey.dark': {
-			'background-color': '#232323'
-		},
-		'..green': {
-			'background-color': '#1f7e5c'
-		},
-		'..green.dark': {
-			'background-color': '#1a664a'
-		},
-		'..red': {
-			'background-color': '#e66c69'
-		},
-		'..red.dark': {
-			'background-color': '#b85655'
-		},
-		'..yellow': {
-			'background-color': '#daa571'
-		},
-		'..yellow.dark': {
-			'background-color': '#af845a'
-		},
-		'..blue': {
-			'background-color': '#5b9aa9'
-		},
-		'..blue.dark': {
-			'background-color': '#497b86'
-		},
-		'..purple': {
-			'background-color': '#6b5b8c'
-		},
-		'..purple.dark': {
-			'background-color': '#554971'
-		},
-		'..wine': {
-			'background-color': '#8b5d79'
-		},
-		'..wine.dark': {
-			'background-color': '#704a61'
-		},
-		'..twitter': {
-			'background-color': '#2589c5'
-		},
-		'..twitter.dark': {
-			'background-color': '#0067bc'
-		},
-		'..facebook': {
-			'background-color': '#3b5999'
-		},
-		'..facebook.dark': {
-			'background-color': '#2f4785'
-		}
-	};
 	
 	Button.translator = function(el, attrs) {
-		attrs.text = el.innerText;
+		attrs.text = attrs.text || el.innerText;
 		return new this.Button(attrs);
 	};
 	

@@ -385,9 +385,7 @@ var Component = (function() {
 		},
 		classes: function(classes) {
 			var cls = this.constructor;
-			var accessor;
-			if( cls === Application || cls.prototype instanceof Application ) accessor = this.accessor(); 
-			else accessor = cls.accessor();
+			var accessor = cls.accessor();
 			
 			var el = this.el;
 			

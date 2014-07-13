@@ -73,9 +73,7 @@ var Container = (function() {
 		},
 		remove: function(index) {
 			var item = this.get(index);
-			var index = this.indexOf(item);
-				
-			
+			var index = this.indexOf(item);			
 
 			if( !item ) return;
 			

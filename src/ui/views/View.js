@@ -29,7 +29,6 @@
 			});
 
 			this.on('removed', function(e) {
-				console.log('removed', e.removed);
 				var removed = e.removed;
 				removed = this.packed(removed);
 				

@@ -1,6 +1,13 @@
-<h1>Reservation</h1>
-<application style="border:1px solid blue;">
-	<view horizontal="true">
-		<timetable cols="room1,room2,room3" rows="date"></timetable>
-	</view>
-</application>
+<view>
+	<timetable cols="room1,room2,room3,room4" rows="date">
+		<option name="mapper" content="object">
+			{
+				col: function(data) {
+					var booked = data.booked;
+				},
+				row: function(data) {
+				}
+			}
+		</option>
+	</timetable>
+</view>

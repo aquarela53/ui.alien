@@ -3,7 +3,7 @@
  * 
  * @author: joje (https://github.com/joje6)
  * @version: 0.1.0
- * @date: 2014-07-13 5:9:37
+ * @date: 2014-07-13 14:15:17
 */
 
 /*!
@@ -4881,8 +4881,8 @@ var $ = (function() {
 			var arr = [];
 			this.each(function() {
 				arr.push(this.className.trim().split(' '));
-			});			
-			return arr;
+			});
+			return array_return(arr);
 		}
 				
 		return this.each(function() {			
