@@ -145,8 +145,80 @@ body {
 }
 
 // Button
-.aui.btn {
+.aui.button {
 	display: inline-block;
+	cursor: hand;
+	cursor: pointer;
+	min-height: 32;
+	color: #f6f6f6;
+	background-color: transparent;
+	
+	.inner {
+		padding: 8px 10px;
+	}
+
+	&:hover {
+		background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%);
+	}
+	
+	&.glass {
+		background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 50%,rgba(255, 255, 255, 0) 51%);
+	}
+	
+	&.grey {
+		background-color: #2e2e2e;
+	}
+	&.grey.dark {
+		background-color: #232323;
+	}
+	&.green {
+		background-color: #1f7e5c;
+	}
+	&.green.dark {
+		background-color: #1a664a;
+	}
+	&.red {
+		background-color: #e66c69;
+	}
+	&.red.dark {
+		background-color: #b85655;
+	}
+	&.yellow {
+		background-color: #daa571;
+	}
+	&.yellow.dark {
+		background-color: #af845a;
+	}
+	&.blue {
+		background-color: #5b9aa9;
+	}
+	&.blue.dark {
+		background-color: #497b86;
+	}
+	&.purple {
+		background-color: #6b5b8c;
+	}
+	&.purple.dark {
+		background-color: #554971;
+	}
+	&.wine {
+		background-color: #8b5d79;
+	}
+	&.wine.dark {
+		background-color: #704a61;
+	}
+	&.twitter {
+		background-color: #2589c5;
+	}
+	&.twitter.dark {
+		background-color: #0067bc;
+	}
+	&.facebook {
+		background-color: #3b5999;
+	}
+	&.facebook.dark {
+		background-color: #2f4785;
+	}
 }
 
 // SideNavigation
